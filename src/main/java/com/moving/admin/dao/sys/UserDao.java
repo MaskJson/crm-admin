@@ -11,4 +11,6 @@ import java.util.List;
 public interface UserDao extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     @Query("from User where username=:username and password=:password")
     List<User> login(@Param("username") String username, @Param("password") String password);
+
+    User findByUsername(String userName);
 }

@@ -41,6 +41,7 @@ public class RoleController {
     private PermissionService permissionService;
 
     @ApiOperation(value = "获取全部角色")
+    @GetMapping("/getAllList")
     public Result<Object> roleGetAll() throws Exception {
         List<Role> list = roleService.getAll();
         return ResultUtil.success(list);

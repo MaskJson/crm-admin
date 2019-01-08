@@ -27,6 +27,8 @@ public class User extends BaseEntity {
 
     private String avatar = "https://s1.ax1x.com/2018/05/19/CcdVQP.png";
 
+    private Integer type;
+
     @ApiModelProperty(value = "状态：0正常， -1禁用")
     private Integer status;
 
