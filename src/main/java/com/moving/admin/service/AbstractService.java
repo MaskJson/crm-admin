@@ -23,19 +23,12 @@ public class AbstractService {
             throw new WebException(401, "未登录", null);
         }
         Map<String, Object> map = jwtUtil.decode(jwt, TokenInformation.class);
-        if (map == null) {
-            throw new WebException(401, "未登录", null);
-        }
         TokenInformation token = (TokenInformation) map.get("token");
         boolean overtime = (boolean) map.get("overtime");
-        if (token == null) {
-            throw new WebException(401, "未登录", null);
-        }
         if (overtime) {
             throw new WebException(401, "登录超时", null);
         }
         return token.getId();
-
     }
 
     public Timestamp now() {

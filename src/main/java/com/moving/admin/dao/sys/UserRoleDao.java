@@ -12,7 +12,8 @@ public interface UserRoleDao extends JpaRepository<UserRole, Long>, JpaSpecifica
 
     List<UserRole> findByUserId(Long userId);
 
-    List<UserRole> findByRoleId(Long roleId);
+    @Query("from UserRole where roleId=:roleId")
+    List<UserRole> findByRoleId(@Param("roleId") Long roleId);
 
     @Query(" select roleId from UserRole where userId=:userId")
     List<Long> findRoleIdsByUserId(@Param("userId") Long userId);

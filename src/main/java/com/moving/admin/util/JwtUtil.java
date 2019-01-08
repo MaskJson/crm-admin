@@ -7,6 +7,7 @@ import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.moving.admin.exception.WebException;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWTSigner;
@@ -83,7 +84,7 @@ public class JwtUtil {
             }
             return null;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             return null;
         }
     }

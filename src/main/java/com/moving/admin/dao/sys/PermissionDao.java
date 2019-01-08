@@ -9,7 +9,12 @@ import java.util.List;
 public interface PermissionDao extends JpaRepository<Permission, Long>, JpaSpecificationExecutor<Permission> {
     List<Permission> findByIdIn(List<Long> permissionIdList);
 
+    List<Permission> findByTypeAndStatusOrderBySortOrder(Integer type, Integer status);
+
+    List<Permission> findByTitle(String title);
+
     List<Permission> findByParentIdOrderBySortOrder(Long parentId);
 
     List<Permission> findByLevelOrderBySortOrder(Integer level);
+
 }

@@ -13,6 +13,7 @@ public class UserService {
     @Autowired
     private UserDao userDao;
 
+    // 登录
     public User login(String username, String password) {
         List<User> list = userDao.login(username, password);
         if (list.size() > 0) {
@@ -21,7 +22,6 @@ public class UserService {
             result.setId(user.getId());
             result.setNickName(user.getNickName());
             result.setAvatar(user.getAvatar());
-            result.setRoleId(user.getRoleId());
             return result;
         }
 

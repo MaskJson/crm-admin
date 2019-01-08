@@ -100,14 +100,14 @@ public class Test {
     @RequestMapping(value = "/order-detail", method = RequestMethod.GET)
     public Result<Order> getDetailById(Long id) {
     	System.err.println(id);
-    	return ResultUtil.getResult(testService.getDetail(id));
+    	return ResultUtil.success(testService.getDetail(id));
     }
     
     @IgnoreSecurity
     @RequestMapping(value = "/json", method = RequestMethod.POST)
     public Result<Object> jsonTest(@RequestBody Map<String, Object> map) {
     	System.err.println(map.get("hobbies"));
-    	return ResultUtil.getResult(null);
+    	return ResultUtil.success(null);
     }
     
     @IgnoreSecurity

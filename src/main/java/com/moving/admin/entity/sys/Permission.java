@@ -18,7 +18,10 @@ public class Permission extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @ApiModelProperty(value = "菜单名称")
+    @ApiModelProperty(value = "类型 0页面 1具体操作")
+    private Integer type;
+
+    @ApiModelProperty(value = "路由name")
     private String name;
 
     @ApiModelProperty(value = "层级")
@@ -27,7 +30,7 @@ public class Permission extends BaseEntity {
     @ApiModelProperty(value = "标题")
     private String title;
 
-    @ApiModelProperty(value = "页面父组件")
+    @ApiModelProperty(value = "路由路径")
     @Column(nullable = false)
     private String path;
 
@@ -44,9 +47,28 @@ public class Permission extends BaseEntity {
     @Column(precision = 10, scale = 2)
     private BigDecimal sortOrder;
 
+    @ApiModelProperty(value = "是否启用")
+    private Integer status;
+
     // @Transient表示不是表的字段
     @Transient
     @ApiModelProperty(value = "子菜单/权限")
     private List<Permission> children;
+
+    @Transient
+    @ApiModelProperty(value = "页面拥有的权限类型")
+    private List<String> permTypes;
+
+    @Transient
+    @ApiModelProperty(value = "节点展开 前端所需")
+    private Boolean expand = true;
+
+    @Transient
+    @ApiModelProperty(value = "是否勾选 前端所需")
+    private Boolean checked = false;
+
+    @Transient
+    @ApiModelProperty(value = "是否选中 前端所需")
+    private Boolean selected = false;
 
 }

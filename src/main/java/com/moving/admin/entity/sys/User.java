@@ -6,6 +6,8 @@ import io.swagger.models.auth.In;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -23,12 +25,21 @@ public class User extends BaseEntity {
 
     private String nickName;
 
-    private String avatar;
+    private String avatar = "https://s1.ax1x.com/2018/05/19/CcdVQP.png";
 
-    @ApiModelProperty(value = "角色类型")
-    private Integer roleId;
-
-    @ApiModelProperty(value = "状态：1正常， 0禁用")
+    @ApiModelProperty(value = "状态：0正常， -1禁用")
     private Integer status;
+
+    private Date createTime;
+
+    private Date updateTime;
+
+    @Transient
+    @ApiModelProperty(value = "用户拥有角色")
+    private List<Role> roles;
+
+    @Transient
+    @ApiModelProperty(value = "用户拥有的权限")
+    private List<Permission> permissions;
 
 }
