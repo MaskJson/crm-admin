@@ -49,7 +49,7 @@ public class UserController extends AbstractController {
 
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", dataType = "String", name = "username", value = "用户名"),
-            @ApiImplicitParam(paramType = "query", dataType = "Long", name = "password", value = "密码")
+            @ApiImplicitParam(paramType = "query", dataType = "String", name = "password", value = "密码")
     })
     @ApiOperation("系统用户登录")
     @IgnoreSecurity
@@ -126,7 +126,7 @@ public class UserController extends AbstractController {
             return ResultUtil.error("添加失败");
         }
         if (mgrUserTemp.getRoles() != null && mgrUserTemp.getRoles().size() > 0) {
-            //添加角色
+            // 添加角色
             for (Role role : mgrUserTemp.getRoles()) {
                 UserRole userRole = new UserRole();
                 userRole.setUserId(mgrUser.getId());
@@ -140,12 +140,12 @@ public class UserController extends AbstractController {
     @ApiOperation(value = "修改资料", notes = "需要通过id获取原用户信息 需要username更新缓存")
     @Transactional
     @PostMapping("/edit")
-    public Result<Object> edit(@RequestBody User user) {
+    public Result<Object> edit(@RequestBody User user) throws Exception {
         if (StringUtils.isEmpty(user.getUsername()) || user.getRoles() == null) {
             return ResultUtil.error("缺少必需表单字段:用户名、角色");
         }
         User oldUser = userService.get(user.getId());
-        //所修改了用户名
+        // 所修改了用户名
         if (!oldUser.getUsername().equals(user.getUsername())) {
             //判断新用户名是否存在
             if (userService.findByUsername(user.getUsername()) != null) {
@@ -158,10 +158,10 @@ public class UserController extends AbstractController {
         if (mgrUser == null) {
             return ResultUtil.error("修改失败");
         }
-        //删除该用户角色
+        // 删除该用户角色
         roleService.deleteRolesByUserId(user.getId());
         if (user.getRoles() != null && user.getRoles().size() > 0) {
-            //新角色
+            // 新角色
             for (Role role : user.getRoles()) {
                 UserRole ur = new UserRole();
                 ur.setRoleId(role.getId());
@@ -169,7 +169,31 @@ public class UserController extends AbstractController {
                 roleService.saveUserRole(ur);
             }
         }
-        //手动删除缓存
+        // 手动删除缓存
+        return ResultUtil.success(null);
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "Long", name = "id", value = "id"),
+            @ApiImplicitParam(paramType = "query", dataType = "int", name = "password", value = "状态")
+    })
+    @ApiOperation(value = "修改用户状态")
+    @PostMapping("/editStatus")
+    public Result editStatus(Long id, Integer status) throws Exception {
+        User user = new User();
+        user.setId(id);
+        user.setStatus(status);
+        userService.update(user);
+        return ResultUtil.success(null);
+    }
+
+    @ApiOperation(value = "批量删除用户")
+    @Transactional
+    @DeleteMapping("/delByIds/{ids}")
+    public Result deleteUser(@PathVariable Long[] ids) throws Exception {
+        for (Long id: ids) {
+            userService.delete(id);
+        }
         return ResultUtil.success(null);
     }
 }

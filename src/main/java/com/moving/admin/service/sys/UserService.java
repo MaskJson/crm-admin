@@ -1,5 +1,6 @@
 package com.moving.admin.service.sys;
 
+import com.moving.admin.dao.sys.UserRoleDao;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.sys.Role;
 import com.moving.admin.entity.sys.Permission;
@@ -22,6 +23,9 @@ public class UserService extends AbstractService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private UserRoleDao userRoleDao;
 
     @Autowired
     private RoleService roleService;
@@ -104,4 +108,8 @@ public class UserService extends AbstractService {
         return userDao.save(u);
     }
 
+    public void delete(Long id) {
+        userDao.deleteById(id);
+        userRoleDao.deleteByUserId(id);
+    }
 }
