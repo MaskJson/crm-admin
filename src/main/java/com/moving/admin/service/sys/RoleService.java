@@ -1,8 +1,6 @@
 package com.moving.admin.service.sys;
 
-import com.moving.admin.dao.sys.UserRoleDao;
 import com.moving.admin.entity.sys.Role;
-import com.moving.admin.entity.sys.UserRole;
 import com.moving.admin.dao.sys.RoleDao;
 import com.moving.admin.service.AbstractService;
 
@@ -23,28 +21,8 @@ public class RoleService extends AbstractService {
     @Autowired
     private RoleDao roleDao;
 
-    @Autowired
-    private UserRoleDao userRoleDao;
-
-    public List<Role> findRolesByUserId(Long userId) {
-        List<Long> roleIds = userRoleDao.findRoleIdsByUserId(userId);
-        if (roleIds != null && roleIds.size() > 0) {
-            List<Role> roles = roleDao.findByIdIn(roleIds);
-            return roles;
-        }
-        return null;
-    }
-
-    public List<UserRole> findUserRoleByRoleId(Long roleId) {
-        return userRoleDao.findByRoleId(roleId);
-    }
-
     public List<Role> getAll() {
         return roleDao.findAll();
-    }
-
-    public void saveUserRole(UserRole userRole) {
-        userRoleDao.save(userRole);
     }
 
     public Page<Role> getPage(Pageable pageable) {
@@ -71,8 +49,8 @@ public class RoleService extends AbstractService {
         roleDao.deleteById(id);
     }
 
-    public void deleteRolesByUserId(Long id) {
-        userRoleDao.deleteByUserId(id);
+    public Role getRole(Long id) {
+        return roleDao.findById(id).get();
     }
 
     public Page<Role> findByCondition(Pageable pageable) {

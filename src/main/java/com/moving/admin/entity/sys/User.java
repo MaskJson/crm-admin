@@ -29,6 +29,9 @@ public class User extends BaseEntity {
 
     private Integer type;
 
+    @ApiModelProperty(value = "角色id")
+    private Long roleId;
+
     @ApiModelProperty(value = "状态：0正常， -1禁用")
     private Integer status;
 
@@ -37,8 +40,8 @@ public class User extends BaseEntity {
     private Date updateTime;
 
     @Transient
-    @ApiModelProperty(value = "用户拥有角色")
-    private List<Role> roles;
+    @ApiModelProperty(value = "用户角色")
+    private Role role;
 
     @Transient
     @ApiModelProperty(value = "用户拥有的权限")

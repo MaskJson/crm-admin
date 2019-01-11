@@ -1,4 +1,4 @@
-package com.moving.admin.service;
+package com.moving.admin.service.common;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +46,7 @@ public class FileUploadService {
 	 */
 	public Object saveFile(MultipartFile file, HttpSession session) throws Exception {
 		String uploadFilePath = session.getServletContext().getRealPath("/img");
+//		String path = generateSavePath(file.getOriginalFilename(), uploadFilePath);
 		String path = generateFileName(file.getOriginalFilename());
 		File dest = new File(uploadFilePath, path);
 		try {
@@ -56,23 +57,22 @@ public class FileUploadService {
 //		String accessUrl = uploadFilePath + "/" + path;
 		return HM.map().put("name", dest.getName()).put("url", path).end();
 	}
-	
 
 	/**
 	 * 生成存放路径
 	 * 
 	 * @return
 	 */
-//	private String generateSavePath(String oname) {
-//		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-//		String path = format.format(new Date());
-//		File file = new File(uploadFilePath, path);
-//		if (!file.exists()) {
-//			file.mkdirs();
-//		}
-//		String name = generateFileName(oname);
-//		return path + "/" + name;
-//	}
+	private String generateSavePath(String oname, String uploadFilePath) {
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		String path = format.format(new Date());
+		File file = new File(uploadFilePath, path);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		String name = generateFileName(oname);
+		return path + "/" + name;
+	}
 
 	/**
 	 * 重新生成文件的名称（后缀不变）

@@ -1,13 +1,11 @@
 package com.moving.admin.controller.sys;
 
-import com.moving.admin.annotation.IgnoreSecurity;
-import com.moving.admin.entity.Order;
 import com.moving.admin.service.sys.PermissionService;
 import com.moving.admin.service.sys.RoleService;
 import com.moving.admin.service.sys.UserService;
 import com.moving.admin.bean.Result;
 import com.moving.admin.entity.sys.Role;
-import com.moving.admin.entity.sys.UserRole;
+import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.sys.RolePermission;
 import com.moving.admin.entity.sys.Permission;
 import com.moving.admin.util.ResultUtil;
@@ -88,8 +86,8 @@ public class RoleController {
     @DeleteMapping("/delAllByIds/{ids}")
     public Result delByIds(@PathVariable Long[] ids) {
         for (Long id : ids) {
-            List<UserRole> list = roleService.findUserRoleByRoleId(id);
-            if (list != null && list.size() > 0) {
+            User user = userService.findUserByRoleId(id);
+            if (user != null) {
                 return ResultUtil.error("删除失败，包含正被用户使用关联的角色");
             }
         }

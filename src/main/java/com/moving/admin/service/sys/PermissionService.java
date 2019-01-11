@@ -2,7 +2,6 @@ package com.moving.admin.service.sys;
 
 import com.moving.admin.dao.sys.PermissionDao;
 import com.moving.admin.dao.sys.RolePermissionDao;
-import com.moving.admin.dao.sys.UserRoleDao;
 import com.moving.admin.entity.sys.RolePermission;
 import com.moving.admin.service.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +17,6 @@ public class PermissionService extends AbstractService {
 
     @Autowired
     private PermissionDao permissionDao;
-
-    @Autowired
-    private UserRoleDao userRoleDao;
 
     @Autowired
     private RolePermissionDao rolePermissionDao;
@@ -51,11 +47,10 @@ public class PermissionService extends AbstractService {
     }
 
     // 获取登录用户的菜单
-    public List<Permission> findPermissionsByUserId(Long userId) {
-        userId = userId == null ? super.getCurrentUserID() : userId;
-        List<Long> roleIds = userRoleDao.findRoleIdsByUserId(userId);
-        if (roleIds != null && roleIds.size() > 0) {
-            List<Long> permissionIds = rolePermissionDao.findPermissionIdsByRoleIdIn(roleIds);
+    public List<Permission> findPermissionsOfUser(Long roleId) {
+        roleId = roleId == null ? super.getCurrentRoleId() : roleId;
+        if (roleId != null) {
+            List<Long> permissionIds = rolePermissionDao.findPermissionIdsByRoleId(roleId);
             if (permissionIds != null && permissionIds.size() > 0) {
                 List<Permission> list = permissionDao.findByIdIn(permissionIds);
                 List<Permission> menuList = new ArrayList<>();
@@ -78,21 +73,6 @@ public class PermissionService extends AbstractService {
                         }
                     }
 
-                    //匹配二级页面拥有权限
-                    if (secondMenuList != null && secondMenuList.size() > 0) {
-                        for (Permission p : secondMenuList) {
-                            List<String> permTypes = new ArrayList<>();
-                            if (buttonPermissions != null && buttonPermissions.size() > 0) {
-                                for (Permission pe : buttonPermissions) {
-                                    if (p.getId().equals(pe.getParentId())) {
-                                        permTypes.add(pe.getTitle());
-                                    }
-                                }
-                            }
-                            p.setPermTypes(permTypes);
-                        }
-                    }
-
                     if (menuList != null && menuList.size() > 0) {
                         //匹配一级页面拥有二级页面
                         for (Permission p : menuList) {
@@ -105,6 +85,21 @@ public class PermissionService extends AbstractService {
                                 }
                             }
                             p.setChildren(secondMenu);
+                        }
+                    }
+
+                    //匹配二级页面拥有权限
+                    if (secondMenuList != null && secondMenuList.size() > 0) {
+                        for (Permission p : secondMenuList) {
+                            List<String> permTypes = new ArrayList<>();
+                            if (buttonPermissions != null && buttonPermissions.size() > 0) {
+                                for (Permission pe : buttonPermissions) {
+                                    if (p.getId().equals(pe.getParentId())) {
+                                        permTypes.add(pe.getTitle());
+                                    }
+                                }
+                            }
+                            p.setPermTypes(permTypes);
                         }
                     }
                 }

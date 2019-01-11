@@ -13,4 +13,6 @@ public interface UserDao extends JpaRepository<User, Long>, JpaSpecificationExec
     List<User> login(@Param("username") String username, @Param("password") String password);
 
     User findByUsername(String userName);
+
+    User findByRoleId(Long roleId);
 }

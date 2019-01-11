@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-public class TestNative extends AbstractNative {
+public class TestNative extends AbstractNative<Object> {
     private StringBuilder count = new StringBuilder("SELECT count(1)");
     private StringBuilder selectStr = new StringBuilder("SELECT a.id, a.order_name as orderName, a.price as orderPrice, b.nick_name as nickName");
     private StringBuilder fromStr = new StringBuilder(" FROM orders a LEFT JOIN user b ON a.user_id = b.id ");

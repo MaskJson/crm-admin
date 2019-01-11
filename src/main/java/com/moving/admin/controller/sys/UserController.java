@@ -1,17 +1,16 @@
 package com.moving.admin.controller.sys;
 
-import com.moving.admin.annotation.IgnoreSecurity;
 import com.moving.admin.bean.Result;
 import com.moving.admin.bean.TokenInformation;
 import com.moving.admin.controller.AbstractController;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.sys.Role;
-import com.moving.admin.entity.sys.UserRole;
 import com.moving.admin.service.sys.RoleService;
 import com.moving.admin.service.sys.UserService;
 import com.moving.admin.util.JwtUtil;
 import com.moving.admin.util.MD5Util;
 import com.moving.admin.util.ResultUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Api(description = "系统用户管理")
 @RestController
 @RequestMapping("/sys/user")
 public class UserController extends AbstractController {
@@ -52,7 +52,6 @@ public class UserController extends AbstractController {
             @ApiImplicitParam(paramType = "query", dataType = "String", name = "password", value = "密码")
     })
     @ApiOperation("系统用户登录")
-    @IgnoreSecurity
     @PostMapping("/login")
     public Result<Map> login(String username, String password) throws Exception {
         User user = userService.login(username, password);
@@ -60,7 +59,7 @@ public class UserController extends AbstractController {
             if (user.getStatus() == -1) {
                 return ResultUtil.error("该用户已被禁用");
             }
-            String token = jwtUtil.encode(new TokenInformation(user.getId()));
+            String token = jwtUtil.encode(new TokenInformation(user.getId(), user.getRoleId()));
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("user", user);
             map.put("token", token);
@@ -95,8 +94,10 @@ public class UserController extends AbstractController {
         Page<User> page = userService.getUserByPage(user, startDate, endDate, pageable);
         for (User u : page.getContent()) {
             // 关联角色
-            List<Role> list = roleService.findRolesByUserId(u.getId());
-            u.setRoles(list);
+//            List<Role> list = roleService.findRolesByUserId(u.getId());
+//            u.setRoles(list);
+            Role role = roleService.getRole(user.getRoleId());
+            u.setRole(role);
             // 清除持久上下文环境 避免后面语句导致持久化
             entityManager.clear();
             u.setPassword(null);
@@ -108,7 +109,7 @@ public class UserController extends AbstractController {
     @PostMapping("/add")
     public Result<User> add(@RequestBody User mgrUserTemp) {
         if (StringUtils.isEmpty(mgrUserTemp.getUsername()) || StringUtils.isEmpty(mgrUserTemp.getPassword())
-                || mgrUserTemp.getRoles() == null) {
+                || mgrUserTemp.getRoleId() == null) {
             return ResultUtil.error("确实必要表单字段");
         }
 
@@ -125,15 +126,6 @@ public class UserController extends AbstractController {
         if (mgrUser == null) {
             return ResultUtil.error("添加失败");
         }
-        if (mgrUserTemp.getRoles() != null && mgrUserTemp.getRoles().size() > 0) {
-            // 添加角色
-            for (Role role : mgrUserTemp.getRoles()) {
-                UserRole userRole = new UserRole();
-                userRole.setUserId(mgrUser.getId());
-                userRole.setRoleId(role.getId());
-                roleService.saveUserRole(userRole);
-            }
-        }
         return ResultUtil.success(mgrUser);
     }
 
@@ -141,7 +133,7 @@ public class UserController extends AbstractController {
     @Transactional
     @PostMapping("/edit")
     public Result<Object> edit(@RequestBody User user) throws Exception {
-        if (StringUtils.isEmpty(user.getUsername()) || user.getRoles() == null) {
+        if (StringUtils.isEmpty(user.getUsername()) || user.getRoleId() == null) {
             return ResultUtil.error("缺少必需表单字段:用户名、角色");
         }
         User oldUser = userService.get(user.getId());
@@ -158,18 +150,6 @@ public class UserController extends AbstractController {
         if (mgrUser == null) {
             return ResultUtil.error("修改失败");
         }
-        // 删除该用户角色
-        roleService.deleteRolesByUserId(user.getId());
-        if (user.getRoles() != null && user.getRoles().size() > 0) {
-            // 新角色
-            for (Role role : user.getRoles()) {
-                UserRole ur = new UserRole();
-                ur.setRoleId(role.getId());
-                ur.setUserId(user.getId());
-                roleService.saveUserRole(ur);
-            }
-        }
-        // 手动删除缓存
         return ResultUtil.success(null);
     }
 

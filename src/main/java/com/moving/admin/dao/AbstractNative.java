@@ -1,4 +1,4 @@
-package com.moving.admin.dao.natives;
+package com.moving.admin.dao;
 
 import org.springframework.data.domain.Pageable;
 

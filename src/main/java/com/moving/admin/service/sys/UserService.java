@@ -1,8 +1,6 @@
 package com.moving.admin.service.sys;
 
-import com.moving.admin.dao.sys.UserRoleDao;
 import com.moving.admin.entity.sys.User;
-import com.moving.admin.entity.sys.Role;
 import com.moving.admin.entity.sys.Permission;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.service.AbstractService;
@@ -25,9 +23,6 @@ public class UserService extends AbstractService {
     private UserDao userDao;
 
     @Autowired
-    private UserRoleDao userRoleDao;
-
-    @Autowired
     private RoleService roleService;
 
     @Autowired
@@ -43,10 +38,15 @@ public class UserService extends AbstractService {
             result.setNickName(user.getNickName());
             result.setAvatar(user.getAvatar());
             result.setStatus(user.getStatus());
-            result.setRoles(roleService.findRolesByUserId(user.getId()));
+            result.setRoleId(user.getRoleId());
             return result;
         }
         return null;
+    }
+
+    // 根据roleId获取user
+    public User findUserByRoleId(Long roleId) {
+        return userDao.findByRoleId(roleId);
     }
 
     // 分页查询用户列表
@@ -77,9 +77,7 @@ public class UserService extends AbstractService {
         User mgrUser = userDao.findByUsername(userName);
         if (mgrUser != null) {
             Long userId = mgrUser.getId();
-            List<Role> roleList = roleService.findRolesByUserId(userId);
-            mgrUser.setRoles(roleList);
-            List<Permission> permissionList = permissionService.findPermissionsByUserId(userId);
+            List<Permission> permissionList = permissionService.findPermissionsOfUser(mgrUser.getRoleId());
             mgrUser.setPermissions(permissionList);
         }
         return mgrUser;
@@ -87,11 +85,9 @@ public class UserService extends AbstractService {
 
     // 根据userID获取用户详情
     public User findByUserId() {
-        User mgrUser = userDao.findById(super.getCurrentUserID()).get();
+        User mgrUser = userDao.findById(super.getCurrentUserId()).get();
         Long userId = mgrUser.getId();
-        List<Role> roleList = roleService.findRolesByUserId(userId);
-        mgrUser.setRoles(roleList);
-        List<Permission> permissionList = permissionService.findPermissionsByUserId(userId);
+        List<Permission> permissionList = permissionService.findPermissionsOfUser(mgrUser.getRoleId());
         mgrUser.setPermissions(permissionList);
         return mgrUser;
     }
@@ -110,6 +106,5 @@ public class UserService extends AbstractService {
 
     public void delete(Long id) {
         userDao.deleteById(id);
-        userRoleDao.deleteByUserId(id);
     }
 }
