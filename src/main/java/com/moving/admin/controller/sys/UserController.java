@@ -92,9 +92,6 @@ public class UserController extends AbstractController {
     public Result<Page<User>> getByCondition(User user, String startDate, String endDate, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC)Pageable pageable) {
         Page<User> page = userService.getUserByPage(user, startDate, endDate, pageable);
         for (User u : page.getContent()) {
-            // 关联角色
-//            List<Role> list = roleService.findRolesByUserId(u.getId());
-//            u.setRoles(list);
             Role role = roleService.getRole(u.getRoleId());
             u.setRole(role);
             // 清除持久上下文环境 避免后面语句导致持久化
