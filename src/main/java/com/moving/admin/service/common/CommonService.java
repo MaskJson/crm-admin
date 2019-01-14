@@ -5,19 +5,19 @@ import com.moving.admin.dao.common.IndustryDao;
 import com.moving.admin.entity.common.Aptness;
 import com.moving.admin.entity.common.Industry;
 import com.moving.admin.service.AbstractService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CommonService extends AbstractService {
 
-    @Autowired
+    @Resource
     private IndustryDao industryDao;
 
-    @Autowired
+    @Resource
     private AptnessDao aptnessDao;
 
     // 获取所有行业

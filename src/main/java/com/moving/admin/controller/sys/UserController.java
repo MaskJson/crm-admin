@@ -14,7 +14,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Api(description = "系统用户管理")
@@ -35,13 +34,13 @@ import java.util.Map;
 @RequestMapping("/sys/user")
 public class UserController extends AbstractController {
 
-    @Autowired
+    @Resource
     private UserService userService;
 
-    @Autowired
+    @Resource
     private RoleService roleService;
 
-    @Autowired
+    @Resource
     private JwtUtil jwtUtil;
 
     @PersistenceContext
@@ -90,13 +89,13 @@ public class UserController extends AbstractController {
     })
     @ApiOperation(value = "系统用户分页查询")
     @GetMapping("getByCondition")
-    public Result<Page<User>> getByCondition(User user, String startDate, String endDate, @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC)Pageable pageable) {
+    public Result<Page<User>> getByCondition(User user, String startDate, String endDate, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC)Pageable pageable) {
         Page<User> page = userService.getUserByPage(user, startDate, endDate, pageable);
         for (User u : page.getContent()) {
             // 关联角色
 //            List<Role> list = roleService.findRolesByUserId(u.getId());
 //            u.setRoles(list);
-            Role role = roleService.getRole(user.getRoleId());
+            Role role = roleService.getRole(u.getRoleId());
             u.setRole(role);
             // 清除持久上下文环境 避免后面语句导致持久化
             entityManager.clear();
