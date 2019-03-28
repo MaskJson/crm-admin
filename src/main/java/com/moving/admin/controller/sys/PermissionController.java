@@ -31,7 +31,7 @@ public class PermissionController {
     @ApiOperation(value = "获取用户权限菜单")
     @GetMapping("/getMenuListByUserId")
     public Result<List> getMenuListByUserId() throws Exception {
-        return ResultUtil.success(permissionService.findPermissionsOfUser(null));
+        return ResultUtil.success(permissionService.findPermissionsOfUser());
     }
 
     @ApiOperation(value = "获取权限菜单树")

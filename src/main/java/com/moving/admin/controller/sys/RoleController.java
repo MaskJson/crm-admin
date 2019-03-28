@@ -46,8 +46,8 @@ public class RoleController {
     }
 
     @ApiImplicitParams({
-        @ApiImplicitParam(paramType = "query", dataType = "Long", name = "page", value = "页码"),
-        @ApiImplicitParam(paramType = "query", dataType = "Long", name = "size", value = "每页条数")
+            @ApiImplicitParam(paramType = "query", dataType = "Long", name = "page", value = "页码"),
+            @ApiImplicitParam(paramType = "query", dataType = "Long", name = "size", value = "每页条数")
     })
     @ApiOperation("角色分页查询")
     @GetMapping("/getRoleByPage")
@@ -69,8 +69,8 @@ public class RoleController {
     }
 
     @ApiImplicitParams({
-        @ApiImplicitParam(paramType = "query", dataType = "Long", name = "id", value = "id"),
-        @ApiImplicitParam(paramType = "query", dataType = "String", name = "roleName", value = "角色名称"),
+            @ApiImplicitParam(paramType = "query", dataType = "Long", name = "id", value = "id"),
+            @ApiImplicitParam(paramType = "query", dataType = "String", name = "roleName", value = "角色名称"),
             @ApiImplicitParam(paramType = "query", dataType = "String", name = "roleName", value = "角色描述")
     })
     @ApiOperation(value = "更新角色")
@@ -100,7 +100,7 @@ public class RoleController {
     }
 
     @ApiImplicitParams({
-        @ApiImplicitParam(paramType = "query", dataType = "Long", name = "roleId", value = "角色id"),
+            @ApiImplicitParam(paramType = "query", dataType = "Long", name = "roleId", value = "角色id"),
             @ApiImplicitParam(paramType = "query", dataType = "String", name = "permIds", value = "菜单ids")
     })
     @ApiOperation(value = "编辑角色分配权限")
@@ -112,6 +112,7 @@ public class RoleController {
         for (int j = 0; j < strings.length; j++) {
             ids.add(Long.parseLong(strings[j]));
         }
+        System.err.println(ids.size());
         permissionService.deleteByRoleId(roleId);
         //分配新权限
         for (Long permId : ids) {

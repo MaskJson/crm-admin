@@ -4,6 +4,7 @@ import com.moving.admin.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
@@ -14,8 +15,8 @@ import javax.persistence.*;
 public class Team extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(generator = "id_generator")
+    @GenericGenerator(name = "id_generator", strategy = "identity")
     private Long id;
 
     @ApiModelProperty(value = "客户总监id")

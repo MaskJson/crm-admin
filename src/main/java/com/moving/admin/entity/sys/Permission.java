@@ -3,6 +3,7 @@ package com.moving.admin.entity.sys;
 import com.moving.admin.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,8 +15,8 @@ import java.util.List;
 public class Permission extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(generator = "id_generator")
+    @GenericGenerator(name = "id_generator", strategy = "identity")
     private Long id;
 
     @ApiModelProperty(value = "类型 0页面 1具体操作")

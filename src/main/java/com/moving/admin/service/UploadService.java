@@ -24,13 +24,13 @@ import com.moving.admin.util.HM;
  *
  */
 @Service
-public class FileUploadService extends AbstractService {
+public class UploadService extends AbstractService {
 
-	@Resource
-	private HttpServletRequest request;
-	
-	@Resource
-	private HttpSession session;
+//	@Resource
+//	private HttpServletRequest request;
+//
+//	@Resource
+//	private HttpSession session;
 //	/**
 //	 * 文件磁盘存放路径
 //	 */
@@ -42,8 +42,8 @@ public class FileUploadService extends AbstractService {
 //	 */
 //	@Value("${upload.file.access}")
 //	private String uploadFileAccess;
-	private String uploadFilePath = session.getServletContext().getRealPath("/img");
-
+//	private String uploadFilePath = session.getServletContext().getRealPath("/img");
+//	private String uploadFilePath = request.getSession().getServletContext().getRealPath("/img");
 	/**
 	 * 保存文件
 	 * 
@@ -51,8 +51,9 @@ public class FileUploadService extends AbstractService {
 	 * @return
 	 * @throws Exception
 	 */
-	public Object saveFile(MultipartFile file) throws Exception {
+	public Object saveFile(MultipartFile file, HttpServletRequest request) throws Exception {
 		System.out.println(request.getSession().getServletContext().getRealPath("/"));
+		String uploadFilePath = request.getSession().getServletContext().getRealPath("/img");
 		String path = generateFileName(file.getOriginalFilename());
 		File dest = new File(uploadFilePath, path);
 		try {

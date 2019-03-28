@@ -47,8 +47,8 @@ public class PermissionService extends AbstractService {
     }
 
     // 获取登录用户的菜单
-    public List<Permission> findPermissionsOfUser(Long roleId) {
-        roleId = roleId == null ? super.getCurrentRoleId() : roleId;
+    public List<Permission> findPermissionsOfUser() {
+        Long roleId = super.getCurrentRoleId();
         if (roleId != null) {
             List<Long> permissionIds = rolePermissionDao.findPermissionIdsByRoleId(roleId);
             if (permissionIds != null && permissionIds.size() > 0) {

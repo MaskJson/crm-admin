@@ -4,19 +4,22 @@ import com.moving.admin.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.models.auth.In;
 import lombok.Data;
+import lombok.Getter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
+@Getter
 @Entity
 @Data
 @Table(name = "sys_user")
 public class User extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(generator = "id_generator")
+    @GenericGenerator(name = "id_generator", strategy = "identity")
     private Long id;
 
     private String username;
@@ -46,5 +49,7 @@ public class User extends BaseEntity {
     @Transient
     @ApiModelProperty(value = "用户拥有的权限")
     private List<Permission> permissions;
+
+
 
 }

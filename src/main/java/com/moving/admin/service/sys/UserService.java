@@ -77,7 +77,7 @@ public class UserService extends AbstractService {
         User mgrUser = userDao.findByUsername(userName);
         if (mgrUser != null) {
             Long userId = mgrUser.getId();
-            List<Permission> permissionList = permissionService.findPermissionsOfUser(mgrUser.getRoleId());
+            List<Permission> permissionList = permissionService.findPermissionsOfUser();
             mgrUser.setPermissions(permissionList);
         }
         return mgrUser;
@@ -87,7 +87,7 @@ public class UserService extends AbstractService {
     public User findByUserId() {
         User mgrUser = userDao.findById(super.getCurrentUserId()).get();
         Long userId = mgrUser.getId();
-        List<Permission> permissionList = permissionService.findPermissionsOfUser(mgrUser.getRoleId());
+        List<Permission> permissionList = permissionService.findPermissionsOfUser();
         mgrUser.setPermissions(permissionList);
         return mgrUser;
     }
