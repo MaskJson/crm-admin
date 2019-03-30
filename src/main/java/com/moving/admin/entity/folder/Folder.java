@@ -1,5 +1,6 @@
-package com.moving.admin.entity;
+package com.moving.admin.entity.folder;
 
+import com.moving.admin.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,7 +14,7 @@ import javax.persistence.Table;
 @ApiModel("收藏夹")
 @Data
 @Entity
-@Table(name = "customer")
+@Table(name = "folder")
 public class Folder extends BaseEntity {
 
     @Id

@@ -1,4 +1,4 @@
-package com.moving.admin.dao;
+package com.moving.admin.dao.customer;
 
 import com.moving.admin.entity.customer.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;

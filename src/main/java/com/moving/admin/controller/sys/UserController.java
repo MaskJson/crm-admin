@@ -89,8 +89,8 @@ public class UserController extends AbstractController {
     })
     @ApiOperation(value = "系统用户分页查询")
     @GetMapping("getByCondition")
-    public Result<Page<User>> getByCondition(User user, String startDate, String endDate, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC)Pageable pageable) {
-        Page<User> page = userService.getUserByPage(user, startDate, endDate, pageable);
+    public Result<Page<User>> getByCondition(String username, Integer type, String startDate, String endDate, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC)Pageable pageable) {
+        Page<User> page = userService.getUserByPage(username, type, startDate, endDate, pageable);
         for (User u : page.getContent()) {
             Role role = roleService.getRole(u.getRoleId());
             u.setRole(role);

@@ -50,18 +50,18 @@ public class UserService extends AbstractService {
     }
 
     // 分页查询用户列表
-    public Page<User> getUserByPage(User user, String startDate, String endDate, Pageable pageable) {
+    public Page<User> getUserByPage(String username, Integer type, String startDate, String endDate, Pageable pageable) {
         return userDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
-            if (!StringUtils.isEmpty(user.getUsername())) {
-                list.add(cb.equal(root.get("username"), user.getUsername()));
+            if (!StringUtils.isEmpty(username)) {
+                list.add(cb.equal(root.get("username"), username));
             }
-            if (user.getType() != null) {
-                list.add(cb.equal(root.get("type"), user.getType()));
+            if (type != null) {
+                list.add(cb.equal(root.get("type"), type));
             }
-            if (user.getStatus() != null) {
-                list.add(cb.equal(root.get("status"), user.getStatus()));
-            }
+//            if (user.getStatus() != null) {
+//                list.add(cb.equal(root.get("status"), user.getStatus()));
+//            }
             if (!StringUtils.isEmpty(startDate) && !StringUtils.isEmpty(endDate)) {
                 Date start = DateUtil.strToDate(startDate);
                 Date end = DateUtil.strToDate(endDate);

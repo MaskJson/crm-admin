@@ -1,8 +1,11 @@
 package com.moving.admin.service;
 
-import com.moving.admin.dao.CustomerDao;
+import com.moving.admin.dao.customer.CustomerDao;
+import com.moving.admin.dao.customer.CustomerRemindDao;
+import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.entity.customer.Customer;
-import com.moving.admin.util.DateUtil;
+import com.moving.admin.entity.customer.CustomerRemind;
+import com.moving.admin.entity.sys.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,12 @@ public class CustomerService extends AbstractService {
     @Autowired
     private CustomerDao customerDao;
 
+    @Autowired
+    private CustomerRemindDao customerRemindDao;
+
+    @Autowired
+    private UserDao userDao;
+
     // 添加、编辑
     public Long save(Customer customer) {
         customer.setUpdateTime(new Date(System.currentTimeMillis()));
@@ -36,30 +45,57 @@ public class CustomerService extends AbstractService {
         } else {
             customer = customerDao.findByName(name);
         }
+        if (customer != null) {
+            User user = userDao.findById(customer.getCreateUserId()).get();
+            customer.setCreateUser(user.getNickName());
+        }
         return customer;
     }
 
     // 分页查询
     public Page<Customer> getCustomerList(Long id, String name, String industry, Long folderId, Pageable pageable) {
-        return customerDao.findAll((root, query, cb) -> {
+        Page<Customer> result = customerDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
-
-//            if (!StringUtils.isEmpty(user.getUsername())) {
-//                list.add(cb.equal(root.get("username"), user.getUsername()));
-//            }
-//            if (user.getType() != null) {
-//                list.add(cb.equal(root.get("type"), user.getType()));
-//            }
-//            if (user.getStatus() != null) {
-//                list.add(cb.equal(root.get("status"), user.getStatus()));
-//            }
-//            if (!StringUtils.isEmpty(startDate) && !StringUtils.isEmpty(endDate)) {
-//                Date start = DateUtil.strToDate(startDate);
-//                Date end = DateUtil.strToDate(endDate);
-//                list.add(cb.between(root.get("createTime").as(Date.class), start, end));
-//            }
+            if (id != null) {
+                list.add(cb.equal(root.get("id"), id));
+            }
+            if (!StringUtils.isEmpty(name)) {
+                list.add(cb.like(root.get("name"), "%" + name + "%"));
+            }
+            if (!StringUtils.isEmpty(industry)) {
+                list.add(cb.like(root.get("name"), industry + industry + "%"));
+            }
             Predicate[] predicates = new Predicate[list.size()];
             return query.where(list.toArray(predicates)).getRestriction();
         }, pageable);
+        if (folderId != null) {
+//            result.filter(customer -> {
+//
+//            });
+        }
+        return result;
+    }
+
+    // 关注装修改
+    public void toggleFollow(Long id, Boolean follow) {
+        Customer customer = customerDao.findById(id).get();
+        customer.setFollow(follow);
+        save(customer);
+    }
+
+    // 添加客户跟踪
+    public Long saveRemind(CustomerRemind remind) {
+        remind.setCreateTime(new Date(System.currentTimeMillis()));
+        remind.setUpdateTime(new Date(System.currentTimeMillis()));
+        customerRemindDao.save(remind);
+        return remind.getId();
+    }
+
+    // 客户跟踪跟进结束
+    public Long finishRemindById(Long id) {
+        CustomerRemind customerRemind = customerRemindDao.findById(id).get();
+        customerRemind.setFinish(true);
+        saveRemind(customerRemind);
+        return id;
     }
 }
