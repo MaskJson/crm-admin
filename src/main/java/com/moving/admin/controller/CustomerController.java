@@ -3,6 +3,7 @@ package com.moving.admin.controller;
 import com.moving.admin.bean.Result;
 import com.moving.admin.entity.customer.Customer;
 import com.moving.admin.entity.customer.CustomerRemind;
+import com.moving.admin.entity.customer.Department;
 import com.moving.admin.service.CustomerService;
 import com.moving.admin.util.ResultUtil;
 import io.swagger.annotations.Api;
@@ -60,6 +61,27 @@ public class CustomerController extends AbstractController {
     @PostMapping("/finish-remind")
     public Result<Long> save(Long id) throws Exception {
         return ResultUtil.success(customerService.finishRemindById(id));
+    }
+
+    @ApiOperation("客户跟踪记录")
+    @GetMapping("/remind-list")
+    public Result<List<CustomerRemind>>getAllRemind(Long id) throws Exception {
+        List<CustomerRemind> list = customerService.getAllRemind(id);
+        return ResultUtil.success(list);
+    }
+
+    @ApiOperation("获取所有客户")
+    @GetMapping("/customer-all")
+    public Result<List<Customer>>getAllCustomer() throws Exception {
+        List<Customer> list = customerService.getAllCustomer();
+        return ResultUtil.success(list);
+    }
+
+    @ApiOperation("获取所有部门")
+    @GetMapping("/department-all")
+    public Result<List<Department>>getAllDepartment() throws Exception {
+        List<Department> list = customerService.getAllDepartment();
+        return ResultUtil.success(list);
     }
 
 }

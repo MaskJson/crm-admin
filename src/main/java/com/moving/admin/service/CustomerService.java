@@ -2,9 +2,11 @@ package com.moving.admin.service;
 
 import com.moving.admin.dao.customer.CustomerDao;
 import com.moving.admin.dao.customer.CustomerRemindDao;
+import com.moving.admin.dao.customer.DepartmentDao;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.entity.customer.Customer;
 import com.moving.admin.entity.customer.CustomerRemind;
+import com.moving.admin.entity.customer.Department;
 import com.moving.admin.entity.sys.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +31,9 @@ public class CustomerService extends AbstractService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private DepartmentDao departmentDao;
 
     // 添加、编辑
     public Long save(Customer customer) {
@@ -88,6 +93,9 @@ public class CustomerService extends AbstractService {
         remind.setCreateTime(new Date(System.currentTimeMillis()));
         remind.setUpdateTime(new Date(System.currentTimeMillis()));
         customerRemindDao.save(remind);
+        if (remind.getFollowRemindId() != null) {
+            finishRemindById(remind.getFollowRemindId());
+        }
         return remind.getId();
     }
 
@@ -95,7 +103,25 @@ public class CustomerService extends AbstractService {
     public Long finishRemindById(Long id) {
         CustomerRemind customerRemind = customerRemindDao.findById(id).get();
         customerRemind.setFinish(true);
-        saveRemind(customerRemind);
         return id;
+    }
+
+    // 获取客户跟踪记录
+    public List<CustomerRemind> getAllRemind(Long customerId) {
+        List<CustomerRemind> list = customerRemindDao.findAllByCustomerIdOrderByIdDesc(customerId);
+        list.forEach(customerRemind -> {
+            customerRemind.setCreateUser(userDao.findById(customerRemind.getCreateUserId()).get().getNickName());
+        });
+        return list;
+    }
+
+    // 获取所有客户
+    public List<Customer> getAllCustomer() {
+        return customerDao.findAll();
+    }
+
+    // 获取所有部门
+    public List<Department> getAllDepartment() {
+        return departmentDao.findAll();
     }
 }
