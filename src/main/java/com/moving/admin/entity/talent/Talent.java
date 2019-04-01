@@ -108,6 +108,9 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "创建者")
     private Long createUserId;
 
+    @ApiModelProperty(value = "是否关注")
+    private Boolean follow;
+
     @ApiModelProperty(value = "创建时间")
     private Date createTime = new Date(System.currentTimeMillis());
 

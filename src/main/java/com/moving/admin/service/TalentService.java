@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 
 @Service
 public class TalentService extends AbstractService {
@@ -46,6 +47,7 @@ public class TalentService extends AbstractService {
     // 添加人才
     @Transactional
     public Long save(Talent talent) {
+        talent.setUpdateTime(new Date(System.currentTimeMillis()));
         talentDao.save(talent);
         Long id = talent.getId();
         experienceDao.removeAllByTalentId(id);
