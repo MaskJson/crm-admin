@@ -3,10 +3,12 @@ package com.moving.admin.service;
 import com.moving.admin.dao.customer.CustomerDao;
 import com.moving.admin.dao.customer.CustomerRemindDao;
 import com.moving.admin.dao.customer.DepartmentDao;
+import com.moving.admin.dao.folder.FolderItemDao;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.entity.customer.Customer;
 import com.moving.admin.entity.customer.CustomerRemind;
 import com.moving.admin.entity.customer.Department;
+import com.moving.admin.entity.folder.FolderItem;
 import com.moving.admin.entity.sys.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,6 +37,9 @@ public class CustomerService extends AbstractService {
 
     @Autowired
     private DepartmentDao departmentDao;
+
+    @Autowired
+    private FolderItemDao folderItemDao;
 
     // 添加、编辑
     public Long save(Customer customer) {
@@ -70,14 +76,18 @@ public class CustomerService extends AbstractService {
             if (!StringUtils.isEmpty(industry)) {
                 list.add(cb.like(root.get("name"), industry + industry + "%"));
             }
+            if (folderId != null) {
+                List<FolderItem> folderItems = folderItemDao.findAllByFolderIdAndAndType(folderId, 1);
+                List<Long> ids = new ArrayList<>();
+                folderItems.forEach(folderItem -> {
+                    ids.add(folderItem.getItemId());
+                });
+                Expression<Long> exp = root.<Long>get("id");
+                cb.and(exp.in(ids));
+            }
             Predicate[] predicates = new Predicate[list.size()];
             return query.where(list.toArray(predicates)).getRestriction();
         }, pageable);
-        if (folderId != null) {
-//            result.filter(customer -> {
-//
-//            });
-        }
         return result;
     }
 
