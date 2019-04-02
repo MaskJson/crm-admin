@@ -5,11 +5,14 @@ import com.moving.admin.dao.customer.CustomerRemindDao;
 import com.moving.admin.dao.customer.DepartmentDao;
 import com.moving.admin.dao.folder.FolderItemDao;
 import com.moving.admin.dao.sys.UserDao;
+import com.moving.admin.dao.talent.ExperienceDao;
+import com.moving.admin.dao.talent.TalentDao;
 import com.moving.admin.entity.customer.Customer;
 import com.moving.admin.entity.customer.CustomerRemind;
 import com.moving.admin.entity.customer.Department;
 import com.moving.admin.entity.folder.FolderItem;
 import com.moving.admin.entity.sys.User;
+import com.moving.admin.entity.talent.Experience;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +44,12 @@ public class CustomerService extends AbstractService {
     @Autowired
     private FolderItemDao folderItemDao;
 
+    @Autowired
+    private ExperienceDao experienceDao;
+
+    @Autowired
+    private TalentDao talentDao;
+
     // 添加、编辑
     public Long save(Customer customer) {
         customer.setUpdateTime(new Date(System.currentTimeMillis()));
@@ -57,8 +66,10 @@ public class CustomerService extends AbstractService {
             customer = customerDao.findByName(name);
         }
         if (customer != null) {
-            User user = userDao.findById(customer.getCreateUserId()).get();
-            customer.setCreateUser(user.getNickName());
+            Long userId = customer.getCreateUserId();
+            if (userId != null) {
+                customer.setCreateUser(userDao.findById(userId).get().getNickName());
+            }
         }
         return customer;
     }
@@ -74,7 +85,7 @@ public class CustomerService extends AbstractService {
                 list.add(cb.like(root.get("name"), "%" + name + "%"));
             }
             if (!StringUtils.isEmpty(industry)) {
-                list.add(cb.like(root.get("name"), industry + industry + "%"));
+                list.add(cb.like(root.get("industry"), "%" + industry + "%"));
             }
             if (folderId != null) {
                 List<FolderItem> folderItems = folderItemDao.findAllByFolderIdAndAndType(folderId, 1);
@@ -82,8 +93,9 @@ public class CustomerService extends AbstractService {
                 folderItems.forEach(folderItem -> {
                     ids.add(folderItem.getItemId());
                 });
+                System.err.println(ids.size());
                 Expression<Long> exp = root.<Long>get("id");
-                cb.and(exp.in(ids));
+                list.add(cb.and(exp.in(ids)));
             }
             Predicate[] predicates = new Predicate[list.size()];
             return query.where(list.toArray(predicates)).getRestriction();
@@ -120,7 +132,13 @@ public class CustomerService extends AbstractService {
     public List<CustomerRemind> getAllRemind(Long customerId) {
         List<CustomerRemind> list = customerRemindDao.findAllByCustomerIdOrderByIdDesc(customerId);
         list.forEach(customerRemind -> {
-            customerRemind.setCreateUser(userDao.findById(customerRemind.getCreateUserId()).get().getNickName());
+            Long userId = customerRemind.getCreateUserId();
+            if (userId != null) {
+                User user = userDao.findById(userId).get();
+                if (user != null) {
+                    customerRemind.setCreateUser(user.getNickName());
+                }
+            }
         });
         return list;
     }
@@ -134,4 +152,19 @@ public class CustomerService extends AbstractService {
     public List<Department> getAllDepartment() {
         return departmentDao.findAll();
     }
+
+    // 获取该公司下所有相关人才,talentId 去重
+    public List<Experience> getCustomerTalents(Long id) {
+        List<Experience> experiences = experienceDao.findAllByCustomerIdOrderByDepartmentId(id);
+        experiences.forEach(experience -> {
+            if (experience.getTalentId() != null) {
+                experience.setTalent(talentDao.findById(experience.getTalentId()).get());
+            }
+            if (experience.getDepartmentId() != null) {
+                experience.setDepartment(departmentDao.findById(experience.getDepartmentId()).get().getName());
+            }
+        });
+        return experiences;
+    }
+
 }

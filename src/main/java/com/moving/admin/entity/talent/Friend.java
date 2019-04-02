@@ -5,10 +5,7 @@ import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @ApiModel("朋友介绍")
 @Data
@@ -25,8 +22,14 @@ public class Friend extends BaseEntity {
 
     private String name;
 
+    private Long customerId;
+
+    private Long departmentId;
+
+    @Transient
     private String company;
 
+    @Transient
     private String department;
 
     private String phone;

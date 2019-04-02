@@ -121,7 +121,7 @@ public class Talent extends BaseEntity {
     @Transient
     private String createUser;
 
-    @ApiModelProperty(value = "创建者name")
+    @ApiModelProperty(value = "关联项目ID")
     @Transient
     private Long projectId;
 

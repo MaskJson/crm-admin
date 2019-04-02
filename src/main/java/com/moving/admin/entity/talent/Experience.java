@@ -6,10 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @ApiModel("工作经历")
@@ -23,6 +20,11 @@ public class Experience extends BaseEntity {
     @GenericGenerator(name = "id_generator", strategy = "identity")
     private Long id;
 
+    private Long customerId;
+
+    private Long departmentId;
+
+    @Transient
     @ApiModelProperty(value = "公司")
     private String company;
 
@@ -38,6 +40,7 @@ public class Experience extends BaseEntity {
     @ApiModelProperty(value = "职位")
     private String position;
 
+    @Transient
     @ApiModelProperty(value = "部门")
     private String department;
 
@@ -49,5 +52,9 @@ public class Experience extends BaseEntity {
 
     @ApiModelProperty(value = "人才ID")
     private Long talentId;
+
+    @ApiModelProperty(value = "跟踪记录")
+    @Transient
+    private Talent talent;
 
 }

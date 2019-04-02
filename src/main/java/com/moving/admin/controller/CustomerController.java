@@ -6,6 +6,7 @@ import com.moving.admin.bean.Result;
 import com.moving.admin.entity.customer.Customer;
 import com.moving.admin.entity.customer.CustomerRemind;
 import com.moving.admin.entity.customer.Department;
+import com.moving.admin.entity.talent.Experience;
 import com.moving.admin.service.CustomerService;
 import com.moving.admin.util.ResultUtil;
 import io.swagger.annotations.Api;
@@ -96,4 +97,9 @@ public class CustomerController extends AbstractController {
         return ResultUtil.success(list);
     }
 
+    @ApiOperation("获取公司下所有关联人才")
+    @GetMapping("/talent-all")
+    public Result<List<Experience>> getCustomerTalent(Long id) throws Exception {
+        return ResultUtil.success(customerService.getCustomerTalents(id));
+    }
 }

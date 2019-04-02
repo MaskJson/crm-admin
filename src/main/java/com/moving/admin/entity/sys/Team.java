@@ -14,6 +14,7 @@ import javax.persistence.*;
 @Table(name = "team")
 public class Team extends BaseEntity {
 
+
     @Id
     @GeneratedValue(generator = "id_generator")
     @GenericGenerator(name = "id_generator", strategy = "identity")

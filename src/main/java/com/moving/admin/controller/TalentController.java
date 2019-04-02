@@ -3,12 +3,19 @@ package com.moving.admin.controller;
 import com.moving.admin.bean.Result;
 import com.moving.admin.controller.AbstractController;
 import com.moving.admin.entity.talent.Talent;
+import com.moving.admin.entity.talent.TalentRemind;
 import com.moving.admin.service.TalentService;
 import com.moving.admin.util.ResultUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Api(description = "人才管理")
 @RestController
@@ -40,5 +47,32 @@ public class TalentController extends AbstractController {
             return ResultUtil.error("该人才ID不存在");
         }
     }
+
+    @ApiOperation("分页查询")
+    @GetMapping("/list")
+    public Result<Page<Talent>> list(String city, String name, String industry, String aptness, Long folderId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        Page<Talent> result = talentService.getCustomerList(city, name, industry, aptness, folderId, pageable);
+        return ResultUtil.success(result);
+    }
+
+    @ApiOperation("获取人才跟踪记录")
+    @GetMapping("/remind-all")
+    public Result<List<TalentRemind>> getAllRemind(Long id) throws Exception {
+        return ResultUtil.success(talentService.getAllRemind(id));
+    }
+
+    @ApiOperation("修改客户关注状态")
+    @PostMapping("/toggle-follow")
+    public Result toggleFollow(Long id, Boolean follow) throws Exception {
+        talentService.toggleFollow(id, follow);
+        return ResultUtil.success(null);
+    }
+
+    @ApiOperation("添加人才跟踪记录")
+    @PostMapping("/remind-add")
+    public Result<Long> addRemind(@RequestBody TalentRemind talentRemind) throws Exception {
+        return ResultUtil.success(talentService.saveRemind(talentRemind));
+    }
+
 
 }

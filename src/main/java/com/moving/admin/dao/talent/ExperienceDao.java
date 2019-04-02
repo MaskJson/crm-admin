@@ -12,4 +12,8 @@ public interface ExperienceDao extends JpaRepository<Experience, Long>, JpaSpeci
 
     void removeAllByTalentId(Long talentId);
 
+    List<Experience> findAllByCustomerIdOrderByDepartmentId(Long customerId);
+
+    Experience findExperienceByCustomerIdAndDepartmentIdAndTalentId(Long customerId, Long departmentId, Long talentId);
+
 }
