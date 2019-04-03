@@ -27,33 +27,33 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HandlerMethod handlerMethod = null;
-//        if (handler instanceof HandlerMethod) {
-//            handlerMethod = (HandlerMethod) handler;
-//        } else {
-//            return true;
-//        }
-//        IgnoreSecurity ignoreSecurity = handlerMethod.getMethodAnnotation(IgnoreSecurity.class);
-//        //若请求资源不是api，则通过，也可以根据 origin 来访地址决定是否放行指定的项目资源
-//        //无需登录
-//        if (ignoreSecurity != null) {
-//            return true;
-//        } else {
-//            String jwt = request.getHeader("token");
-//            if (jwt != null && jwt != "") {
-//                Map<String, Object> map = jwtUtil.decode(jwt, TokenInformation.class);
-//                if (map == null) {
-//                    throw new WebException(401, "未登录", null);
-//                }
-////					TokenInformation tokenInformation = (TokenInformation) map.get("token");
-//                if ((boolean) map.get("overtime")) {
-//                    throw new WebException(403, "登录超时", null);
-//                }
-//                return true;
-//            }
-//        }
-//        // 未登录
-//        throw new WebException(401, "未登录", null);
-        return true;
+        if (handler instanceof HandlerMethod) {
+            handlerMethod = (HandlerMethod) handler;
+        } else {
+            return true;
+        }
+        IgnoreSecurity ignoreSecurity = handlerMethod.getMethodAnnotation(IgnoreSecurity.class);
+//        String requestPath = request.getRequestURI()
+        //若请求资源不是api，则通过，也可以根据 origin 来访地址决定是否放行指定的项目资源
+        //无需登录
+        if (ignoreSecurity != null) {
+            return true;
+        } else {
+            String jwt = request.getHeader("token");
+            if (jwt != null && jwt != "") {
+                Map<String, Object> map = jwtUtil.decode(jwt, TokenInformation.class);
+                if (map == null) {
+                    throw new WebException(401, "未登录", null);
+                }
+//					TokenInformation tokenInformation = (TokenInformation) map.get("token");
+                if ((boolean) map.get("overtime")) {
+                    throw new WebException(403, "登录超时", null);
+                }
+                return true;
+            }
+        }
+        // 未登录
+        throw new WebException(401, "未登录", null);
     }
 
     @Override

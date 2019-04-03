@@ -3,9 +3,7 @@ package com.moving.admin.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.moving.admin.bean.Result;
-import com.moving.admin.entity.customer.Customer;
-import com.moving.admin.entity.customer.CustomerRemind;
-import com.moving.admin.entity.customer.Department;
+import com.moving.admin.entity.customer.*;
 import com.moving.admin.entity.talent.Experience;
 import com.moving.admin.service.CustomerService;
 import com.moving.admin.util.ResultUtil;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Map;
 
 @Api(description = "客户管理")
 @RestController
@@ -91,6 +90,13 @@ public class CustomerController extends AbstractController {
     }
 
     @ApiOperation("获取所有部门")
+    @GetMapping("/department/byId")
+    public Result<List<Department>>getAllDepartmentByCustomerId(Long id) throws Exception {
+        List<Department> list = customerService.getCustomerDepartments(id);
+        return ResultUtil.success(list);
+    }
+
+    @ApiOperation("获取所有部门")
     @GetMapping("/department-all")
     public Result<List<Department>>getAllDepartment() throws Exception {
         List<Department> list = customerService.getAllDepartment();
@@ -102,4 +108,31 @@ public class CustomerController extends AbstractController {
     public Result<List<Experience>> getCustomerTalent(Long id) throws Exception {
         return ResultUtil.success(customerService.getCustomerTalents(id));
     }
+
+    @ApiOperation("添加-编辑客户联系人")
+    @PostMapping("/contact/save")
+    public Result<Long> saveContact(@RequestBody CustomerContact customerContact) throws Exception {
+        return ResultUtil.success(customerService.saveCustomerContact(customerContact));
+    }
+
+    @ApiOperation("添加客户联系人联系记录")
+    @PostMapping("/contact/remark/save")
+    public Result<Long> saveContactRemark(@RequestBody CustomerContactRemark customerContactRemark) throws Exception {
+        return ResultUtil.success(customerService.saveCustomerContactRemark(customerContactRemark));
+    }
+
+    @ApiOperation("获取公司下所有联系人及其联系记录")
+    @GetMapping("/contact/all")
+    public Result<List<Map<String, Object>>> getCustomerContact(Long id) throws Exception {
+        return ResultUtil.success(customerService.getAllCustomerContact(id));
+    }
+
+    @ApiOperation("客户列名-取消列名")
+    @PostMapping("/contact/bindFollowUser-toggle")
+    public Result<Long> toggleBindFollowUser(Long customerId, Long userId, Boolean status) throws Exception {
+        return ResultUtil.success(customerService.toggleBindFollowUser(customerId, userId, status));
+    }
+
+
+
 }

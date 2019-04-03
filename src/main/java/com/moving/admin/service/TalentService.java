@@ -53,6 +53,9 @@ public class TalentService extends AbstractService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private CommonService commonService;
+
     // 手机号验证重复
     public Talent checkPhone(String phone) {
         Talent talent = null;
@@ -100,19 +103,23 @@ public class TalentService extends AbstractService {
         experienceDao.removeAllByTalentId(id);
         talent.getExperienceList().forEach(item -> {
             Long customerId = addCustomerFromTalentInfo(item.getCompany());
-            Long departmentId = addDepartmentFromTalentInfo(customerId, item.getDepartment());
+            Long departmentId = commonService.addDepartmentFromTalentInfo(customerId, item.getDepartment());
             Experience experience = experienceDao.findExperienceByCustomerIdAndDepartmentIdAndTalentId(item.getCustomerId(), item.getDepartmentId(), id);
-            if (experience == null) {
+//            if (experience == null) {
+            if (true) {
                 item.setTalentId(id);
                 item.setCustomerId(customerId);
                 item.setDepartmentId(departmentId);
+                if (item.getStatus()) {
+                    item.setEndTime(new Date(System.currentTimeMillis()));
+                }
                 experienceDao.save(item);
             }
         });
         friendDao.removeAllByTalentId(id);
         talent.getFriends().forEach(friend -> {
             Long customerId = addCustomerFromTalentInfo(friend.getCompany());
-            Long departmentId = addDepartmentFromTalentInfo(customerId, friend.getDepartment());
+            Long departmentId = commonService.addDepartmentFromTalentInfo(customerId, friend.getDepartment());
             friend.setTalentId(id);
             friend.setCustomerId(customerId);
             friend.setDepartmentId(departmentId);
@@ -124,7 +131,6 @@ public class TalentService extends AbstractService {
             chance.setTalentId(id);
             chance.setCustomerId(customerId);
             chanceDao.save(chance);
-
         });
         TalentRemind remind = talent.getRemind();
         if (remind != null) {
@@ -146,18 +152,6 @@ public class TalentService extends AbstractService {
             customerDao.save(customer);
             return customer.getId();
         }
-    }
-
-    // 添加部门，去重
-    public Long addDepartmentFromTalentInfo(Long customerId, String name) {
-        Department department = departmentDao.findByCustomerIdAndName(customerId, name);
-        if (department == null) {
-            department = new Department();
-            department.setCustomerId(customerId);
-            department.setName(name);
-            departmentDao.save(department);
-        }
-        return department.getId();
     }
 
     // 获取人才详情

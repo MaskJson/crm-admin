@@ -1,29 +1,31 @@
 package com.moving.admin.service;
 
-import com.moving.admin.dao.customer.CustomerDao;
-import com.moving.admin.dao.customer.CustomerRemindDao;
-import com.moving.admin.dao.customer.DepartmentDao;
+import com.moving.admin.dao.customer.*;
 import com.moving.admin.dao.folder.FolderItemDao;
+import com.moving.admin.dao.natives.CustomerNative;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.dao.talent.ExperienceDao;
 import com.moving.admin.dao.talent.TalentDao;
-import com.moving.admin.entity.customer.Customer;
-import com.moving.admin.entity.customer.CustomerRemind;
-import com.moving.admin.entity.customer.Department;
+import com.moving.admin.entity.customer.*;
 import com.moving.admin.entity.folder.FolderItem;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.talent.Experience;
+import com.moving.admin.exception.WebException;
+import com.moving.admin.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -50,8 +52,23 @@ public class CustomerService extends AbstractService {
     @Autowired
     private TalentDao talentDao;
 
+    @Autowired
+    private CustomerContactDao customerContactDao;
+
+    @Autowired
+    private CustomerContactRemarkDao customerContactRemarkDao;
+
+    @Autowired
+    private UnbindRecordDao unbindRecordDao;
+
+    @Autowired
+    private CommonService commonService;
+
+    @Autowired
+    private CustomerNative customerNative;
+
     // 添加、编辑
-    public Long save(Customer customer) {
+    public Long save(@RequestBody Customer customer) {
         customer.setUpdateTime(new Date(System.currentTimeMillis()));
         customerDao.save(customer);
         return customer.getId();
@@ -67,8 +84,15 @@ public class CustomerService extends AbstractService {
         }
         if (customer != null) {
             Long userId = customer.getCreateUserId();
-            if (userId != null) {
-                customer.setCreateUser(userDao.findById(userId).get().getNickName());
+            Long followUserId = customer.getFollowUserId();
+//            if (userId != null) {
+//                customer.setCreateUser(userDao.findById(userId).get().getNickName());
+//            }
+            if (followUserId != null) {
+                User user = userDao.findById(followUserId).get();
+                if (user != null) {
+                    customer.setFollowUser(user.getNickName());
+                }
             }
         }
         return customer;
@@ -111,7 +135,7 @@ public class CustomerService extends AbstractService {
     }
 
     // 添加客户跟踪
-    public Long saveRemind(CustomerRemind remind) {
+    public Long saveRemind(@RequestBody CustomerRemind remind) {
         remind.setCreateTime(new Date(System.currentTimeMillis()));
         remind.setUpdateTime(new Date(System.currentTimeMillis()));
         customerRemindDao.save(remind);
@@ -165,6 +189,73 @@ public class CustomerService extends AbstractService {
             }
         });
         return experiences;
+    }
+
+    // 获取公司下所有部门
+    public List<Department> getCustomerDepartments(Long id) {
+        return departmentDao.findAllByCustomerId(id);
+    }
+
+    /**
+     * 联系人相关
+     */
+    // 添加联系人
+    public Long saveCustomerContact(@RequestBody CustomerContact customerContact) {
+        customerContact.setUpdateTime(new Date(System.currentTimeMillis()));
+        System.err.println(customerContact.getCustomerId());
+        System.err.println(customerContact.getDepartment());
+        customerContact.setDepartmentId(commonService.addDepartmentFromTalentInfo(customerContact.getCustomerId(), customerContact.getDepartment()));
+        customerContactDao.save(customerContact);
+        return customerContact.getId();
+    }
+
+    // 添加联系记录
+    public Long saveCustomerContactRemark(@RequestBody CustomerContactRemark customerContactRemark) {
+        customerContactRemarkDao.save(customerContactRemark);
+        return customerContactRemark.getId();
+    }
+
+    // 获取客户下的所有联系人
+    public List<Map<String, Object>> getAllCustomerContact(Long customerId) {
+        return customerNative.getAllCustomerContactById(customerId);
+    }
+
+    // 列名或取消列名
+    @Transactional
+    public Long toggleBindFollowUser(Long customerId, Long userId, Boolean status) {
+        Customer customer = customerDao.findById(customerId).get();
+        if (status && customer.getFollowUserId() != null) {
+            throw new WebException(400, "该客户已被其他用户列名", null);
+        }
+        if (customer != null) {
+            Long followUserId = customer.getFollowUserId();
+            if (followUserId == userId) {
+                UnbindRecord unbindRecord = new UnbindRecord();
+                unbindRecord.setCustomerId(customerId);
+                unbindRecord.setUserId(userId);
+                unbindRecord.setCreateTime(new Date(System.currentTimeMillis()));
+                unbindRecordDao.deleteAllByCustomerIdAndUserId(customerId, userId);
+                unbindRecordDao.save(unbindRecord);
+                customer.setType(0);
+                customer.setFollowUserId(null);
+            } else if (followUserId == null){
+                UnbindRecord unbindRecord = unbindRecordDao.findUnbindRecordByCustomerIdAndUserIdAndCreateTimeAfter(customerId, userId, new Date(System.currentTimeMillis() - 86400000L));
+                if (unbindRecord != null) {
+                    throw new WebException(400, "您在" + DateUtil.dateToStr(unbindRecord.getCreateTime()) + "取消了该客户的列名，一个月内不允许对该客户做列名操作", null);
+                }
+                Integer customersOfUser = customerDao.getCountByFollowUserId(userId);
+                if (customersOfUser >= 50) {
+                    throw new WebException(400, "单人的客户列名上限为50， 您已达到上限", null);
+                } else {
+                    customer.setType(1);
+                    customer.setFollowUserId(userId);
+                }
+            }
+            customerDao.save(customer);
+            return customerId;
+        } else {
+            throw new WebException(400, "该客户不存在", null);
+        }
     }
 
 }

@@ -11,7 +11,7 @@ public interface CustomerDao extends JpaRepository<Customer, Long>, JpaSpecifica
 
     Customer findByName(String name);
 
-//    @Query("select id, name from Customer")
-//    List<Customer> findAllCustomer();
+    @Query(value = "select count(1) from customer where follow_user_id = ?", nativeQuery = true)
+    Integer getCountByFollowUserId(Long userId);
 
 }

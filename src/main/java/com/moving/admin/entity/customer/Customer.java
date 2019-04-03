@@ -65,6 +65,9 @@ public class Customer extends BaseEntity {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "拓展跟进用户ID")
+    private Long followUserId;
+
     @ApiModelProperty(value = "关联项目数")
     @Transient
     private Long projectCount;
@@ -76,4 +79,8 @@ public class Customer extends BaseEntity {
     @ApiModelProperty(value = "创建者name")
     @Transient
     private String createUser;
+
+    @ApiModelProperty(value = "拓展用户name")
+    @Transient
+    private String followUser;
 }

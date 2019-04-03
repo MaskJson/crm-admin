@@ -1,5 +1,6 @@
 package com.moving.admin.controller.sys;
 
+import com.moving.admin.annotation.IgnoreSecurity;
 import com.moving.admin.bean.Result;
 import com.moving.admin.bean.TokenInformation;
 import com.moving.admin.controller.AbstractController;
@@ -52,6 +53,7 @@ public class UserController extends AbstractController {
     })
     @ApiOperation("系统用户登录")
     @PostMapping("/login")
+    @IgnoreSecurity
     public Result<Map> login(String username, String password) throws Exception {
         User user = userService.login(username, password);
         if (user!=null) {
