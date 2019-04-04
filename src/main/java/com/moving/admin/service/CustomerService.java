@@ -68,7 +68,7 @@ public class CustomerService extends AbstractService {
     private CustomerNative customerNative;
 
     // 添加、编辑
-    public Long save(@RequestBody Customer customer) {
+    public Long save(Customer customer) {
         customer.setUpdateTime(new Date(System.currentTimeMillis()));
         customerDao.save(customer);
         return customer.getId();
@@ -200,24 +200,32 @@ public class CustomerService extends AbstractService {
      * 联系人相关
      */
     // 添加联系人
-    public Long saveCustomerContact(@RequestBody CustomerContact customerContact) {
+    public Long saveCustomerContact(CustomerContact customerContact) {
+        if (customerContact.getId() == null) {
+            customerContact.setCreateTime(new Date(System.currentTimeMillis()));
+        }
         customerContact.setUpdateTime(new Date(System.currentTimeMillis()));
-        System.err.println(customerContact.getCustomerId());
-        System.err.println(customerContact.getDepartment());
         customerContact.setDepartmentId(commonService.addDepartmentFromTalentInfo(customerContact.getCustomerId(), customerContact.getDepartment()));
         customerContactDao.save(customerContact);
         return customerContact.getId();
     }
 
+    // 删除联系人及其联系记录
+    @Transactional
+    public void delCustomerContactByIds(Long [] ids) {
+        customerContactDao.deleteAllByIdIn(ids);
+        customerContactRemarkDao.deleteAllByCustomerContactIdIn(ids);
+    }
+
     // 添加联系记录
-    public Long saveCustomerContactRemark(@RequestBody CustomerContactRemark customerContactRemark) {
+    public CustomerContactRemark saveCustomerContactRemark(CustomerContactRemark customerContactRemark) {
         customerContactRemarkDao.save(customerContactRemark);
-        return customerContactRemark.getId();
+        return customerContactRemark;
     }
 
     // 获取客户下的所有联系人
-    public List<Map<String, Object>> getAllCustomerContact(Long customerId) {
-        return customerNative.getAllCustomerContactById(customerId);
+    public List<Map<String, Object>> getAllCustomerContact(Long customerId, String name, Long departmentId, String position, String phone) {
+        return customerNative.getAllCustomerContactById(customerId, name, departmentId, position, phone);
     }
 
     // 列名或取消列名

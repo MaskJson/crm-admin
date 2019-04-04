@@ -8,4 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface CustomerContactDao extends JpaRepository<CustomerContact, Long>, JpaSpecificationExecutor<CustomerContact> {
+
+    void deleteAllByIdIn(Long[] ids);
+
 }

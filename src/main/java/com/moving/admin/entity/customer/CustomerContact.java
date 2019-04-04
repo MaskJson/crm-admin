@@ -36,7 +36,7 @@ public class CustomerContact extends BaseEntity {
 
     private Long createUserId;
 
-    private Date createTime = new Date(System.currentTimeMillis());
+    private Date createTime;
 
     private Date updateTime;
 

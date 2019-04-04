@@ -117,14 +117,21 @@ public class CustomerController extends AbstractController {
 
     @ApiOperation("添加客户联系人联系记录")
     @PostMapping("/contact/remark/save")
-    public Result<Long> saveContactRemark(@RequestBody CustomerContactRemark customerContactRemark) throws Exception {
+    public Result<CustomerContactRemark> saveContactRemark(@RequestBody CustomerContactRemark customerContactRemark) throws Exception {
         return ResultUtil.success(customerService.saveCustomerContactRemark(customerContactRemark));
     }
 
     @ApiOperation("获取公司下所有联系人及其联系记录")
     @GetMapping("/contact/all")
-    public Result<List<Map<String, Object>>> getCustomerContact(Long id) throws Exception {
-        return ResultUtil.success(customerService.getAllCustomerContact(id));
+    public Result<List<Map<String, Object>>> getCustomerContact(Long id, String name, Long departmentId, String position, String phone) throws Exception {
+        return ResultUtil.success(customerService.getAllCustomerContact(id, name, departmentId, position, phone));
+    }
+
+    @ApiOperation("删除联系人")
+    @PostMapping("/contact/del")
+    public Result delCustomerContactByIds(@RequestBody Long [] ids) throws Exception {
+        customerService.delCustomerContactByIds(ids);
+        return ResultUtil.success(null);
     }
 
     @ApiOperation("客户列名-取消列名")
