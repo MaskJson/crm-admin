@@ -43,6 +43,10 @@ public class User extends BaseEntity {
     private Date updateTime;
 
     @Transient
+    @ApiModelProperty(value = "团队ID")
+    private Long teamId;
+
+    @Transient
     @ApiModelProperty(value = "用户角色")
     private Role role;
 

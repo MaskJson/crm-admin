@@ -7,6 +7,8 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.Map;
 
 @ApiModel("团队")
 @Data
@@ -14,25 +16,34 @@ import javax.persistence.*;
 @Table(name = "team")
 public class Team extends BaseEntity {
 
-
     @Id
     @GeneratedValue(generator = "id_generator")
     @GenericGenerator(name = "id_generator", strategy = "identity")
     private Long id;
 
-    @ApiModelProperty(value = "客户总监id")
-    private Long cpId;
+    private Long userId;
 
-    @ApiModelProperty(value = "项目经理id")
-    private Long pmId;
+    @ApiModelProperty(value = "成员等级：1：总监、2：项目经理、3：高级顾问、4：中级顾问、5：兼职 --- 中级顾问和兼职没有下级，下级只能为顾问和助理")
+    private Integer level;
 
-    @ApiModelProperty(value = "项目顾问id")
-    private Long plId;
+    private Long parentId;
 
-    @ApiModelProperty(value = "关联项目经理id")
-    private Long parentPmId;
+    private Long teamId;
 
-    @ApiModelProperty(value = "关联总监id")
-    private Long parentCpId;
+    @Transient
+    @ApiModelProperty(value = "项目经理列表")
+    private List<Map<String, Object>> pms;
+
+    @Transient
+    @ApiModelProperty(value = "高级顾问列表")
+    private List<Map<String, Object>> iPls;
+
+    @Transient
+    @ApiModelProperty(value = "中级顾问列表")
+    private List<Long> mPls;
+
+    @Transient
+    @ApiModelProperty(value = "兼职列表")
+    private List<Long> pts;
 
 }

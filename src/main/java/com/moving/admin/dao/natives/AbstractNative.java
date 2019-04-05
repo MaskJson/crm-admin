@@ -2,10 +2,15 @@ package com.moving.admin.dao.natives;
 
 import org.springframework.data.domain.Pageable;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
 
 public abstract class AbstractNative<T> {
+
+    @PersistenceContext
+    protected EntityManager entityManager;
 
     public abstract void appendSort(Pageable pageable);
 
