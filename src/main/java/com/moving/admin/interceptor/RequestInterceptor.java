@@ -40,12 +40,11 @@ public class RequestInterceptor implements HandlerInterceptor {
             return true;
         } else {
             String jwt = request.getHeader("token");
-            if (jwt != null && jwt != "") {
+            if (jwt != null && !jwt.equals("")) {
                 Map<String, Object> map = jwtUtil.decode(jwt, TokenInformation.class);
                 if (map == null) {
                     throw new WebException(401, "未登录", null);
                 }
-//					TokenInformation tokenInformation = (TokenInformation) map.get("token");
                 if ((boolean) map.get("overtime")) {
                     throw new WebException(403, "登录超时", null);
                 }
