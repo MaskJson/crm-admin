@@ -97,6 +97,7 @@ public class TeamService extends AbstractService {
             if (!StringUtils.isEmpty(name)) {
                 list.add(cb.like(root.get("nickName"), "%" + name + "%"));
             }
+            list.add(cb.equal(root.get("roleId"), 3));
             Predicate[] predicates = new Predicate[list.size()];
             return query.where(list.toArray(predicates)).getRestriction();
         }, pageable);

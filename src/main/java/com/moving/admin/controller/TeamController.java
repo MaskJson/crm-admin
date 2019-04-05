@@ -1,5 +1,6 @@
 package com.moving.admin.controller;
 
+import com.moving.admin.annotation.IgnoreSecurity;
 import com.moving.admin.bean.Result;
 import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.sys.User;
