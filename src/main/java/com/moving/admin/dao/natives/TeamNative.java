@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class TeamNative extends AbstractNative<User> {
+public class TeamNative extends AbstractNative {
 
     private StringBuilder select = new StringBuilder("select u.id as id, u.nick_name as nickName");
     private StringBuilder count = new StringBuilder("select count(1)");

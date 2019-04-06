@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import javax.persistence.NoResultException;
 import java.math.BigInteger;
 
-public abstract class AbstractNative<T> {
+public abstract class AbstractNative {
 
     public abstract void appendSort(Pageable pageable);
 

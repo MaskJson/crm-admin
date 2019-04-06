@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CustomerNative extends AbstractNative<Customer> {
+public class CustomerNative extends AbstractNative {
 
     private String contactSelect = "select c.id, c.name, d.name as department, c.create_user_id as createUserId, c.create_time as createTime, c.position, c.important, c.phone, u.nick_name as createUser";
     private String contactFrom = " from customer_contact c left join department d on c.department_id = d.id left join sys_user u on u.id = c.create_user_id";
