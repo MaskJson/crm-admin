@@ -1,5 +1,8 @@
 package com.moving.admin.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.moving.admin.dao.natives.TeamNative;
 import com.moving.admin.dao.sys.TeamDao;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.entity.sys.Team;
@@ -25,6 +28,9 @@ public class TeamService extends AbstractService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private TeamNative teamNative;
+
     /**
      * // 添加-编辑团队
      * @param team
@@ -42,38 +48,46 @@ public class TeamService extends AbstractService {
         }
         Long teamId = team.getId();
         List<Map<String, Object>> pms = team.getPms();
-        List<Map<String, Object>> iPls = team.getIPls();
-        List<Long> mPls = team.getMPls();
+        List<Map<String, Object>> iPls = team.getIpls();
+        List<Long> mPls = team.getMpls();
         List<Long> pts = team.getPts();
         // 项目经理
         List<Team> teams = new ArrayList<>();
-        pms.forEach(pm -> {
-            Team t = getTeamItem((long)pm.get("userId"), null, teamId, 2);
-            teamDao.save(t);
-            Long parentId = t.getId();
-            ((List<Long>)pm.get("children")).forEach(id -> {
-                teams.add(getTeamItem(id, parentId, teamId, null));
+        if (pms != null) {
+            pms.forEach(pm -> {
+                setTeamList(teamId, teams, pm, 2);
             });
-        });
+        }
         // 高级顾问
-        iPls.forEach(ipl -> {
-            Team t = getTeamItem((long)ipl.get("userId"), null, teamId, 3);
-            teamDao.save(t);
-            Long parentId = t.getId();
-            ((List<Long>)ipl.get("Children")).forEach(id -> {
-                teams.add(getTeamItem(id, parentId, teamId, null));
+        if (iPls != null) {
+            iPls.forEach(ipl -> {
+                setTeamList(teamId, teams, ipl, 3);
             });
-        });
-        // 中级顾问
-        mPls.forEach(id -> {
-            teams.add(getTeamItem(id, null, teamId, 4));
-        });
+        }
+        //中级顾问
+        if (mPls != null) {
+            mPls.forEach(id -> {
+                teams.add(getTeamItem(id, null, teamId, 4));
+            });
+        }
         // 兼职
-        pts.forEach(id -> {
-            teams.add(getTeamItem(id, null, teamId, 5));
-        });
-        teamDao.saveAll(teams);
+        if (pts != null) {
+            pts.forEach(id -> {
+                teams.add(getTeamItem(id, null, teamId, 5));
+            });
+        }
+        List<Team> list = teamDao.saveAll(teams);
         return teamId;
+    }
+
+    public void setTeamList(Long teamId, List<Team> teams, Map<String, Object> map, Integer level) {
+        Team t = getTeamItem(Long.parseLong(map.get("userId").toString()), null, teamId, level);
+        teamDao.save(t);
+        Long parentId = t.getId();
+        JSONArray array = JSON.parseArray(map.get("children").toString());
+        array.forEach(id -> {
+            teams.add(getTeamItem(Long.parseLong(id.toString()), parentId, teamId, null));
+        });
     }
 
     /**
@@ -83,6 +97,13 @@ public class TeamService extends AbstractService {
      */
     public List<Team> getTeamMembersByTeamId(Long teamId) {
         return teamDao.findAllByTeamId(teamId);
+    }
+
+    /**
+     * 获取团队成员信息
+     */
+    public List<Map<String, Object>> getTeamMembersWithInfo(Long teamId) {
+        return teamNative.getTeamMemberWithInfo(teamId);
     }
 
     /**
@@ -105,9 +126,14 @@ public class TeamService extends AbstractService {
             Team team = teamDao.findTeamByUserIdAndLevel(user.getId(), 1);
             if (team != null) {
                 user.setTeamId(team.getId());
+                user.setCount(teamDao.getCountOfTeam(team.getId()));
             }
         });
         return result;
+    }
+
+    public List<Map<String, Object>> getTeamManagerUsers() {
+        return teamNative.getTeamManagerUsers();
     }
 
     /**

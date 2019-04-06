@@ -16,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Api(description = "团队管理")
 @RestController
@@ -37,10 +38,23 @@ public class TeamController extends AbstractController {
         return ResultUtil.success(teamService.getTeamMembersByTeamId(id));
     }
 
+    @ApiOperation("查看团队成员列表带信息")
+    @GetMapping("/membersWithInfo")
+    public Result<List<Map<String, Object>>> getTeamMembersWithInfo(Long id) throws Exception {
+        return ResultUtil.success(teamService.getTeamMembersWithInfo(id));
+    }
+
     @ApiOperation("团队添加-编辑")
-    @PostMapping("/members")
+    @PostMapping("/save")
     public Result<Long> saveTeam(@RequestBody Team team) throws Exception {
         return ResultUtil.success(teamService.save(team));
     }
+
+    @ApiOperation("获取团队管理所需user")
+    @GetMapping("/users")
+    public Result<List<Map<String, Object>>> getTeamManagerUser() throws Exception {
+        return ResultUtil.success(teamService.getTeamManagerUsers());
+    }
+
 
 }

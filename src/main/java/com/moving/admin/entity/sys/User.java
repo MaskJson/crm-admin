@@ -47,6 +47,10 @@ public class User extends BaseEntity {
     private Long teamId;
 
     @Transient
+    @ApiModelProperty(value = "团队成员人数")
+    private Long count;
+
+    @Transient
     @ApiModelProperty(value = "用户角色")
     private Role role;
 
