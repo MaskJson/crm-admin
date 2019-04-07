@@ -117,7 +117,6 @@ public class CustomerService extends AbstractService {
                 folderItems.forEach(folderItem -> {
                     ids.add(folderItem.getItemId());
                 });
-                System.err.println(ids.size());
                 Expression<Long> exp = root.<Long>get("id");
                 list.add(cb.and(exp.in(ids)));
             }
@@ -130,8 +129,10 @@ public class CustomerService extends AbstractService {
     // 关注装修改
     public void toggleFollow(Long id, Boolean follow) {
         Customer customer = customerDao.findById(id).get();
-        customer.setFollow(follow);
-        save(customer);
+        if (customer != null) {
+            customer.setFollow(follow);
+            save(customer);
+        }
     }
 
     // 添加客户跟踪

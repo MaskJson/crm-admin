@@ -14,6 +14,7 @@ public class ControllerAdvice {
     public Map<String, Object> errorHandler(Exception ex) {
         Map<String, Object> map = new HashMap<String, Object>();
         String message = ex.getMessage();
+        ex.printStackTrace();
         message = message != null && message != "" ? message : "请求处理异常";
         if (message.indexOf("Required request body is missing") > -1) {
             message = "请传递所需的json数据,并指定Content-Type";

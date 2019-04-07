@@ -1,6 +1,7 @@
 package com.moving.admin.entity.project;
 
 import com.moving.admin.entity.BaseEntity;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,11 +27,14 @@ public class Project extends BaseEntity {
     @ApiModelProperty(value = "关联客户")
     private Long customerId;
 
+    @ApiModelProperty(value = "是否关注")
+    private Boolean follow;
+
     @ApiModelProperty(value = "项目名称")
     private String name;
 
     @ApiModelProperty(value = "匹配条件")
-    private String match;
+    private String matches;
 
     @ApiModelProperty(value = "招聘数量")
     private Long amount;
@@ -87,10 +91,10 @@ public class Project extends BaseEntity {
     private Integer yearEnd;
 
     @ApiModelProperty(value = "起始年薪")
-    private Integer salaryStart;
+    private double salaryStart;
 
-    @ApiModelProperty(value = "起始年薪")
-    private Integer salaryEnd;
+    @ApiModelProperty(value = "截止年薪")
+    private double salaryEnd;
 
     @ApiModelProperty(value = "年龄要求：1：无要求、2：男、3：女")
     private Integer sex;

@@ -1,7 +1,5 @@
 package com.moving.admin.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.moving.admin.bean.Result;
 import com.moving.admin.entity.customer.*;
 import com.moving.admin.entity.talent.Experience;
@@ -16,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 

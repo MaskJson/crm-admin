@@ -16,18 +16,12 @@ import java.util.Map;
 @Service
 public class CustomerNative extends AbstractNative {
 
-    private String contactSelect = "select c.id, c.name, d.name as department, c.create_user_id as createUserId, c.create_time as createTime, c.position, c.important, c.phone, u.nick_name as createUser";
-    private String contactFrom = " from customer_contact c left join department d on c.department_id = d.id left join sys_user u on u.id = c.create_user_id";
-    private String contactWhere = " where c.customer_id = ";
-    private String contactOrder = " order by c.id desc";
-
-    private String remarkSelect = "select c.id, c.remark, c.create_time as createTime, u.nick_name as createUser";
-    private String remarkFrom = " from customer_contact_remark c join sys_user u on c.create_user_id = u.id";
-    private String remarkWhere = " where c.customer_contact_id = ";
-    private String remarkOrder = " order by c.id desc";
-
     // 获取客户下所有联系人及联系记录
     public List<Map<String, Object>> getAllCustomerContactById(Long customerId, String name, Long departmentId, String position, String phone) {
+        String contactSelect = "select c.id, c.name, d.name as department, c.create_user_id as createUserId, c.create_time as createTime, c.position, c.important, c.phone, u.nick_name as createUser";
+        String contactFrom = " from customer_contact c left join department d on c.department_id = d.id left join sys_user u on u.id = c.create_user_id";
+        String contactWhere = " where c.customer_id = ";
+        String contactOrder = " order by c.id desc";
         // 处理查询条件
         String where = "";
         if (StringUtils.isNotEmpty(name)) {
@@ -64,6 +58,10 @@ public class CustomerNative extends AbstractNative {
 
     // 获取联系人下的联系记录
     public List<Map<String, Object>> getRemarkByContactId(Long contactId) {
+        String remarkSelect = "select c.id, c.remark, c.create_time as createTime, u.nick_name as createUser";
+        String remarkFrom = " from customer_contact_remark c join sys_user u on c.create_user_id = u.id";
+        String remarkWhere = " where c.customer_contact_id = ";
+        String remarkOrder = " order by c.id desc";
         String sql = remarkSelect + remarkFrom + remarkWhere + contactId + remarkOrder;
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);

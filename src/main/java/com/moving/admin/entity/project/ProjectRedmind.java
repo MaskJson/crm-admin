@@ -29,7 +29,10 @@ public class ProjectRedmind extends BaseEntity {
     @ApiModelProperty(value = "项目id")
     private Long projectId;
 
-    @ApiModelProperty(value = "跟踪状态")
+    @ApiModelProperty(value = "跟踪类型")
+    private Integer type;
+
+    @ApiModelProperty(value = "改变状态为")
     private Integer status;
 
     @ApiModelProperty(value = "跟踪备注")
@@ -40,8 +43,5 @@ public class ProjectRedmind extends BaseEntity {
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
-
-    @ApiModelProperty(value = "创建人昵称")
-    private String createUser;
 
 }

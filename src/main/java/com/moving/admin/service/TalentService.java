@@ -206,8 +206,10 @@ public class TalentService extends AbstractService {
     // 关注装修改
     public void toggleFollow(Long id, Boolean follow) {
         Talent talent = talentDao.findById(id).get();
-        talent.setFollow(follow);
-        talentDao.save(talent);
+        if (talent != null) {
+            talent.setFollow(follow);
+            talentDao.save(talent);
+        }
     }
 
     // 添加客户跟踪
