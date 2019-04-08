@@ -81,6 +81,9 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "意向城市")
     private String intentionCity;
 
+    @ApiModelProperty(value = "意向职位")
+    private String position;
+
     @ApiModelProperty(value = "行业")
     private String industry;
 
@@ -141,4 +144,7 @@ public class Talent extends BaseEntity {
     @Transient
     private TalentRemind remind;
 
+    @ApiModelProperty(value = "关联项目数")
+    @Transient
+    private Long projectCount;
 }

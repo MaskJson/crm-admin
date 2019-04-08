@@ -34,11 +34,11 @@ public class CommonService extends AbstractService {
     public List<Map<String, Object>> getListByTableName(Integer type, String name) {
         String tableName = null;
         switch (type) {
-            case 1: tableName = "customer";break;
-            case 2: tableName = "talent";break;
-            case 3: tableName = "project";break;
-            case 4: tableName = "sys_user";break;
-            case 5: tableName = "team";break;
+            case 1: tableName = "customer";break; // 所有客户
+            case 2: tableName = "talent";break; // 所有人才
+            case 3: tableName = "project";break; // 所有项目
+            case 4: tableName = "sys_user";break; // 所有兼职
+            case 5: tableName = "team";break; // 所有团队
         }
         if (tableName == null) {
             return null;

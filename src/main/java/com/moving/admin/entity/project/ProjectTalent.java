@@ -26,6 +26,9 @@ public class ProjectTalent extends BaseEntity {
     @ApiModelProperty(value = "项目id")
     private Long projectId;
 
+    @ApiModelProperty(value = "人才跟踪状态")
+    private Integer type;
+
     @ApiModelProperty(value = "人才进展状态")
     private Integer status;
 
@@ -34,5 +37,8 @@ public class ProjectTalent extends BaseEntity {
 
     @ApiModelProperty(value = "创建人id")
     private Long createUserId;
+
+    @ApiModelProperty(value = "修改时间=最后跟踪时间")
+    private Date updateTime;
 
 }

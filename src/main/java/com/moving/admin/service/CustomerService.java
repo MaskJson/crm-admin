@@ -69,7 +69,9 @@ public class CustomerService extends AbstractService {
 
     // 添加、编辑
     public Long save(Customer customer) {
-        customer.setUpdateTime(new Date(System.currentTimeMillis()));
+        if (customer.getId() != null) {
+            customer.setUpdateTime(new Date(System.currentTimeMillis()));
+        }
         customerDao.save(customer);
         return customer.getId();
     }

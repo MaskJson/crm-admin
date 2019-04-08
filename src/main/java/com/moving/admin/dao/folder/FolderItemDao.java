@@ -4,6 +4,7 @@ import com.moving.admin.entity.folder.FolderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -16,6 +17,6 @@ public interface FolderItemDao extends JpaRepository<FolderItem, Long>, JpaSpeci
     List<FolderItem> findAllByFolderIdAndAndType(Long folderId, Integer type);
 
     @Query("select itemId from FolderItem where folderId=:folderId and type=:type")
-    List<Long> findItemIds(Long folderId, Integer type);
+    List<Long> findItemIds(@Param("folderId") Long folderId, @Param("type") Integer type);
 
 }

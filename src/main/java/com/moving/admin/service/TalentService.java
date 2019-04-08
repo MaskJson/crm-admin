@@ -1,6 +1,7 @@
 package com.moving.admin.service;
 
 import com.moving.admin.dao.customer.CustomerDao;
+import com.moving.admin.dao.project.ProjectTalentDao;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.entity.customer.Customer;
 import com.moving.admin.dao.customer.DepartmentDao;
@@ -8,6 +9,7 @@ import com.moving.admin.dao.folder.FolderItemDao;
 import com.moving.admin.dao.talent.*;
 import com.moving.admin.entity.customer.Department;
 import com.moving.admin.entity.folder.FolderItem;
+import com.moving.admin.entity.project.ProjectTalent;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.talent.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,9 @@ public class TalentService extends AbstractService {
 
     @Autowired
     private CommonService commonService;
+
+    @Autowired
+    private ProjectTalentDao projectTalentDao;
 
     // 手机号验证重复
     public Talent checkPhone(String phone) {
@@ -137,6 +142,16 @@ public class TalentService extends AbstractService {
             remind.setTalentId(id);
             talentRemindDao.save(remind);
         }
+        Long projectId = talent.getProjectId();
+        if (projectId != null) {
+            ProjectTalent projectTalent = new ProjectTalent();
+            projectTalent.setStatus(0);
+            projectTalent.setProjectId(projectId);
+            projectTalent.setTalentId(id);
+            projectTalent.setCreateUserId(talent.getCreateUserId());
+            projectTalent.setCreateTime(talent.getCreateTime());
+            projectTalentDao.save(projectTalent);
+        }
         return id;
     }
 
@@ -186,6 +201,7 @@ public class TalentService extends AbstractService {
                     chance.setCompany(customerDao.findById(chance.getCustomerId()).get().getName());
             });
             talent.setChances(chanceList);
+            talent.setProjectCount(projectTalentDao.getProjectLengthByTalentId(id));
         }
         return talent;
     }

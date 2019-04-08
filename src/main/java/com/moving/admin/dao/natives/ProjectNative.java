@@ -6,72 +6,28 @@ import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class ProjectNative extends AbstractNative {
 
-    private StringBuilder select = new StringBuilder("select a.id as id, a.name as name, u.nick_name as createUser, a.follow, a.create_time as createTime");
-    private StringBuilder selectCount = new StringBuilder("select count(1)");
-    private StringBuilder from = new StringBuilder(" from project a left join sys_user u on a.create_user_id=u.id");
-    private StringBuilder where = new StringBuilder(" where 1=1");
-    private StringBuilder sort = new StringBuilder(" order by ");
-
-    private StringBuilder stringBuilder;
-
-    public Map<String, Object> getResult(EntityManager entityManager) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("content", getProjectList(entityManager));
-        map.put("totalElements", getProjectTotalElements(entityManager));
-        return map;
-    }
-
-    public List<Map<String, Object>> getProjectList(EntityManager entityManager) {
-        String sql = select.append(from).append(where).append(sort).toString();
+    // 获取项目的诊断报告记录
+    public List<Map<String, Object>> getDiagnosisByProjectId(Long projectId) {
+        String sql = "select rp.id as id, u.nick_name as userName, rp.create_time as createTime, rp.remark as remark";
+        String whereFrom = " from project_report rp left join sys_user u on rp.create_user_id=u.id where rp.project_id=";
+        String sort = " order by rp.create_time desc";
         Session session = entityManager.unwrap(Session.class);
-        NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql + whereFrom + projectId + sort);
         query.addScalar("id", StandardBasicTypes.LONG);
-        query.addScalar("name", StandardBasicTypes.STRING);
-        query.addScalar("follow", StandardBasicTypes.BOOLEAN);
-        query.addScalar("createUser", StandardBasicTypes.STRING);
+        query.addScalar("userName", StandardBasicTypes.STRING);
         query.addScalar("createTime", StandardBasicTypes.DATE);
+        query.addScalar("remark", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
     }
 
-    public BigInteger getProjectTotalElements(EntityManager entityManager) {
-        String sqlCount = selectCount.append(from).append(where).append(sort).toString();
-        Query query = entityManager.createNativeQuery(sqlCount);
-
-        return objectToBigInteger(query.getSingleResult());
-    }
-
-    public void setFolder(String folderWhere) {
-        where.append(" and " + folderWhere);
-    }
-
-    public void setCustomer(Long customerId) {
-        where.append(" and a.customer_id=" + customerId);
-    }
-
-    public void setTeam(Long teamId) {
-        where.append(" and a.team_id=" + teamId);
-    }
-
-    public void setIndustry(String industry) {
-        where.append(" and a.industry like '%" + industry + "%'");
-    }
-
-    public void setCity(String city) {
-        where.append(" and a.city='" + city + "'");
-    }
-
-    public void appendSort(Pageable pageable) {
-        super.simpleAppendSort(pageable, sort);
-    }
+    public void appendSort(Pageable pageable) {}
 }

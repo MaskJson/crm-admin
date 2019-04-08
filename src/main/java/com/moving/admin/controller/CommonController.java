@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-@Api(description = "客户管理")
+@Api(description = "公共数据")
 @RestController
 @RequestMapping("/common")
 public class CommonController extends AbstractController {

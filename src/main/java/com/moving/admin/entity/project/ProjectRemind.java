@@ -6,28 +6,19 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @ApiModel("项目人才跟踪记录")
 @Data
 @Entity
 @Table(name = "project_remind")
-public class ProjectRedmind extends BaseEntity {
+public class ProjectRemind extends BaseEntity {
 
     @Id
     @GeneratedValue(generator = "id_generator")
     @GenericGenerator(name = "id_generator", strategy = "identity")
     private Long id;
-
-    @ApiModelProperty(value = "人才id")
-    private Long talentId;
-
-    @ApiModelProperty(value = "项目id")
-    private Long projectId;
 
     @ApiModelProperty(value = "跟踪类型")
     private Integer type;
@@ -42,6 +33,9 @@ public class ProjectRedmind extends BaseEntity {
     private Long createUserId;
 
     @ApiModelProperty(value = "创建时间")
-    private Date createTime;
+    private Date createTime = new Date(System.currentTimeMillis());
+
+    @ApiModelProperty(value = "项目人才id")
+    private Long projectTalentId;
 
 }
