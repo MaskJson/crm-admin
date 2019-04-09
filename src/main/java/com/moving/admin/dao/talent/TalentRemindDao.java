@@ -10,4 +10,6 @@ public interface TalentRemindDao extends JpaRepository<TalentRemind, Long>, JpaS
 
     List<TalentRemind> findAllByTalentIdOrderByIdDesc(Long talentId);
 
+    List<TalentRemind> findAllByTalentIdAndCreateUserIdOrderByIdDesc(Long talentId, Long createUserId);
+
 }

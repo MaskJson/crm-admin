@@ -6,6 +6,7 @@ import com.moving.admin.entity.talent.Talent;
 import com.moving.admin.entity.talent.TalentRemind;
 import com.moving.admin.service.TalentService;
 import com.moving.admin.util.ResultUtil;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
@@ -50,8 +51,8 @@ public class TalentController extends AbstractController {
 
     @ApiOperation("分页查询")
     @GetMapping("/list")
-    public Result<Page<Talent>> list(String city, String name, String industry, String aptness, Long folderId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        Page<Talent> result = talentService.getCustomerList(city, name, industry, aptness, folderId, pageable);
+    public Result<Page<Talent>> list(String city, String name, String industry, String aptness, Long folderId, Boolean follow, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        Page<Talent> result = talentService.getCustomerList(city, name, industry, aptness, folderId, follow, pageable);
         return ResultUtil.success(result);
     }
 
@@ -74,5 +75,18 @@ public class TalentController extends AbstractController {
         return ResultUtil.success(talentService.saveRemind(talentRemind));
     }
 
+    @ApiOperation("专属人才变动")
+    @PostMapping("/toggleType")
+    public Result<Boolean> toggleTalentType(Long id, Long userId, Boolean flag) throws Exception {
+        talentService.toggleType(id, userId, flag);
+        return ResultUtil.success(true);
+    }
+
+    @ApiOperation("将跟踪置为已跟进")
+    @PostMapping("/remind/finish")
+    public Result<Boolean> finishRemind(@RequestBody List<Long> ids) throws Exception {
+        talentService.finishRemindByIds(ids);
+        return ResultUtil.success(true);
+    }
 
 }

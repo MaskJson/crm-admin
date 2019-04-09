@@ -7,10 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @ApiModel("项目")
@@ -26,6 +23,9 @@ public class Project extends BaseEntity {
 
     @ApiModelProperty(value = "关联客户")
     private Long customerId;
+
+    @ApiModelProperty(value = "关联客户的部门")
+    private Long departmentId;
 
     @ApiModelProperty(value = "是否关注")
     private Boolean follow;
@@ -140,5 +140,9 @@ public class Project extends BaseEntity {
 
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
+
+    @ApiModelProperty(value = "部门名称")
+    @Transient
+    private String department;
 
 }

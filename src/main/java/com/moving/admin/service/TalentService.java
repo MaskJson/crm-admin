@@ -12,6 +12,8 @@ import com.moving.admin.entity.folder.FolderItem;
 import com.moving.admin.entity.project.ProjectTalent;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.talent.*;
+import com.moving.admin.exception.WebException;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,7 +71,7 @@ public class TalentService extends AbstractService {
     }
 
     // 分页查询
-    public Page<Talent> getCustomerList(String city, String name, String industry, String aptness, Long folderId, Pageable pageable) {
+    public Page<Talent> getCustomerList(String city, String name, String industry, String aptness, Long folderId, Boolean follow, Pageable pageable) {
         Page<Talent> result = talentDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
             if (!StringUtils.isEmpty(city)) {
@@ -83,6 +85,9 @@ public class TalentService extends AbstractService {
             }
             if (!StringUtils.isEmpty(industry)) {
                 list.add(cb.like(root.get("industry"), "%" + industry + "%"));
+            }
+            if (follow != null) {
+                list.add(cb.equal(root.get("follow"), follow));
             }
             if (folderId != null) {
                 List<FolderItem> folderItems = folderItemDao.findAllByFolderIdAndAndType(folderId, 2);
@@ -102,6 +107,11 @@ public class TalentService extends AbstractService {
     // 添加人才
     @Transactional
     public Long save(Talent talent) {
+        if (talent.getId() != null) {
+            if (talent.getFollowUserId() != null && talent.getFollowUserId() != talent.getActionUserId()) {
+                throw new WebException(400, "该人才已被其他用户列为专属人才，您无权限编辑", null);
+            }
+        }
         talent.setUpdateTime(new Date(System.currentTimeMillis()));
         talentDao.save(talent);
         Long id = talent.getId();
@@ -235,15 +245,66 @@ public class TalentService extends AbstractService {
         talentRemindDao.save(remind);
         Long followId = remind.getFollowRemindId();
         if (followId != null) {
-            finishRemindById(followId);
+            List<Long> ids = new ArrayList<>();
+            ids.add(followId);
+            finishRemindByIds(ids);
         }
         return remind.getId();
     }
 
     // 客户跟踪跟进结束
-    public void finishRemindById(Long id) {
-        TalentRemind talentRemind = talentRemindDao.findById(id).get();
-        talentRemind.setFinish(true);
-        talentRemindDao.save(talentRemind);
+    public void finishRemindByIds(List<Long> ids) {
+        ids.forEach(id -> {
+            TalentRemind talentRemind = talentRemindDao.findById(id).get();
+            talentRemind.setFinish(true);
+            talentRemindDao.save(talentRemind);
+        });
+    }
+
+    // 修改人才类型，flag=true：设为专属，false：取消专属
+    @Transactional
+    public void toggleType(Long id, Long userId, Boolean flag) {
+        Talent talent = talentDao.findById(id).get();
+        if (talent != null) {
+            if (flag) {
+                if (talent.getFollowUserId() != null) {
+                    throw new WebException(400, "该人才已被列为专属人才，请刷新", null);
+                }
+                if (talent.getSex() == null || StringUtils.isEmpty(talent.getPhone()) || StringUtils.isEmpty(talent.getPosition())) {
+                    throw new WebException(400, "专属人才性别、手机、岗位、工作经历所有信息必须填写完整", null);
+                }
+                List<Experience> experiences = experienceDao.findAllByTalentId(id);
+                experiences.forEach(item -> {
+                    if (StringUtils.isEmpty(item.getRemark()) || StringUtils.isEmpty(item.getPerformance())) {
+                        throw new WebException(400, "专属人才工作经历的工作职责和业绩必须填写完整", null);
+                    }
+                });
+                List<TalentRemind> reminds = talentRemindDao.findAllByTalentIdAndCreateUserIdOrderByIdDesc(id, userId);
+                if (reminds.size() < 3) {
+                    throw new WebException(400, "您需要对该人才进行至少3次常规跟踪，不满足设定条件", null);
+                }
+                TalentRemind remind = reminds.get(0);
+                if ((remind.getCreateTime().getTime() + 2592000000L) < System.currentTimeMillis()) {
+                    throw new WebException(400, "您近一个月内未对该人才进行常规跟踪，不满足设定条件", null);
+                }
+                talent.setFollowUserId(userId);
+                talent.setType(1);
+                talentDao.save(talent);
+            } else {
+                if (talent.getFollowUserId() != userId) {
+                    throw new WebException(400, "您不是该人才的专属用户", null);
+                }
+                talent.setFollowUserId(null);
+                talent.setType(0);
+                talentDao.save(talent);
+            }
+        } else {
+            throw new WebException(400, "该人才不存在，请刷新", null);
+        }
+    }
+
+    // 修改人才和添加常规跟踪时，判断是否升级为专属人才
+    public void checkTalentType(Talent talent) {
+
     }
 }

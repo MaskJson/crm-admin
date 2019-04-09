@@ -17,7 +17,7 @@ import java.util.Map;
 public class AdjustNative extends AbstractNative {
 
     private String talentSelect = "select pt.id as id, t.id as talentId, t.name as name, t.position as position, t.city as city, " +
-                                     "t.salary as salary, t.phone as phone, t.tag as tag, t.status as status, pt.update_time as updateTime";
+                                     "t.salary as salary, t.phone as phone, t.tag as tag, t.status as status, pt.type as type, pt.update_time as updateTime";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id";
     private String talentWhere = " where pt.status=";
     private String talentSort = " order by pt.update_time desc";
@@ -36,6 +36,7 @@ public class AdjustNative extends AbstractNative {
         query.addScalar("phone", StandardBasicTypes.STRING);
         query.addScalar("tag", StandardBasicTypes.STRING);
         query.addScalar("status", StandardBasicTypes.INTEGER);
+        query.addScalar("type", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.DATE);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();

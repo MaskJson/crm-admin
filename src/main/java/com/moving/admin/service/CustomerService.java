@@ -101,7 +101,7 @@ public class CustomerService extends AbstractService {
     }
 
     // 分页查询
-    public Page<Customer> getCustomerList(Long id, String name, String industry, Long folderId, Pageable pageable) {
+    public Page<Customer> getCustomerList(Long id, String name, String industry, Long folderId, Boolean follow, Pageable pageable) {
         Page<Customer> result = customerDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
             if (id != null) {
@@ -112,6 +112,9 @@ public class CustomerService extends AbstractService {
             }
             if (!StringUtils.isEmpty(industry)) {
                 list.add(cb.like(root.get("industry"), "%" + industry + "%"));
+            }
+            if (follow != null) {
+                list.add(cb.equal(root.get("follow"), follow));
             }
             if (folderId != null) {
                 List<FolderItem> folderItems = folderItemDao.findAllByFolderIdAndAndType(folderId, 1);
@@ -250,7 +253,7 @@ public class CustomerService extends AbstractService {
                 customer.setType(0);
                 customer.setFollowUserId(null);
             } else if (followUserId == null){
-                UnbindRecord unbindRecord = unbindRecordDao.findUnbindRecordByCustomerIdAndUserIdAndCreateTimeAfter(customerId, userId, new Date(System.currentTimeMillis() - 86400000L));
+                UnbindRecord unbindRecord = unbindRecordDao.findUnbindRecordByCustomerIdAndUserIdAndCreateTimeAfter(customerId, userId, new Date(System.currentTimeMillis() - 2592000000L));
                 if (unbindRecord != null) {
                     throw new WebException(400, "您在" + DateUtil.dateToStr(unbindRecord.getCreateTime()) + "取消了该客户的列名，一个月内不允许对该客户做列名操作", null);
                 }

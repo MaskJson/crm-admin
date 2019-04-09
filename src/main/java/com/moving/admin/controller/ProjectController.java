@@ -11,6 +11,7 @@ import com.moving.admin.entity.project.ProjectTalent;
 import com.moving.admin.service.ProjectService;
 import com.moving.admin.util.ResultUtil;
 import com.moving.admin.util.SqlUtil;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class ProjectController extends AbstractController {
     @ApiOperation("获取项目列表")
     @GetMapping("/list")
     public Result<Map<String, Object>> getList(
-            Long folderId, Long teamId, Long customerId, String industry, String city, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+            Long folderId, Long teamId, Long customerId, String industry, String city, Boolean follow, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
             ) throws Exception {
         ProjectPageNative projectNative = new ProjectPageNative();
         if (folderId != null) {
@@ -75,6 +76,9 @@ public class ProjectController extends AbstractController {
         }
         if (!StringUtils.isEmpty(city)) {
             projectNative.setCity(city);
+        }
+        if (follow != null) {
+            projectNative.setFollow(follow);
         }
         projectNative.appendSort(pageable);
         return ResultUtil.success(projectNative.getResult(entityManager));
@@ -124,6 +128,13 @@ public class ProjectController extends AbstractController {
     @PostMapping("/report/add")
     public Result<Long> addProjectReport(@RequestBody ProjectReport report) throws Exception {
         return ResultUtil.success(projectService.addProjectReport(report));
+    }
+
+    @ApiOperation("推荐给客户二次审核")
+    @PostMapping("/talent/review")
+    public Result<Boolean> reviewToCustomer(Long id, Boolean flag) throws Exception {
+        projectService.reviewToCustomer(id, flag);
+        return ResultUtil.success(true);
     }
 
 }

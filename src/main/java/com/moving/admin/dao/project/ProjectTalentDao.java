@@ -14,7 +14,7 @@ public interface ProjectTalentDao extends JpaRepository<ProjectTalent, Long>, Jp
     List<ProjectTalent> findAllByProjectId(Long projectId);
 
     // 通过人才id获取关联的项目数，不包括已淘汰的
-    @Query("select count(id) from ProjectTalent where talentId=:talentId and status<8")
+    @Query("select count(id) from ProjectTalent where talentId=:talentId and status<7")
     Long getProjectLengthByTalentId(@Param("talentId") Long talentId);
 
     // 查找某项目里是否已存在某人才，若有，重置状态

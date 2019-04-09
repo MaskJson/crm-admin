@@ -5,10 +5,12 @@ import com.moving.admin.dao.project.ProjectDao;
 import com.moving.admin.dao.project.ProjectRemindDao;
 import com.moving.admin.dao.project.ProjectReportDao;
 import com.moving.admin.dao.project.ProjectTalentDao;
+import com.moving.admin.dao.talent.TalentDao;
 import com.moving.admin.entity.project.Project;
 import com.moving.admin.entity.project.ProjectRemind;
 import com.moving.admin.entity.project.ProjectReport;
 import com.moving.admin.entity.project.ProjectTalent;
+import com.moving.admin.entity.talent.Talent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,12 @@ public class ProjectService extends AbstractService {
     @Autowired
     private ProjectNative projectNative;
 
+    @Autowired
+    private TalentDao talentDao;
+
+    @Autowired
+    private CommonService commonService;
+
     // 编辑项目
     public Long save(Project project) {
         if (project.getId() == null) {
@@ -44,6 +52,8 @@ public class ProjectService extends AbstractService {
         } else {
             project.setUpdateTime(new Date(System.currentTimeMillis()));
         }
+        Long departmentId = commonService.addDepartmentFromTalentInfo(project.getCustomerId(), project.getDepartment());
+        project.setDepartmentId(departmentId);
         projectDao.save(project);
         return project.getId();
     }
@@ -63,10 +73,21 @@ public class ProjectService extends AbstractService {
     }
 
     // 添加进展人才
+    @Transactional
     public Long saveProjectTalent(ProjectTalent projectTalent) {
         Date date = new Date(System.currentTimeMillis());
         ProjectTalent old = projectTalentDao.findProjectTalentByProjectIdAndTalentId(projectTalent.getProjectId(), projectTalent.getTalentId());
         // 若已存在，重置状态
+        Long talentId = projectTalent.getTalentId();
+        if (talentId != null) {
+            Talent talent = talentDao.findById(talentId).get();
+            if (talent != null) {
+                talent.setType(0);
+                talent.setFollowUserId(null);
+                talent.setUpdateTime(new Date(System.currentTimeMillis()));
+                talentDao.save(talent);
+            }
+        }
         if (old != null) {
             old.setStatus(0);
             old.setType(1);
@@ -97,6 +118,18 @@ public class ProjectService extends AbstractService {
             projectTalentDao.save(projectTalent);
         }
         return projectRemind.getId();
+    }
+
+    // 项目总监-推荐给客户二次审核
+    @Transactional
+    public void reviewToCustomer(Long id, Boolean flag) {
+        ProjectTalent projectTalent = projectTalentDao.findById(id).get();
+        if (projectTalent != null && projectTalent.getType() == 100) {
+            projectTalent.setType(1);
+            projectTalent.setStatus(flag ? 1 : 8);
+            projectTalent.setUpdateTime(new Date(System.currentTimeMillis()));
+            projectTalentDao.save(projectTalent);
+        }
     }
 
     // 诊断报告所需数据，获取各个状态的人数

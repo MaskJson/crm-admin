@@ -60,7 +60,7 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "状态")
     private Integer status;
 
-    @ApiModelProperty(value = "类型")
+    @ApiModelProperty(value = "类型 0: 普通人才、1：专属人才")
     private Integer type;
 
     @ApiModelProperty(value = "生日")
@@ -120,6 +120,9 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "")
+    private Long followUserId;
+
     @ApiModelProperty(value = "创建者name")
     @Transient
     private String createUser;
@@ -147,4 +150,8 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "关联项目数")
     @Transient
     private Long projectCount;
+
+    @ApiModelProperty(value = "本次操作用户id")
+    @Transient
+    private Long actionUserId;
 }

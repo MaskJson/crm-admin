@@ -43,9 +43,8 @@ public class ProjectPageNative extends AbstractNative {
     }
 
     public BigInteger getProjectTotalElements(EntityManager entityManager) {
-        String sqlCount = selectCount.append(from).append(where).append(sort).toString();
+        String sqlCount = selectCount.append(from).append(where).toString();
         Query query = entityManager.createNativeQuery(sqlCount);
-
         return objectToBigInteger(query.getSingleResult());
     }
 
@@ -68,6 +67,8 @@ public class ProjectPageNative extends AbstractNative {
     public void setCity(String city) {
         where.append(" and a.city='" + city + "'");
     }
+
+    public void setFollow(Boolean follow) { where.append(" and a.follow=" + (follow ? 1 : 0)); }
 
     public void appendSort(Pageable pageable) {
         super.simpleAppendSort(pageable, sort);
