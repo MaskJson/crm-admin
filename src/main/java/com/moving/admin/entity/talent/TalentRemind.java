@@ -66,7 +66,7 @@ public class TalentRemind extends BaseEntity {
     private Long adviserId;
 
     @ApiModelProperty(value = "是否完成跟进")
-    private Boolean finish;
+    private Boolean finish = false;
 
     @ApiModelProperty(value = "创建者name")
     @Transient

@@ -43,7 +43,7 @@ public class CustomerNative extends AbstractNative {
         query.addScalar("name", StandardBasicTypes.STRING);
         query.addScalar("department", StandardBasicTypes.STRING);
         query.addScalar("createUserId", StandardBasicTypes.LONG);
-        query.addScalar("createTime", StandardBasicTypes.DATE);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("position", StandardBasicTypes.STRING);
         query.addScalar("important", StandardBasicTypes.INTEGER);
         query.addScalar("phone", StandardBasicTypes.STRING);
@@ -67,7 +67,7 @@ public class CustomerNative extends AbstractNative {
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("remark", StandardBasicTypes.STRING);
-        query.addScalar("createTime", StandardBasicTypes.DATE);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("createUser", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();

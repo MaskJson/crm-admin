@@ -4,7 +4,7 @@ package com.moving.admin.bean;
 public class Result<T> {
 
     /**
-     * 错误码.
+     * 状态码.
      */
     private Integer code;
 

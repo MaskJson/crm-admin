@@ -68,8 +68,9 @@ public class CustomerController extends AbstractController {
 
     @ApiOperation("客户跟踪结束跟进")
     @PostMapping("/finish-remind")
-    public Result<Long> save(Long id) throws Exception {
-        return ResultUtil.success(customerService.finishRemindById(id));
+    public Result save(@RequestBody List<Long> ids) throws Exception {
+        customerService.finishRemindByIds(ids);
+        return ResultUtil.success(null);
     }
 
     @ApiOperation("客户跟踪记录")

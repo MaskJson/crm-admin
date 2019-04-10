@@ -11,14 +11,12 @@ import com.moving.admin.entity.project.ProjectRemind;
 import com.moving.admin.entity.project.ProjectReport;
 import com.moving.admin.entity.project.ProjectTalent;
 import com.moving.admin.entity.talent.Talent;
+import com.moving.admin.exception.WebException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,10 +80,17 @@ public class ProjectService extends AbstractService {
         if (talentId != null) {
             Talent talent = talentDao.findById(talentId).get();
             if (talent != null) {
-                talent.setType(0);
-                talent.setFollowUserId(null);
-                talent.setUpdateTime(new Date(System.currentTimeMillis()));
-                talentDao.save(talent);
+                List<Integer> status = new ArrayList<Integer>();
+                status.add(7);
+                status.add(8);
+                List<ProjectTalent> projectTalents = projectTalentDao.findAllByTalentIdAndCreateUserIdNotAndStatusNotIn(talentId, talent.getCreateUserId(), status);
+                // 若该人才被其他用户列为项目进展人才了，则设为普通人才
+                if (projectTalents.size() > 0) {
+                    talent.setType(0);
+                    talent.setFollowUserId(null);
+                    talent.setUpdateTime(new Date(System.currentTimeMillis()));
+                    talentDao.save(talent);
+                }
             }
         }
         if (old != null) {

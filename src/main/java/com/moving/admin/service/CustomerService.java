@@ -3,6 +3,7 @@ package com.moving.admin.service;
 import com.moving.admin.dao.customer.*;
 import com.moving.admin.dao.folder.FolderItemDao;
 import com.moving.admin.dao.natives.CustomerNative;
+import com.moving.admin.dao.project.ProjectDao;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.dao.talent.ExperienceDao;
 import com.moving.admin.dao.talent.TalentDao;
@@ -67,6 +68,9 @@ public class CustomerService extends AbstractService {
     @Autowired
     private CustomerNative customerNative;
 
+    @Autowired
+    private ProjectDao projectDao;
+
     // 添加、编辑
     public Long save(Customer customer) {
         if (customer.getId() != null) {
@@ -128,6 +132,9 @@ public class CustomerService extends AbstractService {
             Predicate[] predicates = new Predicate[list.size()];
             return query.where(list.toArray(predicates)).getRestriction();
         }, pageable);
+        result.forEach(customer -> {
+            customer.setProjectCount(projectDao.getCountByCustomerId(customer.getId()));
+        });
         return result;
     }
 
@@ -145,17 +152,23 @@ public class CustomerService extends AbstractService {
         remind.setCreateTime(new Date(System.currentTimeMillis()));
         remind.setUpdateTime(new Date(System.currentTimeMillis()));
         customerRemindDao.save(remind);
-        if (remind.getFollowRemindId() != null) {
-            finishRemindById(remind.getFollowRemindId());
+        Long followId = remind.getFollowRemindId();
+        if (followId != null) {
+            List<Long> ids = new ArrayList<>();
+            ids.add(followId);
+            finishRemindByIds(ids);
         }
         return remind.getId();
     }
 
     // 客户跟踪跟进结束
-    public Long finishRemindById(Long id) {
-        CustomerRemind customerRemind = customerRemindDao.findById(id).get();
-        customerRemind.setFinish(true);
-        return id;
+    public void finishRemindByIds(List<Long> ids) {
+        ids.forEach(id -> {
+            CustomerRemind customerRemind = customerRemindDao.findById(id).get();
+            customerRemind.setFinish(true);
+            customerRemind.setUpdateTime(new Date(System.currentTimeMillis()));
+            customerRemindDao.save(customerRemind);
+        });
     }
 
     // 获取客户跟踪记录

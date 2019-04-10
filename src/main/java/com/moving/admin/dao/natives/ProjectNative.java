@@ -23,7 +23,7 @@ public class ProjectNative extends AbstractNative {
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql + whereFrom + projectId + sort);
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("userName", StandardBasicTypes.STRING);
-        query.addScalar("createTime", StandardBasicTypes.DATE);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("remark", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();

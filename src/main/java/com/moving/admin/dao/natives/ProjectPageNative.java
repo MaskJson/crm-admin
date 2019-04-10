@@ -37,7 +37,7 @@ public class ProjectPageNative extends AbstractNative {
         query.addScalar("name", StandardBasicTypes.STRING);
         query.addScalar("follow", StandardBasicTypes.BOOLEAN);
         query.addScalar("createUser", StandardBasicTypes.STRING);
-        query.addScalar("createTime", StandardBasicTypes.DATE);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
     }

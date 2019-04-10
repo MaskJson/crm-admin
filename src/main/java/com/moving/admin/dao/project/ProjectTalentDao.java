@@ -28,4 +28,7 @@ public interface ProjectTalentDao extends JpaRepository<ProjectTalent, Long>, Jp
     @Query("select count(id) from ProjectTalent where projectId=:projectId")
     Long getCountByProjectId(@Param("projectId") Long projectId);
 
+    // 查看人才是否被其他系统用户列为项目进展人才
+    List<ProjectTalent> findAllByTalentIdAndCreateUserIdNotAndStatusNotIn(Long talentId, Long createUserId, List<Integer> status);
+
 }

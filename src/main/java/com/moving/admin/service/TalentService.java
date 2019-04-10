@@ -156,6 +156,7 @@ public class TalentService extends AbstractService {
         if (projectId != null) {
             ProjectTalent projectTalent = new ProjectTalent();
             projectTalent.setStatus(0);
+            projectTalent.setType(100);
             projectTalent.setProjectId(projectId);
             projectTalent.setTalentId(id);
             projectTalent.setCreateUserId(talent.getCreateUserId());
@@ -173,6 +174,7 @@ public class TalentService extends AbstractService {
         } else {
             customer = new Customer();
             customer.setName(name);
+            customer.setIndustry(null);
             customer.setType(0);
             customerDao.save(customer);
             return customer.getId();
@@ -272,6 +274,13 @@ public class TalentService extends AbstractService {
                 }
                 if (talent.getSex() == null || StringUtils.isEmpty(talent.getPhone()) || StringUtils.isEmpty(talent.getPosition())) {
                     throw new WebException(400, "专属人才性别、手机、岗位、工作经历所有信息必须填写完整", null);
+                }
+                List<Integer> status = new ArrayList<Integer>();
+                status.add(7);
+                status.add(8);
+                List<ProjectTalent> projectTalents = projectTalentDao.findAllByTalentIdAndCreateUserIdNotAndStatusNotIn(id, userId, status);
+                if (projectTalents.size() > 0) {
+                    throw new WebException(400, "该人才已被其他用户列为项目进展人才，不满足设定条件", null);
                 }
                 List<Experience> experiences = experienceDao.findAllByTalentId(id);
                 experiences.forEach(item -> {

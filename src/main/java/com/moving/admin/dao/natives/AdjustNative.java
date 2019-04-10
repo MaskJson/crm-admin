@@ -37,7 +37,7 @@ public class AdjustNative extends AbstractNative {
         query.addScalar("tag", StandardBasicTypes.STRING);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("type", StandardBasicTypes.INTEGER);
-        query.addScalar("updateTime", StandardBasicTypes.DATE);
+        query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
     }
