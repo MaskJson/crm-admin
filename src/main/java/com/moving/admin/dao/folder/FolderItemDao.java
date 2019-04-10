@@ -19,4 +19,8 @@ public interface FolderItemDao extends JpaRepository<FolderItem, Long>, JpaSpeci
     @Query("select itemId from FolderItem where folderId=:folderId and type=:type")
     List<Long> findItemIds(@Param("folderId") Long folderId, @Param("type") Integer type);
 
+    // 获取所有收藏的人才id
+    @Query("select itemId from FolderItem where type=2")
+    List<Long> findFolderTalentIds();
+
 }

@@ -58,9 +58,10 @@ public class ProjectController extends AbstractController {
     @ApiOperation("获取项目列表")
     @GetMapping("/list")
     public Result<Map<String, Object>> getList(
-            Long folderId, Long teamId, Long customerId, String industry, String city, Boolean follow, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+            Long folderId, Long teamId, Long customerId, String industry, String city, Boolean follow, Long userId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
             ) throws Exception {
         ProjectPageNative projectNative = new ProjectPageNative();
+        projectNative.filterUserIdIsInTeam(userId);
         if (folderId != null) {
             projectNative.setFolder(SqlUtil.getIn(folderItemDao.findItemIds(folderId, 3), "a.id"));
         }

@@ -95,7 +95,7 @@ public class CountNative extends AbstractNative {
                 " d.id as departmentId, d.name as departmentName";
         String from = " from project_talent pt left join talent t on pt.talent_id=t.id " +
                 "left join project p on pt.project_id=p.id left join customer c on p.customer_id=c.id left join department d on p.department_id=d.id ";
-        String where = " where pt.talent_id in(select distinct talent_id from talent_remind tr where tr.create_user_id=" + userId + ") " +
+        String where = " where pt.talent_id in(select distinct tr.talent_id from talent_remind tr where tr.create_user_id=" + userId + ") " +
                 "or pt.id in(select distinct project_talent_id from project_remind where create_user_id=" + userId +")";
         String sort = " order by p.customer_id, p.department_id, pt.status";
         String sql = select + from + where + sort;
@@ -118,6 +118,16 @@ public class CountNative extends AbstractNative {
         query.addScalar("departmentName", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
+    }
+
+    // 获取我联系过的且被收藏的人才
+    public List<Map<String, Object>> getFolderTalentsByUserId(Long userId) {
+        String sql = "select t.name from talent t where t.id in (select f.item_id where type=2) and (t.id in " +
+                "(select distinct tr.talent_id from talent_remind tr where tr.create_user_id=" + userId + ") " +
+                "or  t.id in (select distinct project_talent_id from project_remind where create_user_id=" + userId +")";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
+        return null;
     }
 
     // 获取分页sql

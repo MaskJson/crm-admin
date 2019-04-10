@@ -48,6 +48,13 @@ public class ProjectPageNative extends AbstractNative {
         return objectToBigInteger(query.getSingleResult());
     }
 
+    public void filterUserIdIsInTeam(Long userId) {
+        String filter = " and a.create_user_id=" + userId + " or a.team_id=" + userId + " or a.part_id=" + userId +
+                " or " + userId + " in (select t.user_id from team t where t.team_id in (select id from team tt where tt.user_id=a.create_user_id and level=1))" +
+                " or " + userId + " in (select ttt.user_id from team ttt where ttt.team_id=a.team_id)";
+        where.append(filter);
+    }
+
     public void setFolder(String folderWhere) {
         where.append(" and " + folderWhere);
     }
