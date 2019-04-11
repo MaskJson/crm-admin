@@ -54,6 +54,8 @@ public class ProjectService extends AbstractService {
             Team team = teamDao.findTeamByUserIdAndLevel(project.getCreateUserId(), 1);
             if (team != null) {
                 project.setTeamId(team.getId());
+            } else {
+                throw new WebException(400, "您还未拥有团队，请联系管理员分配团队成员", null);
             }
             project.setCreateTime(new Date(System.currentTimeMillis()));
         } else {

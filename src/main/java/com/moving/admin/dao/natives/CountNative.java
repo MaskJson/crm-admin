@@ -173,8 +173,7 @@ public class CountNative extends AbstractNative {
         String inStr = "(select distinct team_id from team where user_id=" + userId + ")";
         String select = "select r.id, r.remark, u.nick_name as createUser, r.create_time as createTime p.name as projectName";
         String from = " from project_report r left join project p on r.project_id=p.id left join sys_user u on u.id=r.create_user_id";
-        String where = " where r.status=1 and (p.create_team_id is not null and p.create_user_id in " + inStr +
-                " or p.team_id is not null and p.team_id in " + inStr + ")";
+        String where = " where r.status=1 and p.team_id is not null and p.team_id in " + inStr + ")";
         String sort = " order by r.create_time asc";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort + limitStr(pageable));
