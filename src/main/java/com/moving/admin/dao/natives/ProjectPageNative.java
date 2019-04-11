@@ -50,8 +50,8 @@ public class ProjectPageNative extends AbstractNative {
 
     public void filterUserIdIsInTeam(Long userId) {
         // 创建者可看，当全部开放时，所有人都能看，特定兼职看时，指定兼职可看
-        String filter = " and (a.open_type=1 or a.create_user_id=" + userId + " or a.part_id=" + userId +
-                " or " + userId + " in (select ttt.user_id from team ttt where (ttt.team_id=a.team_id or ttt.team_id=a.create_team_id) and ttt.team_id is not null))";
+        String filter = " and (a.create_user_id=" + userId + " or (a.open_type=1 and date_add(a.create_time, interval 7 day) < now()) or a.part_id=" + userId +
+                " or " + userId + " in (select ttt.user_id from team ttt where ttt.team_id=a.team_id and ttt.team_id is not null))";
         where.append(filter);
     }
 

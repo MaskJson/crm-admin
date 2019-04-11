@@ -77,7 +77,7 @@ public class CountNative extends AbstractNative {
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("customerType", StandardBasicTypes.INTEGER);
         query.addScalar("remark", StandardBasicTypes.STRING);
-        query.addScalar("meetTime", StandardBasicTypes.DATE);
+        query.addScalar("meetTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("meetAddress", StandardBasicTypes.STRING);
         query.addScalar("meetNotice", StandardBasicTypes.STRING);
         query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
@@ -106,8 +106,8 @@ public class CountNative extends AbstractNative {
         query.addScalar("talentId", StandardBasicTypes.LONG);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("type", StandardBasicTypes.INTEGER);
-        query.addScalar("createTime", StandardBasicTypes.DATE);
-        query.addScalar("updateTime", StandardBasicTypes.DATE);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("talentName", StandardBasicTypes.STRING);
         query.addScalar("talentStatus", StandardBasicTypes.INTEGER);
@@ -154,8 +154,8 @@ public class CountNative extends AbstractNative {
         query.addScalar("talentId", StandardBasicTypes.LONG);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("type", StandardBasicTypes.INTEGER);
-        query.addScalar("createTime", StandardBasicTypes.DATE);
-        query.addScalar("updateTime", StandardBasicTypes.DATE);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("talentName", StandardBasicTypes.STRING);
         query.addScalar("talentStatus", StandardBasicTypes.INTEGER);
@@ -164,6 +164,40 @@ public class CountNative extends AbstractNative {
         query.addScalar("customerName", StandardBasicTypes.STRING);
         query.addScalar("departmentId", StandardBasicTypes.LONG);
         query.addScalar("departmentName", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
+    // 获取未处理的诊断提醒记录
+    public List<Map<String, Object>> getReportPending(Long userId, Pageable pageable) {
+        String inStr = "(select distinct team_id from team where user_id=" + userId + ")";
+        String select = "select r.id, r.remark, u.nick_name as createUser, r.create_time as createTime p.name as projectName";
+        String from = " from project_report r left join project p on r.project_id=p.id left join sys_user u on u.id=r.create_user_id";
+        String where = " where r.status=1 and (p.create_team_id is not null and p.create_user_id in " + inStr +
+                " or p.team_id is not null and p.team_id in " + inStr + ")";
+        String sort = " order by r.create_time asc";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort + limitStr(pageable));
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("createUser", StandardBasicTypes.STRING);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("projectName", StandardBasicTypes.STRING);
+        query.addScalar("remark", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
+    // 项目总监获取项目诊断报告
+    public List<Map<String, Object>> getReports(Long userId, Pageable pageable) {
+        String select = "r.id, r.create_time as createTime, u.nick_name as createUser, sr.role_name as roleName, " +
+                "r.all_count as allCount, r.recommend_count as recommendCount, r. as interviewCount, r. as offerCount, r. as workingCount, " +
+                "r. as qualityCount, r. as qualityPassCount";
+        String from = " from project_report r left join project p on r.project_id=p.id left join sys_user u on u.id=r.create_user_id left join sys_role sr on sr.id=u.role_id";
+        String where = "";
+        String sort = "";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort + limitStr(pageable));
+
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
     }

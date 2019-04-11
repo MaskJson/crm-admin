@@ -6,10 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @ApiModel("项目诊断报告")
@@ -61,5 +58,9 @@ public class ProjectReport extends BaseEntity {
 
     @ApiModelProperty(value = "通过保证期人数")
     private int qualityPassCount;
+
+    @ApiModelProperty(value = "跟进的经历提醒")
+    @Transient
+    private Long followId;
 
 }

@@ -53,7 +53,7 @@ public class ProjectService extends AbstractService {
         if (project.getId() == null) {
             Team team = teamDao.findTeamByUserIdAndLevel(project.getCreateUserId(), 1);
             if (team != null) {
-                project.setCreateTeamId(team.getId());
+                project.setTeamId(team.getId());
             }
             project.setCreateTime(new Date(System.currentTimeMillis()));
         } else {
@@ -175,9 +175,20 @@ public class ProjectService extends AbstractService {
 
     // 添加项目诊断报告
     public Long addProjectReport(ProjectReport report) {
+        Long followId = report.getFollowId();
+        if (followId != null) {
+            ProjectReport projectReport = projectReportDao.findById(followId).get();
+            if (projectReport != null) {
+                projectReport.setStatus(false);
+                projectReportDao.save(projectReport);
+            }
+        }
         report.setCreateTime(new Date(System.currentTimeMillis()));
         projectReportDao.save(report);
         return report.getId();
     }
+
+    // 项目总监获取诊断报告
+
 
 }

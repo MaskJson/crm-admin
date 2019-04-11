@@ -54,4 +54,10 @@ public class CountController extends AbstractController {
         return ResultUtil.success(countNative.getFolderTalentsByUserId(userId));
     }
 
+    @ApiOperation("项目诊断待办")
+    @GetMapping("/project/pending/report")
+    public Result<List<Map<String, Object>>> getReportPending(Long userId,  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        return ResultUtil.success(countNative.getReportPending(userId, pageable));
+    }
+
 }
