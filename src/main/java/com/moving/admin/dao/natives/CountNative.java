@@ -55,6 +55,23 @@ public class CountNative extends AbstractNative {
         return map;
     }
 
+    public Map<String, BigInteger> homeCount(Long userId) {
+        Map<String, BigInteger> map = new HashMap<>();
+        String countSelectTal = "select count(1)";
+        String fromTal = " from talent_remind r left join talent t on r.talent_id=t.id";
+        String whereTal = " where r.create_user_id=" + userId +" and r.finish=0";
+        String countSelectCust = "select count(1)";
+        String fromCust  = " from customer_remind r left join customer c on r.customer_id=c.id";
+        String whereCust = " where r.create_user_id=" + userId + " and r.finish=0";
+        map.put("talentFirst", getTotal(countSelectTal + fromTal + whereTal + " and type=1"));
+        map.put("talentSecond", getTotal(countSelectTal + fromTal + whereTal + " and type=2"));
+        map.put("talentThird", getTotal(countSelectTal + fromTal + whereTal + " and type=3"));
+        map.put("customerFirst", getTotal(countSelectCust + fromCust + whereCust + " and type=1"));
+        map.put("customerSecond", getTotal(countSelectCust + fromCust + whereCust + " and type=2"));
+        map.put("customerThird", getTotal(countSelectCust + fromCust + whereCust + " and type=3"));
+        return map;
+    }
+
     // 获取客户常规跟踪的待办列表
     public Map<String, Object> customerRemindPendingList(Long userId, Integer type, Pageable pageable) {
         Map<String, Object> map = new HashMap<>();

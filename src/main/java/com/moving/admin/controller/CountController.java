@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -55,9 +56,21 @@ public class CountController extends AbstractController {
     }
 
     @ApiOperation("项目诊断待办")
-    @GetMapping("/project/pending/report")
+    @GetMapping("/project/report/pending")
     public Result<List<Map<String, Object>>> getReportPending(Long userId,  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
         return ResultUtil.success(countNative.getReportPending(userId, pageable));
+    }
+
+    @ApiOperation("总监-查看诊断记录")
+    @GetMapping("/project/report/list")
+    public Result<List<Map<String, Object>>> getReportList(Long userId,  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        return ResultUtil.success(countNative.getReports(userId, pageable));
+    }
+
+    @ApiOperation("首页统计")
+    @GetMapping("/home")
+    public Result<Map<String, BigInteger>> getHomeCount(Long userId) throws Exception {
+        return ResultUtil.success(countNative.homeCount(userId));
     }
 
 }
