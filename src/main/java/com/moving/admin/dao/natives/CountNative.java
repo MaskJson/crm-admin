@@ -122,12 +122,50 @@ public class CountNative extends AbstractNative {
 
     // 获取我联系过的且被收藏的人才
     public List<Map<String, Object>> getFolderTalentsByUserId(Long userId) {
-        String sql = "select t.name from talent t where t.id in (select f.item_id where type=2) and (t.id in " +
+        String sql = "select t.id, t.name, t.status, t.follow_user_id as followUserId, t.position from talent t where t.id in (select item_id from folder_item where type=2) and (t.id in " +
                 "(select distinct tr.talent_id from talent_remind tr where tr.create_user_id=" + userId + ") " +
-                "or  t.id in (select distinct project_talent_id from project_remind where create_user_id=" + userId +")";
+                "or  t.id in (select distinct project_talent_id from project_remind where create_user_id=" + userId +"))";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
-        return null;
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("name", StandardBasicTypes.STRING);
+        query.addScalar("status", StandardBasicTypes.INTEGER);
+        query.addScalar("followUserId", StandardBasicTypes.LONG);
+        query.addScalar("position", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
+    // 获取我联系过的经过各个状态的项目进展人才
+    public List<Map<String, Object>> getProjectStatusTalents(Long userId) {
+        String select = "select pr.status as remindStatus, pt.id, pt.project_id as projectId, pt.talent_id as talentId, pt.status, pt.type, pt.create_time as createTime, pt.update_time as updateTime," +
+                " p.name as projectName, t.name as talentName, t.status as talentStatus, t.follow_user_id as followuserId, c.id as customerId, c.name as customerName," +
+                " d.id as departmentId, d.name as departmentName";
+        String from = " from project_remind pr left join project_talent pt on pr.project_talent_id=pt.id " +
+                " left join project p on pt.project_id=p.id left join talent t on pt.talent_id=t.id" +
+                " left join customer c on p.customer_id=c.id left join department d on p.department_id=d.id";
+        String where = " where pr.create_user_id=" + userId + " and pr.status in (1,3,4,7) and pt.talent_id in(select distinct tr.talent_id from talent_remind tr where tr.create_user_id=" + userId + ")";
+        String sort = " group by pr.project_talent_id, pr.status order by p.customer_id, p.department_id, pt.status";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort);
+        query.addScalar("remindStatus", StandardBasicTypes.INTEGER);
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("projectId", StandardBasicTypes.LONG);
+        query.addScalar("talentId", StandardBasicTypes.LONG);
+        query.addScalar("status", StandardBasicTypes.INTEGER);
+        query.addScalar("type", StandardBasicTypes.INTEGER);
+        query.addScalar("createTime", StandardBasicTypes.DATE);
+        query.addScalar("updateTime", StandardBasicTypes.DATE);
+        query.addScalar("projectName", StandardBasicTypes.STRING);
+        query.addScalar("talentName", StandardBasicTypes.STRING);
+        query.addScalar("talentStatus", StandardBasicTypes.INTEGER);
+        query.addScalar("followUserId", StandardBasicTypes.LONG);
+        query.addScalar("customerId", StandardBasicTypes.LONG);
+        query.addScalar("customerName", StandardBasicTypes.STRING);
+        query.addScalar("departmentId", StandardBasicTypes.LONG);
+        query.addScalar("departmentName", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
     }
 
     // 获取分页sql

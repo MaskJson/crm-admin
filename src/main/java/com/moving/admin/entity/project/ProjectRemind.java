@@ -38,4 +38,8 @@ public class ProjectRemind extends BaseEntity {
     @ApiModelProperty(value = "项目人才id")
     private Long projectTalentId;
 
+    @ApiModelProperty(value = "角色id")
+    @Transient
+    private Integer roleId;
+
 }

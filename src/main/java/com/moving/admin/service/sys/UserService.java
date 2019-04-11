@@ -1,5 +1,7 @@
 package com.moving.admin.service.sys;
 
+import com.moving.admin.dao.sys.TeamDao;
+import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.sys.Permission;
 import com.moving.admin.dao.sys.UserDao;
@@ -27,6 +29,9 @@ public class UserService extends AbstractService {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private TeamDao teamDao;
 
     // 登录
     public User login(String username, String password) {
@@ -93,7 +98,16 @@ public class UserService extends AbstractService {
     }
 
     public User save(User mgrUser) {
-        return userDao.save(mgrUser);
+        if (mgrUser.getId() == null) {
+            userDao.save(mgrUser);
+            Team team = new Team();
+            team.setLevel(1);
+            team.setUserId(mgrUser.getId());
+            teamDao.save(team);
+        } else {
+            userDao.save(mgrUser);
+        }
+        return mgrUser;
     }
 
     public User get(Long id) {

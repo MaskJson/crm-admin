@@ -42,4 +42,16 @@ public class CountController extends AbstractController {
         return ResultUtil.success(countNative.getTalentMapByUserId(userId));
     }
 
+    @ApiOperation("人才地图-统计各个状态下的人才")
+    @GetMapping("/talent/map/status")
+    public Result<List<Map<String, Object>>> getProjectStatusTalents(Long userId) throws Exception {
+        return ResultUtil.success(countNative.getProjectStatusTalents(userId));
+    }
+
+    @ApiOperation("人才地图-获取收藏的人才")
+    @GetMapping("/talent/map/folder")
+    public Result<List<Map<String, Object>>> getFolderTalents(Long userId) throws Exception {
+        return ResultUtil.success(countNative.getFolderTalentsByUserId(userId));
+    }
+
 }

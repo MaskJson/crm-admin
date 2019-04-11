@@ -29,5 +29,24 @@ public class ProjectNative extends AbstractNative {
         return query.getResultList();
     }
 
+    // 获取人才的项目经历
+    public List<Map<String, Object>> getTalentProjects(Long talentId) {
+        String select = "select pt.id, pt.type, pt.status, pt.update_time as updateTime, p.name as projectName, c.name as customerName, d.name as departmentName";
+        String whereFrom = " from project_talent pt left join project p on pt.project_id = p.id left join customer c on p.customer_id=c.id" +
+                " left join department d on p.department_id=d.id where pt.talent_id=" + talentId;
+        String sort = " order by pt.update_time desc";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + whereFrom + sort);
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("projectName", StandardBasicTypes.STRING);
+        query.addScalar("type", StandardBasicTypes.INTEGER);
+        query.addScalar("status", StandardBasicTypes.INTEGER);
+        query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("customerName", StandardBasicTypes.STRING);
+        query.addScalar("departmentName", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
     public void appendSort(Pageable pageable) {}
 }

@@ -2,6 +2,7 @@ package com.moving.admin.controller;
 
 import com.moving.admin.bean.Result;
 import com.moving.admin.controller.AbstractController;
+import com.moving.admin.dao.natives.ProjectNative;
 import com.moving.admin.entity.talent.Talent;
 import com.moving.admin.entity.talent.TalentRemind;
 import com.moving.admin.service.TalentService;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Api(description = "人才管理")
 @RestController
@@ -25,6 +27,9 @@ public class TalentController extends AbstractController {
 
     @Autowired
     private TalentService talentService;
+
+    @Autowired
+    private ProjectNative projectNative;
 
     @ApiOperation("手机号验证")
     @GetMapping("/check")
@@ -87,6 +92,12 @@ public class TalentController extends AbstractController {
     public Result<Boolean> finishRemind(@RequestBody List<Long> ids) throws Exception {
         talentService.finishRemindByIds(ids);
         return ResultUtil.success(true);
+    }
+
+    @ApiOperation("获取人才项目经历")
+    @GetMapping("/project")
+    public Result<List<Map<String, Object>>> getProjectTalents(Long id) throws Exception {
+        return ResultUtil.success(projectNative.getTalentProjects(id));
     }
 
 }

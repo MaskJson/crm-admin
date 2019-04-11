@@ -5,11 +5,13 @@ import com.moving.admin.dao.project.ProjectDao;
 import com.moving.admin.dao.project.ProjectRemindDao;
 import com.moving.admin.dao.project.ProjectReportDao;
 import com.moving.admin.dao.project.ProjectTalentDao;
+import com.moving.admin.dao.sys.TeamDao;
 import com.moving.admin.dao.talent.TalentDao;
 import com.moving.admin.entity.project.Project;
 import com.moving.admin.entity.project.ProjectRemind;
 import com.moving.admin.entity.project.ProjectReport;
 import com.moving.admin.entity.project.ProjectTalent;
+import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.talent.Talent;
 import com.moving.admin.exception.WebException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +45,16 @@ public class ProjectService extends AbstractService {
     @Autowired
     private CommonService commonService;
 
+    @Autowired
+    private TeamDao teamDao;
+
     // 编辑项目
     public Long save(Project project) {
         if (project.getId() == null) {
+            Team team = teamDao.findTeamByUserIdAndLevel(project.getCreateUserId(), 1);
+            if (team != null) {
+                project.setCreateTeamId(team.getId());
+            }
             project.setCreateTime(new Date(System.currentTimeMillis()));
         } else {
             project.setUpdateTime(new Date(System.currentTimeMillis()));
@@ -113,6 +122,10 @@ public class ProjectService extends AbstractService {
     // 添加进展人才跟踪，并同时修改对应人才状态
     @Transactional
     public Long addProjectRemind(ProjectRemind projectRemind) {
+        if (projectRemind.getRoleId() == 2) {
+            projectRemind.setType(1);
+            projectRemind.setStatus(1);
+        }
         projectRemindDao.save(projectRemind);
         ProjectTalent projectTalent = projectTalentDao.findById(projectRemind.getProjectTalentId()).get();
         // 跟进后修改人才进展状态

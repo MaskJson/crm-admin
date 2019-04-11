@@ -126,7 +126,10 @@ public class Project extends BaseEntity {
     @ApiModelProperty(value = "客户在该领域带情况")
     private String actuality;
 
-    @ApiModelProperty(value = "项目总监")
+    @ApiModelProperty(value = "创建者团队id")
+    private Long createTeamId;
+
+    @ApiModelProperty(value = "项目推荐-团队id")
     private Long teamId;
 
     @ApiModelProperty(value = "兼职人id")
