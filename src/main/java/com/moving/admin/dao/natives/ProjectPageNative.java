@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class ProjectPageNative extends AbstractNative {
 
-    private StringBuilder select = new StringBuilder("select a.id as id, a.name as name, u.nick_name as createUser, a.follow, a.create_time as createTime");
+    private StringBuilder select = new StringBuilder("select a.id as id, a.create_user_id as createUserId, a.name as name, u.nick_name as createUser, a.follow, a.create_time as createTime");
     private StringBuilder selectCount = new StringBuilder("select count(1)");
     private StringBuilder from = new StringBuilder(" from project a left join sys_user u on a.create_user_id=u.id");
     private StringBuilder where = new StringBuilder(" where 1=1");
@@ -34,6 +34,7 @@ public class ProjectPageNative extends AbstractNative {
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("createUserId", StandardBasicTypes.LONG);
         query.addScalar("name", StandardBasicTypes.STRING);
         query.addScalar("follow", StandardBasicTypes.BOOLEAN);
         query.addScalar("createUser", StandardBasicTypes.STRING);
@@ -51,7 +52,7 @@ public class ProjectPageNative extends AbstractNative {
     public void filterUserIdIsInTeam(Long userId) {
         // 创建者可看，当全部开放时，所有人都能看，特定兼职看时，指定兼职可看
         String filter = " and (a.create_user_id=" + userId + " or (a.open_type=1 and date_add(a.create_time, interval 7 day) < now()) or a.part_id=" + userId +
-                " or " + userId + " in (select ttt.user_id from team ttt where ttt.team_id=a.team_id and ttt.team_id is not null))";
+                " or (" + userId + " in (select ttt.user_id from team ttt where ttt.team_id=a.team_id and ttt.team_id is not null) and a.open_type=2))";
         where.append(filter);
     }
 

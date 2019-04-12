@@ -1,5 +1,6 @@
 package com.moving.admin.service;
 
+import com.moving.admin.dao.customer.DepartmentDao;
 import com.moving.admin.dao.natives.ProjectNative;
 import com.moving.admin.dao.project.ProjectDao;
 import com.moving.admin.dao.project.ProjectRemindDao;
@@ -7,6 +8,7 @@ import com.moving.admin.dao.project.ProjectReportDao;
 import com.moving.admin.dao.project.ProjectTalentDao;
 import com.moving.admin.dao.sys.TeamDao;
 import com.moving.admin.dao.talent.TalentDao;
+import com.moving.admin.entity.customer.Department;
 import com.moving.admin.entity.project.Project;
 import com.moving.admin.entity.project.ProjectRemind;
 import com.moving.admin.entity.project.ProjectReport;
@@ -48,6 +50,9 @@ public class ProjectService extends AbstractService {
     @Autowired
     private TeamDao teamDao;
 
+    @Autowired
+    private DepartmentDao departmentDao;
+
     // 编辑项目
     public Long save(Project project) {
         if (project.getId() == null) {
@@ -69,6 +74,11 @@ public class ProjectService extends AbstractService {
 
     // 获取项目详情
     public Project getById(Long id) {
+        Project project = projectDao.findById(id).get();
+        Department department = departmentDao.findById(project.getDepartmentId()).get();
+        if (department != null) {
+            project.setDepartment(department.getName());
+        }
         return projectDao.findById(id).get();
     }
 
@@ -124,7 +134,7 @@ public class ProjectService extends AbstractService {
     // 添加进展人才跟踪，并同时修改对应人才状态
     @Transactional
     public Long addProjectRemind(ProjectRemind projectRemind) {
-        if (projectRemind.getRoleId() == 2) {
+        if (projectRemind.getRoleId() == 3 && projectRemind.getType() == 100) {
             projectRemind.setType(1);
             projectRemind.setStatus(1);
         }
@@ -142,10 +152,31 @@ public class ProjectService extends AbstractService {
 
     // 项目总监-推荐给客户二次审核
     @Transactional
-    public void reviewToCustomer(Long id, Boolean flag) {
-        ProjectTalent projectTalent = projectTalentDao.findById(id).get();
+    public void reviewToCustomer(Long projectTalentId, Long projectRemindId, Boolean flag, Long userId) {
+        ProjectTalent projectTalent = projectTalentDao.findById(projectTalentId).get();
+        ProjectRemind followRemind = projectRemindDao.findById(projectRemindId).get();
         if (projectTalent != null && projectTalent.getType() == 100) {
-            projectTalent.setType(1);
+            if (flag) { // 推荐成功
+                if (followRemind != null) {
+                    followRemind.setType(1);
+                    followRemind.setStatus(1);
+                    projectRemindDao.save(followRemind);
+                }
+            } else { // 淘汰
+                if (followRemind != null) {
+                    followRemind.setType(101); // 未推荐成功
+                    projectRemindDao.save(followRemind);
+                }
+                // 新增总监淘汰记录
+                ProjectRemind remind = new ProjectRemind();
+                remind.setType(15);
+                remind.setStatus(8);
+                remind.setCreateUserId(userId);
+                remind.setCreateTime(new Date(System.currentTimeMillis()));
+                remind.setProjectTalentId(projectTalentId);
+                projectRemindDao.save(remind);
+            }
+            projectTalent.setType(flag ? 1 : 15);
             projectTalent.setStatus(flag ? 1 : 8);
             projectTalent.setUpdateTime(new Date(System.currentTimeMillis()));
             projectTalentDao.save(projectTalent);

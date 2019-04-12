@@ -100,11 +100,18 @@ public class UserService extends AbstractService {
     public User save(User mgrUser) {
         if (mgrUser.getId() == null) {
             userDao.save(mgrUser);
-            Team team = new Team();
-            team.setLevel(1);
-            team.setUserId(mgrUser.getId());
-            teamDao.save(team);
+            if (mgrUser.getRoleId() == 3) {
+                Team team = new Team();
+                team.setLevel(1);
+                team.setUserId(mgrUser.getId());
+                teamDao.save(team);
+            }
         } else {
+            User user = userDao.findById(mgrUser.getId()).get();
+            if (user != null) {
+                mgrUser.setPassword(user.getPassword());
+            }
+            mgrUser.setUpdateTime(new Date(System.currentTimeMillis()));
             userDao.save(mgrUser);
         }
         return mgrUser;

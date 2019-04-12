@@ -52,7 +52,7 @@ public class Permission extends BaseEntity {
     private Integer status = 1;
 
     @ApiModelProperty(value = "是否显示左侧菜单")
-    private Boolean hideInMenu = true;
+    private Boolean hideInMenu;
 
     // @Transient表示不是表的字段
     @Transient

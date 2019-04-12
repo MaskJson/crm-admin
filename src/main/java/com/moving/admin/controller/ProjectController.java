@@ -132,8 +132,8 @@ public class ProjectController extends AbstractController {
 
     @ApiOperation("推荐给客户二次审核")
     @PostMapping("/talent/review")
-    public Result<Boolean> reviewToCustomer(Long id, Boolean flag) throws Exception {
-        projectService.reviewToCustomer(id, flag);
+    public Result<Boolean> reviewToCustomer(Long projectTalentId, Long projectRemindId, Boolean flag, Long userId) throws Exception {
+        projectService.reviewToCustomer(projectTalentId, projectRemindId, flag, userId);
         return ResultUtil.success(true);
     }
 

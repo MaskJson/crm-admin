@@ -57,14 +57,20 @@ public class CountController extends AbstractController {
 
     @ApiOperation("项目诊断待办")
     @GetMapping("/project/report/pending")
-    public Result<List<Map<String, Object>>> getReportPending(Long userId,  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+    public Result<Map<String, Object>> getReportPending(Long userId,  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
         return ResultUtil.success(countNative.getReportPending(userId, pageable));
     }
 
     @ApiOperation("总监-查看诊断记录")
     @GetMapping("/project/report/list")
-    public Result<List<Map<String, Object>>> getReportList(Long userId,  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+    public Result<Map<String, Object>> getReportList(Long userId,  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
         return ResultUtil.success(countNative.getReports(userId, pageable));
+    }
+
+    @ApiOperation("获取待审核的推荐记录")
+    @GetMapping("/recommend/pending")
+    public Result<Map<String, Object>> getRecommendPending(Long userId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        return ResultUtil.success(countNative.getRecommendListByUserId(userId, pageable));
     }
 
     @ApiOperation("首页统计")

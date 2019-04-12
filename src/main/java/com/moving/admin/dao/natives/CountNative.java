@@ -186,36 +186,85 @@ public class CountNative extends AbstractNative {
     }
 
     // 获取未处理的诊断提醒记录
-    public List<Map<String, Object>> getReportPending(Long userId, Pageable pageable) {
-        String inStr = "(select distinct team_id from team where user_id=" + userId + ")";
-        String select = "select r.id, r.remark, u.nick_name as createUser, r.create_time as createTime p.name as projectName";
+    public Map<String, Object> getReportPending(Long userId, Pageable pageable) {
+        Map<String, Object> map = new HashMap<>();
+        String inStr = "(select team_id from team where user_id=" + userId + ")";
+        String select = "select r.id, r.remark, u.nick_name as createUser, r.create_time as createTime, p.name as projectName, p.id as projectId";
+        String countSelect = "select count(1)";
         String from = " from project_report r left join project p on r.project_id=p.id left join sys_user u on u.id=r.create_user_id";
-        String where = " where r.status=1 and p.team_id is not null and p.team_id in " + inStr + ")";
+        String where = " where r.status=1 and r.type=1 and p.team_id is not null and p.team_id in " + inStr;
         String sort = " order by r.create_time asc";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort + limitStr(pageable));
         query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("projectId", StandardBasicTypes.LONG);
         query.addScalar("createUser", StandardBasicTypes.STRING);
         query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("remark", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        return query.getResultList();
+        map.put("content", query.getResultList());
+        map.put("totalElements", getTotal(countSelect + from + where));
+        return map;
     }
 
     // 项目总监获取项目诊断报告
-    public List<Map<String, Object>> getReports(Long userId, Pageable pageable) {
-        String select = "r.id, r.create_time as createTime, u.nick_name as createUser, sr.role_name as roleName, " +
-                "r.all_count as allCount, r.recommend_count as recommendCount, r. as interviewCount, r. as offerCount, r. as workingCount, " +
-                "r. as qualityCount, r. as qualityPassCount";
+    public Map<String, Object> getReports(Long userId, Pageable pageable) {
+        Map<String, Object> map = new HashMap<>();
+        String select = "select r.id, r.create_time as createTime, u.nick_name as createUser, sr.role_name as roleName, p.name as projectName, p.id as projectId, " +
+                "r.all_count as allCount, r.recommend_count as recommendCount, r.interview_count as interviewCount, r.offer_count as offerCount, r.working_count as workingCount, " +
+                "r.quality_count as qualityCount, r.quality_pass_count as qualityPassCount";
+        String countSelect = "select count(1)";
         String from = " from project_report r left join project p on r.project_id=p.id left join sys_user u on u.id=r.create_user_id left join sys_role sr on sr.id=u.role_id";
-        String where = "";
-        String sort = "";
+        String where = " where p.create_user_id=" + userId +" or p.open_type=1";
+        String sort = " order by p.id asc, r.create_time desc";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort + limitStr(pageable));
-
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("allCount", StandardBasicTypes.BIG_INTEGER);
+        query.addScalar("recommendCount", StandardBasicTypes.BIG_INTEGER);
+        query.addScalar("interviewCount", StandardBasicTypes.BIG_INTEGER);
+        query.addScalar("offerCount", StandardBasicTypes.BIG_INTEGER);
+        query.addScalar("workingCount", StandardBasicTypes.BIG_INTEGER);
+        query.addScalar("qualityCount", StandardBasicTypes.BIG_INTEGER);
+        query.addScalar("qualityPassCount", StandardBasicTypes.BIG_INTEGER);
+        query.addScalar("roleName", StandardBasicTypes.STRING);
+        query.addScalar("createUser", StandardBasicTypes.STRING);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        return query.getResultList();
+        map.put("content", query.getResultList());
+        map.put("totalElements", getTotal(countSelect + from + where));
+        return map;
+    }
+
+    // 项目总监获取未处理的人才推荐审核
+    public Map<String, Object> getRecommendListByUserId(Long userId, Pageable pageable) {
+        Map<String, Object> map = new HashMap<>();
+        String select = "select pr.id, pt.id as projectTalentId, p.id as projectId, t.id as talentId, t.follow_user_id as followUserId," +
+                " t.status as talentStatus, t.name as talentName, p.name as projectName," +
+                " u.nick_name as createUser, pr.create_time as createTime";
+        String countSelect = "select count(1)";
+        String from = " from project_remind pr left join project_talent pt on pr.project_talent_id=pt.id" +
+                " left join project p on p.id=pt.project_id left join talent t on pt.talent_id=t.id" +
+                " left join sys_user u on u.id=pr.create_user_id";
+        String where = " where  pr.type=100 and (p.create_user_id=" + userId + " or p.open_type=1)";
+        String sort = " order by p.id desc, pr.create_time desc";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort + limitStr(pageable));
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("projectTalentId", StandardBasicTypes.LONG);
+        query.addScalar("projectId", StandardBasicTypes.LONG);
+        query.addScalar("talentId", StandardBasicTypes.LONG);
+        query.addScalar("followUserId", StandardBasicTypes.LONG);
+        query.addScalar("talentStatus", StandardBasicTypes.INTEGER);
+        query.addScalar("projectName", StandardBasicTypes.STRING);
+        query.addScalar("talentName", StandardBasicTypes.STRING);
+        query.addScalar("createUser", StandardBasicTypes.STRING);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        map.put("content", query.getResultList());
+        map.put("totalElements", getTotal(countSelect + from + where));
+        return map;
     }
 
     // 获取分页sql
