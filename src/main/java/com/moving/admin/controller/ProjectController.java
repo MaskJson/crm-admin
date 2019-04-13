@@ -93,8 +93,8 @@ public class ProjectController extends AbstractController {
 
     @ApiOperation("根据状态获取项目进展人才")
     @GetMapping("/talent/getByStatus")
-    public Result<List<Map<String, Object>>> getProjectTalentByStatus(Integer status, Long id) throws Exception {
-        return ResultUtil.success(adjustNative.getProjectTalent(status, id));
+    public Result<List<Map<String, Object>>> getProjectTalentByStatus(Integer status, Long id, Long userId) throws Exception {
+        return ResultUtil.success(adjustNative.getProjectTalent(status, id, userId));
     }
 
     @ApiOperation("添加项目人才")

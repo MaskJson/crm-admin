@@ -55,7 +55,8 @@ public class CountNative extends AbstractNative {
         return map;
     }
 
-    public Map<String, BigInteger> homeCount(Long userId) {
+    // 统计人才和客户的跟踪待办
+    public Map<String, BigInteger> homeCountRemind(Long userId) {
         Map<String, BigInteger> map = new HashMap<>();
         String countSelectTal = "select count(1)";
         String fromTal = " from talent_remind r left join talent t on r.talent_id=t.id";
@@ -69,6 +70,12 @@ public class CountNative extends AbstractNative {
         map.put("customerFirst", getTotal(countSelectCust + fromCust + whereCust + " and type=1"));
         map.put("customerSecond", getTotal(countSelectCust + fromCust + whereCust + " and type=2"));
         map.put("customerThird", getTotal(countSelectCust + fromCust + whereCust + " and type=3"));
+        return map;
+    }
+
+    // 统计项目进展，四大阶段的相关人才数量
+    public Map<String, BigInteger> homeCountProjectTalent(Map<String, BigInteger> map) {
+
         return map;
     }
 

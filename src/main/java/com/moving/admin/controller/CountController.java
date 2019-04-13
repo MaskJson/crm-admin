@@ -76,7 +76,8 @@ public class CountController extends AbstractController {
     @ApiOperation("首页统计")
     @GetMapping("/home")
     public Result<Map<String, BigInteger>> getHomeCount(Long userId) throws Exception {
-        return ResultUtil.success(countNative.homeCount(userId));
+        Map<String, BigInteger> map = countNative.homeCountRemind(userId);
+        return ResultUtil.success(countNative.homeCountProjectTalent(map));
     }
 
 }
