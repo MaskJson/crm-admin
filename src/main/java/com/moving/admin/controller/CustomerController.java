@@ -1,6 +1,7 @@
 package com.moving.admin.controller;
 
 import com.moving.admin.bean.Result;
+import com.moving.admin.dao.natives.CustomerNative;
 import com.moving.admin.entity.customer.*;
 import com.moving.admin.entity.talent.Experience;
 import com.moving.admin.service.CustomerService;
@@ -24,6 +25,9 @@ public class CustomerController extends AbstractController {
 
     @Autowired
     CustomerService customerService;
+
+    @Autowired
+    private CustomerNative customerNative;
 
     @ApiOperation("客户添加-编辑")
     @PostMapping("/save")
@@ -138,6 +142,10 @@ public class CustomerController extends AbstractController {
         return ResultUtil.success(customerService.toggleBindFollowUser(customerId, userId, status));
     }
 
-
+    @ApiOperation("获取公司的相关项目")
+    @GetMapping("/project/page")
+    public Result<Map<String, Object>> getCustomerProjects(Long id, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        return ResultUtil.success(customerNative.getProjectByCustomerId(id, pageable));
+    }
 
 }

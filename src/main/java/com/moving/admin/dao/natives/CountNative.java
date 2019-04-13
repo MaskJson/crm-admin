@@ -107,50 +107,66 @@ public class CountNative extends AbstractNative {
 
     // 获取人才地图
     public List<Map<String, Object>> getTalentMapByUserId(Long userId) {
-        String select = "select pt.id, pt.project_id as projectId, pt.talent_id as talentId, pt.status, pt.type, pt.create_time as createTime, pt.update_time as updateTime," +
-                " p.name as projectName, t.name as talentName, t.status as talentStatus, t.follow_user_id as followuserId, c.id as customerId, c.name as customerName," +
-                " d.id as departmentId, d.name as departmentName";
-        String from = " from project_talent pt left join talent t on pt.talent_id=t.id " +
-                "left join project p on pt.project_id=p.id left join customer c on p.customer_id=c.id left join department d on p.department_id=d.id ";
-        String where = " where pt.talent_id in(select distinct tr.talent_id from talent_remind tr where tr.create_user_id=" + userId + ") " +
-                "or pt.id in(select distinct project_talent_id from project_remind where create_user_id=" + userId +")";
-        String sort = " order by p.customer_id, p.department_id, pt.status";
-        String sql = select + from + where + sort;
+        String select = "select id, name as talentName, status, follow_user_id as followUserId, city, phone, sex";
+        String from = " from talent";
+        String where = " where id in(select distinct talent_id from talent_remind where create_user_id=" + userId + ") " +
+                "or id in(select distinct pt.talent_id from project_remind pr left join project_talent pt on pt.id=pr.project_talent_id where pr.create_user_id=" + userId +")";
+        String sql = select + from + where;
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
-        query.addScalar("projectId", StandardBasicTypes.LONG);
-        query.addScalar("talentId", StandardBasicTypes.LONG);
-        query.addScalar("status", StandardBasicTypes.INTEGER);
-        query.addScalar("type", StandardBasicTypes.INTEGER);
-        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
-        query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
-        query.addScalar("projectName", StandardBasicTypes.STRING);
+        query.addScalar("city", StandardBasicTypes.STRING);
+        query.addScalar("phone", StandardBasicTypes.STRING);
         query.addScalar("talentName", StandardBasicTypes.STRING);
-        query.addScalar("talentStatus", StandardBasicTypes.INTEGER);
+        query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("followUserId", StandardBasicTypes.LONG);
-        query.addScalar("customerId", StandardBasicTypes.LONG);
-        query.addScalar("customerName", StandardBasicTypes.STRING);
-        query.addScalar("departmentId", StandardBasicTypes.LONG);
-        query.addScalar("departmentName", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        return query.getResultList();
+        List<Map<String, Object>> talentList = query.getResultList();
+        talentList.forEach(map -> {
+            map.put("info", getWorkInfo(Long.parseLong(map.get("id").toString())));
+        });
+        return talentList;
     }
 
     // 获取我联系过的且被收藏的人才
     public List<Map<String, Object>> getFolderTalentsByUserId(Long userId) {
-        String sql = "select t.id, t.name, t.status, t.follow_user_id as followUserId, t.position from talent t where t.id in (select item_id from folder_item where type=2) and (t.id in " +
+        String sql = "select t.id, t.name as talentName, t.status, t.follow_user_id as followUserId, t.city, t.phone  from talent t where t.id in (select item_id from folder_item where type=2) and (t.id in " +
                 "(select distinct tr.talent_id from talent_remind tr where tr.create_user_id=" + userId + ") " +
                 "or  t.id in (select distinct project_talent_id from project_remind where create_user_id=" + userId +"))";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
-        query.addScalar("name", StandardBasicTypes.STRING);
+        query.addScalar("city", StandardBasicTypes.STRING);
+        query.addScalar("phone", StandardBasicTypes.STRING);
+        query.addScalar("talentName", StandardBasicTypes.STRING);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("followUserId", StandardBasicTypes.LONG);
-        query.addScalar("position", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        return query.getResultList();
+        List<Map<String, Object>> talentList = query.getResultList();
+        talentList.forEach(map -> {
+            map.put("info", getWorkInfo(Long.parseLong(map.get("id").toString())));
+        });
+        return talentList;
+    }
+
+    // 获取人才地图的最后一份工作信息
+    public Map<String, Object> getWorkInfo(Long talentId) {
+        String sql = "select e.customer_id as customerId, e.department_id as departmentId, e.position, c.name as customerName, d.name as departmentName" +
+                " from experience e left join customer c on e.customer_id=c.id left join department d on e.department_id=d.id" +
+                " where e.status=1 and e.talent_id=" + talentId;
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
+        query.addScalar("customerId", StandardBasicTypes.LONG);
+        query.addScalar("departmentId", StandardBasicTypes.LONG);
+        query.addScalar("position", StandardBasicTypes.STRING);
+        query.addScalar("customerName", StandardBasicTypes.STRING);
+        query.addScalar("departmentName", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        List<Map<String, Object>> list = query.getResultList();
+        if (list.size() > 0) {
+            return list.get(0);
+        }
+        return new HashMap<>();
     }
 
     // 获取我联系过的经过各个状态的项目进展人才
