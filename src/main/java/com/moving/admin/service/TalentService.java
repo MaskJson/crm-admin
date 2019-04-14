@@ -27,6 +27,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TalentService extends AbstractService {
@@ -106,7 +107,9 @@ public class TalentService extends AbstractService {
             return query.where(list.toArray(predicates)).getRestriction();
         }, pageable);
         result.forEach(talent -> {
-            talent.setPosition(countNative.getWorkInfo(talent.getId()).get("position").toString());
+            Map<String, Object> map = countNative.getWorkInfo(talent.getId());
+            talent.setPosition(map.get("position") != null ? map.get("position").toString() : "");
+            talent.setProjects(projectTalentDao.findProjectIdsOfTalent(talent.getId()));
         });
         return result;
     }

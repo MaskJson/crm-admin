@@ -154,4 +154,8 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "本次操作用户id")
     @Transient
     private Long actionUserId;
+
+    @ApiModelProperty(value = "人才处于非结束进展的项目")
+    @Transient
+    private List<Long> projects;
 }
