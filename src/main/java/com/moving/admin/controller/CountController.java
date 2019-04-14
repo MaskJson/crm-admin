@@ -2,6 +2,7 @@ package com.moving.admin.controller;
 
 import com.moving.admin.bean.Result;
 import com.moving.admin.dao.natives.CountNative;
+import com.moving.admin.dao.natives.HomePageNative;
 import com.moving.admin.util.ResultUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +25,9 @@ public class CountController extends AbstractController {
 
     @Autowired
     private CountNative countNative;
+
+    @Autowired
+    private HomePageNative homePageNative;
 
     @ApiOperation("人才待办")
     @GetMapping("/talent/pending")
@@ -76,8 +80,8 @@ public class CountController extends AbstractController {
     @ApiOperation("首页统计")
     @GetMapping("/home")
     public Result<Map<String, BigInteger>> getHomeCount(Long userId) throws Exception {
-        Map<String, BigInteger> map = countNative.homeCountRemind(userId);
-        return ResultUtil.success(countNative.homeCountProjectTalent(map));
+        Map<String, BigInteger> map = homePageNative.homeCountRemind(userId);
+        return ResultUtil.success(homePageNative.homeCountProjectTalent(map));
     }
 
 }
