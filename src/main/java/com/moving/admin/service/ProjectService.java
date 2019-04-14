@@ -66,8 +66,6 @@ public class ProjectService extends AbstractService {
         } else {
             project.setUpdateTime(new Date(System.currentTimeMillis()));
         }
-        Long departmentId = commonService.addDepartmentFromTalentInfo(project.getCustomerId(), project.getDepartment());
-        project.setDepartmentId(departmentId);
         projectDao.save(project);
         return project.getId();
     }
@@ -75,10 +73,6 @@ public class ProjectService extends AbstractService {
     // 获取项目详情
     public Project getById(Long id) {
         Project project = projectDao.findById(id).get();
-        Department department = departmentDao.findById(project.getDepartmentId()).get();
-        if (department != null) {
-            project.setDepartment(department.getName());
-        }
         return projectDao.findById(id).get();
     }
 

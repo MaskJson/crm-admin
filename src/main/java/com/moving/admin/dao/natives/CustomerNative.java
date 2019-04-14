@@ -79,9 +79,9 @@ public class CustomerNative extends AbstractNative {
     // 获取公司下项目
     public Map<String, Object> getProjectByCustomerId(Long customerId, Pageable pageable) {
         Map<String, Object> map = new HashMap<>();
-        String select = "select p.id, p.name as projectName, d.name as departmentName, u.nick_name as createUser, p.create_time as createTime";
+        String select = "select p.id, p.name as projectName, u.nick_name as createUser, p.create_time as createTime";
         String countSelect = "select count(1)";
-        String from = " from project p left join sys_user u on p.create_user_id=u.id left join department d on p.department_id=d.id";
+        String from = " from project p left join sys_user u on p.create_user_id=u.id";
         String where = " where p.customer_id=" + customerId;
         String sort = " order by p.create_time desc";
         Session session = entityManager.unwrap(Session.class);

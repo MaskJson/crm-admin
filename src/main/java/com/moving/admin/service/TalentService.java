@@ -1,6 +1,7 @@
 package com.moving.admin.service;
 
 import com.moving.admin.dao.customer.CustomerDao;
+import com.moving.admin.dao.natives.CountNative;
 import com.moving.admin.dao.project.ProjectTalentDao;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.entity.customer.Customer;
@@ -63,6 +64,9 @@ public class TalentService extends AbstractService {
     @Autowired
     private ProjectTalentDao projectTalentDao;
 
+    @Autowired
+    private CountNative countNative;
+
     // 手机号验证重复
     public Talent checkPhone(String phone) {
         Talent talent = null;
@@ -101,6 +105,9 @@ public class TalentService extends AbstractService {
             Predicate[] predicates = new Predicate[list.size()];
             return query.where(list.toArray(predicates)).getRestriction();
         }, pageable);
+        result.forEach(talent -> {
+            talent.setPosition(countNative.getWorkInfo(talent.getId()).get("position").toString());
+        });
         return result;
     }
 

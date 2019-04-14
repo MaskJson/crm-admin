@@ -158,6 +158,14 @@ public class CustomerService extends AbstractService {
             ids.add(followId);
             finishRemindByIds(ids);
         }
+        Long customerId = remind.getCustomerId();
+        Customer customer = customerDao.findById(customerId).get();
+        if (customer != null) {
+            // 签约后类型为客户
+            Integer status = remind.getStatus();
+            customer.setType(status == 5 ? 6 : status);
+            customerDao.save(customer);
+        }
         return remind.getId();
     }
 

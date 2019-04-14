@@ -5,6 +5,7 @@ import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,10 @@ import java.util.Map;
 @Service
 public class AdjustNative extends AbstractNative {
 
-    private String talentSelect = "select pt.id as id, t.id as talentId, t.name as name, t.position as position, t.city as city, " +
+    @Autowired
+    private CountNative countNative;
+
+    private String talentSelect = "select pt.id as id, t.id as talentId, t.name as name, t.city as city, " +
                                      "t.salary as salary, t.phone as phone, t.tag as tag, t.status as status, pt.type as type, pt.update_time as updateTime";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project_remind pr on pr.project_id=pt.project_id";
     private String talentWhere = " where pt.status=";
@@ -30,7 +34,6 @@ public class AdjustNative extends AbstractNative {
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("talentId", StandardBasicTypes.LONG);
         query.addScalar("name", StandardBasicTypes.STRING);
-        query.addScalar("position", StandardBasicTypes.STRING);
         query.addScalar("city", StandardBasicTypes.STRING);
         query.addScalar("salary", StandardBasicTypes.STRING);
         query.addScalar("phone", StandardBasicTypes.STRING);
@@ -39,6 +42,10 @@ public class AdjustNative extends AbstractNative {
         query.addScalar("type", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        List<Map<String, Object>> list = query.getResultList();
+        list.forEach(item -> {
+            item.put("position", countNative.getWorkInfo(Long.parseLong(item.get("id").toString())).get("position"));
+        });
         return query.getResultList();
     }
 

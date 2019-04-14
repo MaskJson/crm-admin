@@ -26,7 +26,7 @@ public class CustomerRemind extends BaseEntity {
     @ApiModelProperty(value = "跟踪类型：1 电话， 2 拜访客户， 3 客户上门")
     private Integer type;
 
-    @ApiModelProperty(value = "客户状态: 0: 普通公司，6：客户，1：列名，2：联系中，3：合作洽谈，4：先推人再签约，5：签约")
+    @ApiModelProperty(value = "客户状态: 0: 普通公司，6：客户，2：联系中，3：合作洽谈，4：先推人再签约，5：签约")
     private Integer status;
 
     @ApiModelProperty(value = "沟通记录")

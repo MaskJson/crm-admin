@@ -92,7 +92,7 @@ public class CustomerController extends AbstractController {
     }
 
     @ApiOperation("获取所有可新建项目的客户")
-    @GetMapping("/customerOfProjects")
+    @GetMapping("/customerOfProject")
     public Result<List<Customer>>getProjectCustomers() throws Exception {
         List<Customer> list = customerService.findProjectCustomers();
         return ResultUtil.success(list);
