@@ -285,4 +285,12 @@ public class CustomerService extends AbstractService {
         }
     }
 
+    // 获取达新建项目标准达公司，未签约先推人或者是客户
+    public List<Customer> findProjectCustomers() {
+        List<Integer> types = new ArrayList<>();
+        types.add(5);
+        types.add(6);
+        return customerDao.findAllByTypeIn(types);
+    }
+
 }

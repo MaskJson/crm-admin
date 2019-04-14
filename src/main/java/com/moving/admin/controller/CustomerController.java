@@ -91,6 +91,13 @@ public class CustomerController extends AbstractController {
         return ResultUtil.success(list);
     }
 
+    @ApiOperation("获取所有可新建项目的客户")
+    @GetMapping("/customerOfProjects")
+    public Result<List<Customer>>getProjectCustomers() throws Exception {
+        List<Customer> list = customerService.findProjectCustomers();
+        return ResultUtil.success(list);
+    }
+
     @ApiOperation("获取所有部门")
     @GetMapping("/department/byId")
     public Result<List<Department>>getAllDepartmentByCustomerId(Long id) throws Exception {

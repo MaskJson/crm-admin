@@ -23,7 +23,7 @@ public class Customer extends BaseEntity {
     @ApiModelProperty(value = "名称")
     private String name;
 
-    @ApiModelProperty(value = "状态：0 普通客户， 12345 扩展客户， 6 客户")
+    @ApiModelProperty(value = "状态：0 普通客户， 2345 扩展客户， 6 客户")
     private Integer type;
 
     @ApiModelProperty(value = "城市")
