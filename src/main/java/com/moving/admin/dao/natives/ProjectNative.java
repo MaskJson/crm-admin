@@ -31,9 +31,9 @@ public class ProjectNative extends AbstractNative {
 
     // 获取人才的项目经历
     public List<Map<String, Object>> getTalentProjects(Long talentId) {
-        String select = "select pt.id, pt.type, pt.status, pt.update_time as updateTime, p.name as projectName, c.name as customerName, d.name as departmentName";
+        String select = "select pt.id, pt.type, pt.status, pt.update_time as updateTime, p.name as projectName, c.name as customerName";
         String whereFrom = " from project_talent pt left join project p on pt.project_id = p.id left join customer c on p.customer_id=c.id" +
-                " left join department d on p.department_id=d.id where pt.talent_id=" + talentId;
+                " where pt.talent_id=" + talentId;
         String sort = " order by pt.update_time desc";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + whereFrom + sort);
@@ -42,8 +42,21 @@ public class ProjectNative extends AbstractNative {
         query.addScalar("type", StandardBasicTypes.INTEGER);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
-        query.addScalar("customerName", StandardBasicTypes.STRING);
         query.addScalar("departmentName", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
+    // 获取对当前用户开放的所有项目
+    public List<Map<String, Object>> getProjectsByUser(Long userId) {
+        String select = "select a.id, a.name";
+        String from = " from project a";
+        String where = " where (a.create_user_id=" + userId + " or (a.open_type=1 and date_add(a.create_time, interval 7 day) < now()) or a.part_id=" + userId +
+                " or (" + userId + " in (select ttt.user_id from team ttt where ttt.team_id=a.team_id and ttt.team_id is not null) and a.open_type=2))";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where);
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("name", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
     }

@@ -111,6 +111,7 @@ public class ProjectService extends AbstractService {
         if (old != null) {
             old.setStatus(0);
             old.setType(1);
+            old.setCreateUserId(projectTalent.getCreateUserId());
             old.setUpdateTime(date);
             projectTalentDao.save(old);
             return old.getId();

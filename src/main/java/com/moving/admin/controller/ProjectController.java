@@ -3,6 +3,7 @@ package com.moving.admin.controller;
 import com.moving.admin.bean.Result;
 import com.moving.admin.dao.folder.FolderItemDao;
 import com.moving.admin.dao.natives.AdjustNative;
+import com.moving.admin.dao.natives.ProjectNative;
 import com.moving.admin.dao.natives.ProjectPageNative;
 import com.moving.admin.entity.project.Project;
 import com.moving.admin.entity.project.ProjectRemind;
@@ -39,6 +40,9 @@ public class ProjectController extends AbstractController {
 
     @Autowired
     private AdjustNative adjustNative;
+
+    @Autowired
+    private ProjectNative projectNative;
 
     @PersistenceContext
     protected EntityManager entityManager;
@@ -135,6 +139,12 @@ public class ProjectController extends AbstractController {
     public Result<Boolean> reviewToCustomer(Long projectTalentId, Long projectRemindId, Boolean flag, Long userId) throws Exception {
         projectService.reviewToCustomer(projectTalentId, projectRemindId, flag, userId);
         return ResultUtil.success(true);
+    }
+
+    @ApiOperation("获取对当前用户开放的项目")
+    @GetMapping("/openByUserId")
+    public Result<List<Map<String, Object>>> getProjectByUser(Long userId) throws Exception {
+        return ResultUtil.success(projectNative.getProjectsByUser(userId));
     }
 
 }

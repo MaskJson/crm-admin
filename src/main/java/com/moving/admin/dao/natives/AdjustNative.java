@@ -22,13 +22,13 @@ public class AdjustNative extends AbstractNative {
 
     private String talentSelect = "select pt.id as id, t.id as talentId, t.name as name, t.city as city, " +
                                      "t.salary as salary, t.phone as phone, t.tag as tag, t.status as status, pt.type as type, pt.update_time as updateTime";
-    private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project_remind pr on pr.project_id=pt.project_id";
+    private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id";
     private String talentWhere = " where pt.status=";
     private String talentSort = " order by pt.update_time desc";
 
     // 根据状态获取项目人才
     public List<Map<String, Object>> getProjectTalent(Integer status, Long projectId, Long userId) {
-        String sql = talentSelect + talentFrom + talentWhere + status + " and pt.project_id=" + projectId + " and pr.create_user_id=" + userId + talentSort;
+        String sql = talentSelect + talentFrom + talentWhere + status + " and pt.project_id=" + projectId + " and pt.create_user_id=" + userId + talentSort;
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);

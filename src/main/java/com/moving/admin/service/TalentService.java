@@ -282,9 +282,6 @@ public class TalentService extends AbstractService {
                 if (talent.getFollowUserId() != null) {
                     throw new WebException(400, "该人才已被列为专属人才，请刷新", null);
                 }
-                if (talent.getSex() == null || StringUtils.isEmpty(talent.getPhone()) || StringUtils.isEmpty(talent.getPosition())) {
-                    throw new WebException(400, "专属人才性别、手机、岗位、工作经历所有信息必须填写完整", null);
-                }
                 List<Integer> status = new ArrayList<Integer>();
                 status.add(7);
                 status.add(8);
@@ -292,12 +289,6 @@ public class TalentService extends AbstractService {
                 if (projectTalents.size() > 0) {
                     throw new WebException(400, "该人才已被其他用户列为项目进展人才，不满足设定条件", null);
                 }
-                List<Experience> experiences = experienceDao.findAllByTalentId(id);
-                experiences.forEach(item -> {
-                    if (StringUtils.isEmpty(item.getRemark()) || StringUtils.isEmpty(item.getPerformance())) {
-                        throw new WebException(400, "专属人才工作经历的工作职责和业绩必须填写完整", null);
-                    }
-                });
                 List<TalentRemind> reminds = talentRemindDao.findAllByTalentIdAndCreateUserIdOrderByIdDesc(id, userId);
                 if (reminds.size() < 3) {
                     throw new WebException(400, "您需要对该人才进行至少3次常规跟踪，不满足设定条件", null);
@@ -306,6 +297,15 @@ public class TalentService extends AbstractService {
                 if ((remind.getCreateTime().getTime() + 2592000000L) < System.currentTimeMillis()) {
                     throw new WebException(400, "您近一个月内未对该人才进行常规跟踪，不满足设定条件", null);
                 }
+                if (talent.getSex() == null || StringUtils.isEmpty(talent.getPhone()) || StringUtils.isEmpty(talent.getPosition())) {
+                    throw new WebException(400, "专属人才性别、手机、工作经历等信息必须填写完整", "info");
+                }
+                List<Experience> experiences = experienceDao.findAllByTalentId(id);
+                experiences.forEach(item -> {
+                    if (StringUtils.isEmpty(item.getRemark()) || StringUtils.isEmpty(item.getPerformance())) {
+                        throw new WebException(400, "专属人才工作经历的工作职责和业绩必须填写完整", "info");
+                    }
+                });
                 talent.setFollowUserId(userId);
                 talent.setType(1);
                 talentDao.save(talent);

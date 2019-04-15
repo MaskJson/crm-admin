@@ -227,6 +227,7 @@ public class CountNative extends AbstractNative {
         query.addScalar("workingCount", StandardBasicTypes.BIG_INTEGER);
         query.addScalar("qualityCount", StandardBasicTypes.BIG_INTEGER);
         query.addScalar("qualityPassCount", StandardBasicTypes.BIG_INTEGER);
+        query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("roleName", StandardBasicTypes.STRING);
         query.addScalar("createUser", StandardBasicTypes.STRING);
         query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);

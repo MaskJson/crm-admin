@@ -32,7 +32,7 @@ public interface ProjectTalentDao extends JpaRepository<ProjectTalent, Long>, Jp
     List<ProjectTalent> findAllByTalentIdAndCreateUserIdNotAndStatusNotIn(Long talentId, Long createUserId, List<Integer> status);
 
     // 获取人才处于非结束的项目ids
-    @Query("select projectId from ProjectTalent where talentId=:talentId and status>0 and status<7")
+    @Query("select projectId from ProjectTalent where talentId=:talentId and status<7")
     List<Long> findProjectIdsOfTalent(@Param("talentId") Long talentId);
 
 }

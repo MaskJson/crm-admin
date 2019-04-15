@@ -41,7 +41,7 @@ public class TalentRemind extends BaseEntity {
     @ApiModelProperty(value = "候选人基本情况")
     private String situation;
 
-    @ApiModelProperty(value = "不离职原因")
+    @ApiModelProperty(value = "离职原因")
     private String cause;
 
     @ApiModelProperty(value = "薪资结构")
@@ -61,9 +61,6 @@ public class TalentRemind extends BaseEntity {
 
     @ApiModelProperty(value = "创建者ID")
     private Long createUserId;
-
-    @ApiModelProperty(value = "提醒用户ID")
-    private Long adviserId;
 
     @ApiModelProperty(value = "是否完成跟进")
     private Boolean finish = false;
