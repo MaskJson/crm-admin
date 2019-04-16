@@ -7,9 +7,10 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.moving.admin.exception.WebException;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,17 +53,24 @@ public class UploadService extends AbstractService {
 	 * @throws Exception
 	 */
 	public Object saveFile(MultipartFile file, HttpServletRequest request) throws Exception {
-		System.out.println(request.getSession().getServletContext().getRealPath("/"));
-		String uploadFilePath = request.getSession().getServletContext().getRealPath("/img");
-		String path = generateFileName(file.getOriginalFilename());
-		File dest = new File(uploadFilePath, path);
-		try {
-			file.transferTo(dest);
-		} catch (IllegalStateException | IOException e) {
-			e.printStackTrace();
-		}
+		if (file != null) {
+            String uploadFilePath = request.getSession().getServletContext().getRealPath("/file");
+            File dir = new File(uploadFilePath);
+            if (!dir.exists() && dir.isDirectory()) {// 判断文件目录是否存在
+                dir.mkdirs();
+            }
+            String path = generateFileName(file.getOriginalFilename());
+            File dest = new File(uploadFilePath, path);
+            try {
+                file.transferTo(dest);
+            } catch (IllegalStateException | IOException e) {
+                e.printStackTrace();
+            }
 //		String accessUrl = uploadFilePath + "/" + path;
-		return HM.map().put("name", dest.getName()).put("url", path).end();
+            return HM.map().put("name", dest.getName()).put("url", path).end();
+        } else {
+		    throw new WebException(400, "上传失败", null);
+        }
 	}
 	
 

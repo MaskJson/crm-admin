@@ -87,4 +87,10 @@ public class CountController extends AbstractController {
         return ResultUtil.success(homePageNative.homeCountProjectTalent(map, userId, roleId));
     }
 
+    @ApiOperation("项目进展提醒统计")
+    @GetMapping("/project/progress")
+    public Result<Map<String, Object>> getHomeCount(Long userId, Long roleId, Integer type, Integer status, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        return ResultUtil.success(homePageNative.talentProgressList(userId,roleId,type, status, pageable));
+    }
+
 }
