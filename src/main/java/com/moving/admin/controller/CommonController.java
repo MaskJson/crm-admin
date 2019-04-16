@@ -2,9 +2,7 @@ package com.moving.admin.controller;
 
 import com.moving.admin.annotation.IgnoreSecurity;
 import com.moving.admin.bean.Result;
-import com.moving.admin.exception.WebException;
 import com.moving.admin.service.CommonService;
-import com.moving.admin.service.UploadService;
 import com.moving.admin.util.ResultUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,11 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpSession;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,9 +25,6 @@ public class CommonController extends AbstractController {
     @Autowired
     private CommonService commonService;
 
-    @Autowired
-    private UploadService uploadService;
-
     @ApiOperation("根据tableName，name按需各个列表")
     @GetMapping("/list")
     public Result<List<Map<String, Object>>> getListByTableName(Integer type, String name) throws Exception {
@@ -44,35 +36,42 @@ public class CommonController extends AbstractController {
     @PostMapping("/upload")
     public Result<String> upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws Exception {
         String md5File = UUID.randomUUID() + file.getOriginalFilename();
-        byte[] bytes = file.getBytes();
-        BufferedOutputStream bos = null;
-        FileOutputStream fos = null;
-        File newFile = null;
+        File newFile;
         String filePath = request.getSession().getServletContext().getRealPath("/file");
         try {
-            File dir = new File(filePath);
-            if (!dir.exists() && dir.isDirectory()) {// 判断文件目录是否存在
-                dir.mkdirs();
-            }
-            String fileName = System.currentTimeMillis() + ".jpg";
-            newFile = new File(filePath + "\\" + md5File);
-            if (!newFile.exists()) {
-                newFile.mkdirs();
-            }
-            fos = new FileOutputStream(newFile);
-            bos = new BufferedOutputStream(fos);
-            bos.write(bytes);
+            newFile = new File(filePath, md5File);
+            file.transferTo(newFile);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (bos != null) {
-                bos.close();
-            }
-            if (fos != null) {
-                fos.close();
-            }
         }
         return ResultUtil.success(md5File);
+    }
+
+    @IgnoreSecurity
+    @ApiOperation("文件下载")
+    @PostMapping("/download")
+    public HttpServletResponse download(String path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        try {
+            String filePath = request.getSession().getServletContext().getRealPath("/file");
+            File file = new File(filePath, path);
+            InputStream fis = new BufferedInputStream(new FileInputStream(file));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+            // 清空response
+            response.reset();
+            // 设置response的header
+            response.addHeader("Content-Disposition", "attachment;filename=" + file.getName());
+            response.addHeader("Content-Length", "" + file.length());
+            OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            toClient.write(buffer);
+            toClient.flush();
+            toClient.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 
 }
