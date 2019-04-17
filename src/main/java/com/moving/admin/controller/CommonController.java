@@ -3,6 +3,8 @@ package com.moving.admin.controller;
 import com.moving.admin.annotation.IgnoreSecurity;
 import com.moving.admin.bean.Result;
 import com.moving.admin.service.CommonService;
+import com.moving.admin.service.CustomerService;
+import com.moving.admin.service.TalentService;
 import com.moving.admin.util.ResultUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,15 +27,21 @@ public class CommonController extends AbstractController {
     @Autowired
     private CommonService commonService;
 
+    @Autowired
+    private TalentService talentService;
+
+    @Autowired
+    private CustomerService customerService;
+
     @ApiOperation("根据tableName，name按需各个列表")
     @GetMapping("/list")
     public Result<List<Map<String, Object>>> getListByTableName(Integer type, String name) throws Exception {
         return ResultUtil.success(commonService.getListByTableName(type, name));
     }
 
-    @IgnoreSecurity
     @ApiOperation("文件上传")
     @PostMapping("/upload")
+    @IgnoreSecurity
     public Result<String> upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws Exception {
         String md5File = UUID.randomUUID() + file.getOriginalFilename();
         File newFile;
@@ -47,9 +55,9 @@ public class CommonController extends AbstractController {
         return ResultUtil.success(md5File);
     }
 
-    @IgnoreSecurity
     @ApiOperation("文件下载")
-    @PostMapping("/download")
+    @GetMapping("/download")
+    @IgnoreSecurity
     public HttpServletResponse download(String path, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
             String filePath = request.getSession().getServletContext().getRealPath("/file");
@@ -72,6 +80,17 @@ public class CommonController extends AbstractController {
             e.printStackTrace();
         }
         return response;
+    }
+
+    @ApiOperation("人才-客户，上传")
+    @GetMapping("/file")
+    public Result<Boolean> uploadFile(Integer type, Long id, String path) throws Exception {
+        if (type == 1) {
+            talentService.setResume(id, path);
+        } else {
+            customerService.setContractUrl(id, path);
+        }
+        return ResultUtil.success(true);
     }
 
 }

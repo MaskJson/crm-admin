@@ -322,8 +322,11 @@ public class TalentService extends AbstractService {
         }
     }
 
-    // 修改人才和添加常规跟踪时，判断是否升级为专属人才
-    public void checkTalentType(Talent talent) {
-
+    public void setResume(Long talentId, String path) {
+        Talent talent = talentDao.findById(talentId).get();
+        if (talent != null) {
+            talent.setResume(path);
+            talentDao.save(talent);
+        }
     }
 }

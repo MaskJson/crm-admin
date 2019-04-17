@@ -282,7 +282,7 @@ public class CustomerService extends AbstractService {
                 if (customersOfUser >= 50) {
                     throw new WebException(400, "单人的客户列名上限为50， 您已达到上限", null);
                 } else {
-                    customer.setType(1);
+                    customer.setType(2);
                     customer.setFollowUserId(userId);
                 }
             }
@@ -299,6 +299,15 @@ public class CustomerService extends AbstractService {
         types.add(5);
         types.add(6);
         return customerDao.findAllByTypeIn(types);
+    }
+
+    // 上传合同
+    public void setContractUrl(Long customerId, String path) {
+        Customer customer = customerDao.findById(customerId).get();
+        if (customer != null) {
+            customer.setContractUrl(path);
+            customerDao.save(customer);
+        }
     }
 
 }

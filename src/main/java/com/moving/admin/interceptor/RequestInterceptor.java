@@ -39,6 +39,10 @@ public class RequestInterceptor implements HandlerInterceptor {
         if (ignoreSecurity != null) {
             return true;
         } else {
+            String requestUrl = request.getRequestURI();
+            if (requestUrl.equals("/api/common/download")) {
+                return true;
+            }
             String jwt = request.getHeader("token");
             if (jwt != null && !jwt.equals("")) {
                 Map<String, Object> map = jwtUtil.decode(jwt, TokenInformation.class);
