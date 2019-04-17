@@ -112,7 +112,7 @@ public class ProjectController extends AbstractController {
     public Result<Long> addProjectRemind(@RequestBody ProjectRemind projectRemind) throws Exception {
         Long id = projectService.addProjectRemind(projectRemind);
         if (id == null) {
-            return ResultUtil.error("该人才已在其他项目入职或进去保证期");
+            return ResultUtil.error("该人才已在其他项目入职或进去保证期, 请刷新");
         } else {
             return ResultUtil.success(id);
         }
