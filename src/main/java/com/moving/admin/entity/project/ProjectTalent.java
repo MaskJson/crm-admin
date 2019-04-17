@@ -26,6 +26,7 @@ public class ProjectTalent extends BaseEntity {
     @ApiModelProperty(value = "项目id")
     private Long projectId;
 
+    // 特殊状态  100 候选审核  200 保护性淘汰
     @ApiModelProperty(value = "人才跟踪状态")
     private Integer type;
 

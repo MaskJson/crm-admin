@@ -35,4 +35,10 @@ public interface ProjectTalentDao extends JpaRepository<ProjectTalent, Long>, Jp
     @Query("select projectId from ProjectTalent where talentId=:talentId and status<7")
     List<Long> findProjectIdsOfTalent(@Param("talentId") Long talentId);
 
+    // 获取该人才在其他项目且处于进展中的记录
+    List<ProjectTalent> findAllByTalentIdAndProjectIdNotAndStatusLessThan(Long talentId, Long projectId, Integer status);
+
+    // 获取该人才在其他项目且处于进展中的记录（入职或进入保证期）
+    List<ProjectTalent> findAllByTalentIdAndProjectIdNotAndStatusBetween(Long talentId, Long projectId, Integer offer, Integer quality);
+
 }

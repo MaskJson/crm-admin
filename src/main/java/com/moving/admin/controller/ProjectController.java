@@ -110,7 +110,12 @@ public class ProjectController extends AbstractController {
     @ApiOperation("添加人才进展跟踪记录")
     @PostMapping("/remind/add")
     public Result<Long> addProjectRemind(@RequestBody ProjectRemind projectRemind) throws Exception {
-        return ResultUtil.success(projectService.addProjectRemind(projectRemind));
+        Long id = projectService.addProjectRemind(projectRemind);
+        if (id == null) {
+            return ResultUtil.error("该人才已在其他项目入职或进去保证期");
+        } else {
+            return ResultUtil.success(id);
+        }
     }
 
     @ApiOperation("获取该项目已关联的非淘汰人才")

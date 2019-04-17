@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskService {
 
-//    @Scheduled(cron = "")
-//    public void checkTalentType() {
-//
-//    }
+    @Scheduled(cron = "0 43 14 * * ?")
+    public void checkTalentType() {
+        System.err.println("task");
+    }
 
 }

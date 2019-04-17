@@ -129,18 +129,37 @@ public class ProjectService extends AbstractService {
     // 添加进展人才跟踪，并同时修改对应人才状态
     @Transactional
     public Long addProjectRemind(ProjectRemind projectRemind) {
+        // 查找是否存在已处于其他项目的进展中的入职状态或保证期状态， 若存在，抛异常
+        ProjectTalent projectTalent = projectTalentDao.findById(projectRemind.getProjectTalentId()).get();
+        List<ProjectTalent> pts = projectTalentDao.findAllByTalentIdAndProjectIdNotAndStatusBetween(projectTalent.getTalentId(), projectTalent.getProjectId(), 5, 6);
+        if (pts.size() > 0) {
+            projectTalent.setStatus(8);
+            projectTalent.setType(200);
+            projectTalent.setUpdateTime(new Date());
+            projectTalentDao.save(projectTalent);
+            return null;
+        }
         if (projectRemind.getRoleId() == 3 && projectRemind.getType() == 100) {
             projectRemind.setType(1);
             projectRemind.setStatus(1);
         }
         projectRemindDao.save(projectRemind);
-        ProjectTalent projectTalent = projectTalentDao.findById(projectRemind.getProjectTalentId()).get();
         // 跟进后修改人才进展状态
         if (projectTalent != null) {
             projectTalent.setType(projectRemind.getType());
             projectTalent.setStatus(projectRemind.getStatus());
             projectTalent.setUpdateTime(new Date(System.currentTimeMillis()));
             projectTalentDao.save(projectTalent);
+            if (projectRemind.getStatus() == 5) {
+                // 若该项目入职，则改变其在其他项目进展状态
+                List<ProjectTalent> list = projectTalentDao.findAllByTalentIdAndProjectIdNotAndStatusLessThan(projectTalent.getTalentId(), projectTalent.getProjectId(), 7);
+                list.forEach(pt -> {
+                    pt.setType(200);
+                    pt.setStatus(8);
+                    pt.setUpdateTime(new Date());
+                    projectTalentDao.save(pt);
+                });
+            }
         }
         return projectRemind.getId();
     }
