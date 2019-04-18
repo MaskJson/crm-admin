@@ -2,11 +2,16 @@ package com.moving.admin.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.moving.admin.dao.customer.CustomerDao;
 import com.moving.admin.dao.natives.TeamNative;
+import com.moving.admin.dao.project.ProjectDao;
 import com.moving.admin.dao.sys.TeamDao;
 import com.moving.admin.dao.sys.UserDao;
+import com.moving.admin.entity.customer.Customer;
+import com.moving.admin.entity.project.Project;
 import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.sys.User;
+import com.moving.admin.exception.WebException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +35,12 @@ public class TeamService extends AbstractService {
 
     @Autowired
     private TeamNative teamNative;
+
+    @Autowired
+    private ProjectDao projectDao;
+
+    @Autowired
+    private CustomerDao customerDao;
 
     /**
      * // 添加-编辑团队
@@ -151,6 +162,64 @@ public class TeamService extends AbstractService {
         t.setTeamId(teamId);
         t.setLevel(level);
         return t;
+    }
+
+    /**
+     * 团队交接(总监离职）
+     * 原团队成员全部转为交接的团队成员，成员等级不变
+     * 该用户所有创建的项目，创建人id 改为交接的总监id
+     */
+    @Transactional
+    public void teamConnect(Long teamId, Long connectTeamId, Long userId, Long connectUserId) {
+        Team team = teamDao.findById(teamId).get();
+        Team connectTeam = teamDao.findById(connectTeamId).get();
+        if (team != null && connectTeam != null && team.getLevel() == 1 && connectTeam.getLevel() == 1 && team.getUserId() == userId && connectTeam.getUserId() == connectUserId) {
+            // 所有相关项目 createUserId 和 teamId
+            List<Project> projects = projectDao.findAllByCreateUserId(userId);
+            projects.forEach(project -> {
+                project.setCreateUserId(connectUserId);
+                project.setTeamId(connectTeamId);
+            });
+            projectDao.saveAll(projects);
+            // 所有相关客户的createUserId 和 followUserId
+            List<Customer> customers = customerDao.findAllByCreateUserIdOrFollowUserId(userId, userId);
+            customers.forEach(customer -> {
+                if (customer.getCreateUserId() == userId) {
+                    customer.setCreateUserId(connectUserId);
+                }
+                if (customer.getFollowUserId() == userId) {
+                    customer.setFollowUserId(connectUserId);
+                }
+            });
+            customerDao.saveAll(customers);
+            // 团队成员转移
+            List<Team> teams = teamDao.findAllByTeamId(teamId);
+            teams.forEach(t -> {
+                t.setTeamId(connectTeamId);
+            });
+            teamDao.saveAll(teams);
+            actionConnect(userId, connectUserId);
+        } else {
+            throw new WebException(400, "数据有误，请刷新页面", null);
+        }
+    }
+
+    /**
+     * 普通成员交接,若该用户是团队的成员，将所有相关userId 改为交接的用户 id
+     */
+    @Transactional
+    public void memberConnect(Long userId, Long connectUserId) {
+
+    }
+
+    /**
+     * 所有相关操作createUserId ,改为交接的用户 id
+     */
+    @Transactional
+    public void actionConnect(Long userId, Long connectUserId) {
+        // 人才相关
+
+        // 项目进展人才相关
     }
 }
 

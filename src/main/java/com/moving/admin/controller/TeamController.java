@@ -2,6 +2,7 @@ package com.moving.admin.controller;
 
 import com.moving.admin.annotation.IgnoreSecurity;
 import com.moving.admin.bean.Result;
+import com.moving.admin.dao.natives.TeamNative;
 import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.service.TeamService;
@@ -25,6 +26,9 @@ public class TeamController extends AbstractController {
 
     @Autowired
     private TeamService teamService;
+
+    @Autowired
+    private TeamNative teamNative;
 
     @ApiOperation("分页查询")
     @GetMapping("/list")
@@ -56,5 +60,10 @@ public class TeamController extends AbstractController {
         return ResultUtil.success(teamService.getTeamManagerUsers());
     }
 
+    @ApiOperation("获取所有团队")
+    @GetMapping("/all")
+    public Result<List<Map<String, Object>>> getTeams() throws Exception {
+        return ResultUtil.success(teamNative.getTeams());
+    }
 
 }

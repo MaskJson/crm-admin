@@ -19,4 +19,6 @@ public interface TeamDao extends JpaRepository<Team, Long>, JpaSpecificationExec
     @Query(value = "select count(id) from Team where teamId=:teamId")
     Long getCountOfTeam(@Param("teamId") Long teamId);
 
+
+
 }

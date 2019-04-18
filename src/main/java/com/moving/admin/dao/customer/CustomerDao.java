@@ -16,4 +16,7 @@ public interface CustomerDao extends JpaRepository<Customer, Long>, JpaSpecifica
 
     List<Customer> findAllByTypeIn(List<Integer> types);
 
+    // 获取所有相关客户，createUserId - followUserId
+    List<Customer> findAllByCreateUserIdOrFollowUserId(Long createUserId, Long followUserId);
+
 }

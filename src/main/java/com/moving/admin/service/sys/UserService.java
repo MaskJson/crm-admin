@@ -5,8 +5,10 @@ import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.sys.Permission;
 import com.moving.admin.dao.sys.UserDao;
+import com.moving.admin.exception.WebException;
 import com.moving.admin.service.AbstractService;
 import com.moving.admin.util.DateUtil;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +40,9 @@ public class UserService extends AbstractService {
         List<User> list = userDao.login(username, password.toUpperCase());
         if (list.size() > 0) {
             User user = (User)list.get(0);
+//            if (!user.getStatus()) {
+//                throw new WebException(400, "用户已禁用，请联系管理员", null);
+//            }
             User result = new User();
             result.setId(user.getId());
             result.setNickName(user.getNickName());
@@ -111,7 +116,7 @@ public class UserService extends AbstractService {
             if (user != null) {
                 mgrUser.setPassword(user.getPassword());
             }
-            mgrUser.setUpdateTime(new Date(System.currentTimeMillis()));
+            mgrUser.setUpdateTime(new Date());
             userDao.save(mgrUser);
         }
         return mgrUser;
@@ -127,5 +132,13 @@ public class UserService extends AbstractService {
 
     public void delete(Long id) {
         userDao.deleteById(id);
+    }
+
+    public void toggleStatus(Long id, Boolean status) {
+        User user = userDao.findById(id).get();
+        if (user != null) {
+            user.setStatus(status);
+            userDao.save(user);
+        }
     }
 }

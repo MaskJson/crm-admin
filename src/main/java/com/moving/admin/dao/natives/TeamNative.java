@@ -45,6 +45,20 @@ public class TeamNative extends AbstractNative {
         return query.getResultList();
     }
 
+    // 获取所有团队 + 总监 id 、昵称
+    public List<Map<String, Object>> getTeams() {
+        String select = "select t.id, t.user_id as userId, u.username as userName, u.nick_name as nickName";
+        String from = " from team t left join sys_user u on t.user_id=u.id";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from);
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("userId", StandardBasicTypes.LONG);
+        query.addScalar("userName", StandardBasicTypes.STRING);
+        query.addScalar("nickName", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
     // 获取团队成员列表带名字
     public List<Map<String, Object>> getTeamMemberWithInfo(Long teamId) {
         String select = "select t.id as id, t.parent_id as parentId, t.level as level, u.nick_name as nickName";
