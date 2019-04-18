@@ -51,7 +51,7 @@ public class AdjustNative extends AbstractNative {
 
     // 获取该项目已关联的人才
     public List<Long> getTalentsByProjectId(Long projectId) {
-        String sql = "select talent_id as id  from project_talent where project_id=" + projectId + " and status<7";
+        String sql = "select talent_id as id  from project_talent where project_id=" + projectId + " and status<8";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
