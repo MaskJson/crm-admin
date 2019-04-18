@@ -3,7 +3,10 @@ package com.moving.admin.dao.talent;
 import com.moving.admin.entity.talent.TalentRemind;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TalentRemindDao extends JpaRepository<TalentRemind, Long>, JpaSpecificationExecutor<TalentRemind> {
@@ -11,5 +14,9 @@ public interface TalentRemindDao extends JpaRepository<TalentRemind, Long>, JpaS
     List<TalentRemind> findAllByTalentIdOrderByIdDesc(Long talentId);
 
     List<TalentRemind> findAllByTalentIdAndCreateUserIdOrderByIdDesc(Long talentId, Long createUserId);
+
+    // 获取该人才在某一时间后的一个月内的跟踪
+    @Query(value = "select count (id) from TalentRemind where talentId=:talentId and createTime<:time")
+    Long getTaskCountByTalentId(@Param("talentId") Long talentId, @Param("time") Date time);
 
 }

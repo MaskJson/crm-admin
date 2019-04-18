@@ -148,7 +148,7 @@ public class ProjectService extends AbstractService {
         if (projectTalent != null) {
             projectTalent.setType(projectRemind.getType());
             projectTalent.setStatus(projectRemind.getStatus());
-            projectTalent.setUpdateTime(new Date(System.currentTimeMillis()));
+            projectTalent.setUpdateTime(new Date());
             projectTalentDao.save(projectTalent);
             if (projectRemind.getStatus() == 5) {
                 // 若该项目入职，则改变其在其他项目进展状态
