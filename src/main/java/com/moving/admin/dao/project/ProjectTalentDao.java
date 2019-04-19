@@ -41,7 +41,10 @@ public interface ProjectTalentDao extends JpaRepository<ProjectTalent, Long>, Jp
     // 获取该人才在其他项目且处于进展中的记录（入职或进入保证期）
     List<ProjectTalent> findAllByTalentIdAndProjectIdNotAndStatusBetween(Long talentId, Long projectId, Integer offer, Integer quality);
 
-    // 获取该人才已厉害项目进展的记录
+    // 获取该人才已离开项目进展的记录
     List<ProjectTalent> findAllByTalentIdAndStatusIsAfterOrderByUpdateTime(Long talentId, Integer status);
+
+    // 根据创建人id 获取
+    List<ProjectTalent> findAllByCreateUserId(Long createUserId);
 
 }

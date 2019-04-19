@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,22 @@ public class TeamController extends AbstractController {
     @GetMapping("/all")
     public Result<List<Map<String, Object>>> getTeams() throws Exception {
         return ResultUtil.success(teamNative.getTeams());
+    }
+
+    @Transactional
+    @ApiOperation("团队交接-总监离职")
+    @PostMapping("/connect/team")
+    public Result<Boolean> teamConnect(Long teamId, Long connectTeamId, Long userId, Long connectUserId) throws Exception {
+        teamService.teamConnect(teamId, connectTeamId, userId, connectUserId);
+        return ResultUtil.success(true);
+    }
+
+    @Transactional
+    @ApiOperation("成员交接-普通用户离职")
+    @PostMapping("/connect/member")
+    public Result<Boolean> memberConnect(Long userId, Long connectUserId) throws Exception {
+        teamService.memberConnect(userId, connectUserId);
+        return ResultUtil.success(true);
     }
 
 }

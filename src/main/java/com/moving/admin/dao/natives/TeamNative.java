@@ -33,6 +33,17 @@ public class TeamNative extends AbstractNative {
         return query.getResultList();
     }
 
+    public List<Map<String, Object>> getUserByRoleId(Long roleId) {
+        String sql = "select id, nick_name as nickName, username as userName from sys_user where role_id=" + roleId;
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("nickName", StandardBasicTypes.STRING);
+        query.addScalar("userName", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
     // 获取团队管理页面需要的用户列表
     public List<Map<String, Object>> getTeamManagerUsers() {
         String sql = "select id, nick_name as nickName, role_id as roleId from sys_user where role_id not in(1,3)";
@@ -48,7 +59,7 @@ public class TeamNative extends AbstractNative {
     // 获取所有团队 + 总监 id 、昵称
     public List<Map<String, Object>> getTeams() {
         String select = "select t.id, t.user_id as userId, u.username as userName, u.nick_name as nickName";
-        String from = " from team t left join sys_user u on t.user_id=u.id";
+        String from = " from team t left join sys_user u on t.user_id=u.id where t.level=1";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from);
         query.addScalar("id", StandardBasicTypes.LONG);

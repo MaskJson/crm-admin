@@ -13,4 +13,6 @@ public interface TalentDao extends JpaRepository<Talent, Long>, JpaSpecification
     // 获取所有专属人才
     List<Talent> findAllByType(Integer type);
 
+    List<Talent> findAllByCreateUserIdOrFollowUserId(Long createUserId, Long followUserId);
+
 }

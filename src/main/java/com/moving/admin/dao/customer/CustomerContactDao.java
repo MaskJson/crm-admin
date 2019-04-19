@@ -11,4 +11,6 @@ public interface CustomerContactDao extends JpaRepository<CustomerContact, Long>
 
     void deleteAllByIdIn(Long[] ids);
 
+    List<CustomerContact> findAllByCreateUserId(Long createUserId);
+
 }

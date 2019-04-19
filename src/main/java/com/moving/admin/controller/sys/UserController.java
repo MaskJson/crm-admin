@@ -4,6 +4,7 @@ import com.moving.admin.annotation.IgnoreSecurity;
 import com.moving.admin.bean.Result;
 import com.moving.admin.bean.TokenInformation;
 import com.moving.admin.controller.AbstractController;
+import com.moving.admin.dao.natives.TeamNative;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.sys.Role;
 import com.moving.admin.service.sys.RoleService;
@@ -15,6 +16,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,6 +30,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Api(description = "系统用户管理")
@@ -43,6 +46,9 @@ public class UserController extends AbstractController {
 
     @Resource
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private TeamNative teamNative;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -174,4 +180,11 @@ public class UserController extends AbstractController {
         }
         return ResultUtil.success(null);
     }
+
+    @ApiOperation(value = "根据角色获取用户列表")
+    @GetMapping("/getByRole")
+    public Result<List<Map<String, Object>>> getUserByRole(Long roleId) throws Exception {
+        return ResultUtil.success(teamNative.getUserByRoleId(roleId));
+    }
+
 }

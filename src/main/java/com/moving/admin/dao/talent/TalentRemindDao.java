@@ -16,7 +16,9 @@ public interface TalentRemindDao extends JpaRepository<TalentRemind, Long>, JpaS
     List<TalentRemind> findAllByTalentIdAndCreateUserIdOrderByIdDesc(Long talentId, Long createUserId);
 
     // 获取该人才在某一时间后的一个月内的跟踪
-    @Query(value = "select count (id) from TalentRemind where talentId=:talentId and createTime<:time")
-    Long getTaskCountByTalentId(@Param("talentId") Long talentId, @Param("time") Date time);
+    @Query(value = "select count (id) from TalentRemind where talentId=:talentId and createTime>:start and createTime<:end")
+    Long getTaskCountByTalentId(@Param("talentId") Long talentId, @Param("time") Date start, @Param("end") Date end);
+
+    List<TalentRemind> findAllByCreateUserId(Long createUserId);
 
 }

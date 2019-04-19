@@ -12,7 +12,7 @@ public class TaskService {
     private TaskNative taskNative;
 
     // 每天凌晨执行定时任务
-//    @Scheduled(cron = "0 59 23 * * ?")
+//    @Scheduled(cron = "0 50 23 * * ?")
     @Scheduled(cron = "*/5 * * * * ?")
     public void checkTalentType() {
 
