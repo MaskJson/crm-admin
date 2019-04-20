@@ -134,7 +134,7 @@ public class UserService extends AbstractService {
         userDao.deleteById(id);
     }
 
-    public void toggleStatus(Long id, Boolean status) {
+    public void toggleStatus(Long id, Integer status) {
         User user = userDao.findById(id).get();
         if (user != null) {
             user.setStatus(status);

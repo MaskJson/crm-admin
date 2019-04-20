@@ -63,7 +63,7 @@ public class UserController extends AbstractController {
     public Result<Map> login(String username, String password) throws Exception {
         User user = userService.login(username, password);
         if (user!=null) {
-            if (!user.getStatus()) {
+            if (user.getStatus() == 0) {
                 return ResultUtil.error("该用户已被禁用");
             }
             String token = jwtUtil.encode(new TokenInformation(user.getId(), user.getRoleId()));
@@ -163,11 +163,8 @@ public class UserController extends AbstractController {
     })
     @ApiOperation(value = "修改用户状态")
     @PostMapping("/editStatus")
-    public Result editStatus(Long id, Boolean status) throws Exception {
-        User user = new User();
-        user.setId(id);
-        user.setStatus(status);
-        userService.update(user);
+    public Result editStatus(Long id, Integer status) throws Exception {
+        userService.toggleStatus(id, status);
         return ResultUtil.success(null);
     }
 

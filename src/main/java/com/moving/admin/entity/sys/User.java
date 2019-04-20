@@ -35,8 +35,8 @@ public class User extends BaseEntity {
     @ApiModelProperty(value = "角色id")
     private Long roleId;
 
-    @ApiModelProperty(value = "状态：正常， 禁用")
-    private Boolean status;
+    @ApiModelProperty(value = "状态：1正常， 0禁用")
+    private Integer status;
 
     private Date createTime;
 
