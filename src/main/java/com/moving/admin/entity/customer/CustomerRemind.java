@@ -23,6 +23,9 @@ public class CustomerRemind extends BaseEntity {
     @ApiModelProperty(value = "客户id")
     private Long customerId;
 
+    @ApiModelProperty(value = "客户联系人id")
+    private Long contactId;
+
     @ApiModelProperty(value = "跟踪类型：1 电话， 2 拜访客户， 3 客户上门")
     private Integer type;
 
@@ -46,6 +49,9 @@ public class CustomerRemind extends BaseEntity {
 
     @ApiModelProperty(value = "见面内容")
     private String meetNotice;
+
+    @ApiModelProperty(value = "签约时间")
+    private Date contactTime;
 
     @ApiModelProperty(value = "创建者ID")
     private Long createUserId;

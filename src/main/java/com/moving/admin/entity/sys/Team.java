@@ -40,7 +40,7 @@ public class Team extends BaseEntity {
 
     @Transient
     @ApiModelProperty(value = "中级顾问列表")
-    private List<Long> mpls;
+    private List<Map<String, Object>> mpls;
 
     @Transient
     @ApiModelProperty(value = "兼职列表")

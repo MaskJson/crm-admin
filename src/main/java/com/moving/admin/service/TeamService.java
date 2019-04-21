@@ -100,7 +100,7 @@ public class TeamService extends AbstractService {
         Long teamId = team.getId();
         List<Map<String, Object>> pms = team.getPms();
         List<Map<String, Object>> iPls = team.getIpls();
-        List<Long> mPls = team.getMpls();
+        List<Map<String, Object>> mPls = team.getMpls();
         List<Long> pts = team.getPts();
         // 项目经理
         List<Team> teams = new ArrayList<>();
@@ -117,8 +117,8 @@ public class TeamService extends AbstractService {
         }
         //中级顾问
         if (mPls != null) {
-            mPls.forEach(id -> {
-                teams.add(getTeamItem(id, null, teamId, 4));
+            iPls.forEach(ipl -> {
+                setTeamList(teamId, teams, ipl, 4);
             });
         }
         // 兼职

@@ -261,6 +261,11 @@ public class TalentService extends AbstractService {
             ids.add(followId);
             finishRemindByIds(ids);
         }
+        Talent talent = talentDao.findById(remind.getTalentId()).get();
+        if (talent != null) {
+            talent.setStatus(remind.getStatus());
+            talentDao.save(talent);
+        }
         return remind.getId();
     }
 
