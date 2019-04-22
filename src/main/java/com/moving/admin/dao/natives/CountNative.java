@@ -25,7 +25,7 @@ public class CountNative extends AbstractNative {
                 " r.meet_address as meetAddress, r.create_time as createTime, t.name, t.phone, t.status as talentStatus, t.follow_user_id as followUserId, t.id as talentId";
         String countSelect = "select count(1)";
         String from = " from talent_remind r left join talent t on r.talent_id=t.id";
-        String where = " where r.create_user_id=" + userId +" and r.finish=0";
+        String where = " where r.create_user_id=" + userId +" and r.finish=0 and now()>r.next_remind_time";
         String sort = " order by r.id asc";
         if (type != null) {
             where = where + " and r.type=" + type;
@@ -62,7 +62,7 @@ public class CountNative extends AbstractNative {
                 "r.create_time as createTime, c.id as customerId, c.name, c.type as customerType, c.follow_user_id as followUserId";
         String countSelect = "select count(1)";
         String from  = " from customer_remind r left join customer c on r.customer_id=c.id";
-        String where = " where r.create_user_id=" + userId + " and r.finish=0";
+        String where = " where r.create_user_id=" + userId + " and r.finish=0 and now()>r.next_remind_time";
         String sort = " order by r.id asc";
         if (type != null) {
             where = where + " and r.type=" + type;
@@ -98,8 +98,6 @@ public class CountNative extends AbstractNative {
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
-        query.addScalar("city", StandardBasicTypes.STRING);
-        query.addScalar("phone", StandardBasicTypes.STRING);
         query.addScalar("talentName", StandardBasicTypes.STRING);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("followUserId", StandardBasicTypes.LONG);
@@ -107,6 +105,7 @@ public class CountNative extends AbstractNative {
         List<Map<String, Object>> talentList = query.getResultList();
         talentList.forEach(map -> {
             map.put("info", getWorkInfo(Long.parseLong(map.get("id").toString())));
+            map.put("remind", getRemindInfo(Long.parseLong(map.get("id").toString())));
         });
         return talentList;
     }
@@ -128,8 +127,32 @@ public class CountNative extends AbstractNative {
         List<Map<String, Object>> talentList = query.getResultList();
         talentList.forEach(map -> {
             map.put("info", getWorkInfo(Long.parseLong(map.get("id").toString())));
+            map.put("remind", getRemindInfo(Long.parseLong(map.get("id").toString())));
         });
         return talentList;
+    }
+
+    // 获取人才地图的最后一次跟踪
+    public Map<String, Object> getRemindInfo(Long talentId) {
+        String sql = "select r.type, r.remark, r.situation, r.cause, r.salary, r.meet_time as meetTime, r.meet_address as meetAddress, u.nick_name as createUser, r.create_time as createTime" +
+                " from talent_remind r left join sys_user u on r.create_user_id=u.id where r.talent_id=" + talentId + " order by r.create_time desc";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
+        query.addScalar("type", StandardBasicTypes.INTEGER);
+        query.addScalar("remark", StandardBasicTypes.STRING);
+        query.addScalar("situation", StandardBasicTypes.STRING);
+        query.addScalar("cause", StandardBasicTypes.STRING);
+        query.addScalar("salary", StandardBasicTypes.STRING);
+        query.addScalar("meetTime", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("meetAddress", StandardBasicTypes.STRING);
+        query.addScalar("createUser", StandardBasicTypes.STRING);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        List<Map<String, Object>> list = query.getResultList();
+        if (list.size() > 0) {
+            return list.get(0);
+        }
+        return new HashMap<>();
     }
 
     // 获取人才地图的最后一份工作信息

@@ -150,6 +150,16 @@ public class TeamService extends AbstractService {
         return teamDao.findAllByTeamId(teamId);
     }
 
+    // 根据总监id获取团队成员
+    public List<Team> getMembersByUserId(Long userId) {
+        Team team = teamDao.findTeamByUserIdAndLevel(userId, 1);
+        if (team != null) {
+            return getTeamMembersByTeamId(team.getId());
+        } else {
+            return null;
+        }
+    }
+
     /**
      * 获取团队成员信息
      */

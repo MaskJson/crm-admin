@@ -105,7 +105,7 @@ public class CustomerService extends AbstractService {
     }
 
     // 分页查询
-    public Page<Customer> getCustomerList(Long id, String name, String industry, Long folderId, Boolean follow, Pageable pageable) {
+    public Page<Customer> getCustomerList(Long id, String name, String industry, Long folderId, Boolean follow, Integer type, Long userId, Pageable pageable) {
         Page<Customer> result = customerDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
             if (id != null) {
@@ -119,6 +119,10 @@ public class CustomerService extends AbstractService {
             }
             if (follow != null) {
                 list.add(cb.equal(root.get("follow"), follow));
+            }
+            if (type != null) {
+                list.add(cb.equal(root.get("createUserId"), userId));
+                list.add(cb.equal(root.get("type"), type));
             }
             if (folderId != null) {
                 List<FolderItem> folderItems = folderItemDao.findAllByFolderIdAndAndType(folderId, 1);
@@ -151,6 +155,9 @@ public class CustomerService extends AbstractService {
     public Long saveRemind(@RequestBody CustomerRemind remind) {
         remind.setCreateTime(new Date(System.currentTimeMillis()));
         remind.setUpdateTime(new Date(System.currentTimeMillis()));
+        if (remind.getNextType() == null) {
+            remind.setFinish(true);
+        }
         customerRemindDao.save(remind);
         Long followId = remind.getFollowRemindId();
         if (followId != null) {
@@ -163,7 +170,7 @@ public class CustomerService extends AbstractService {
         if (customer != null) {
             // 签约后类型为客户
             Integer status = remind.getStatus();
-            customer.setType(status == 5 ? 6 : status);
+            customer.setType(status == 5 && remind.getContactTime() != null ? 6 : status);
             customerDao.save(customer);
         }
         return remind.getId();
@@ -282,7 +289,7 @@ public class CustomerService extends AbstractService {
                 if (customersOfUser >= 50) {
                     throw new WebException(400, "单人的客户列名上限为50， 您已达到上限", null);
                 } else {
-                    customer.setType(2);
+                    customer.setType(1);
                     customer.setFollowUserId(userId);
                 }
             }

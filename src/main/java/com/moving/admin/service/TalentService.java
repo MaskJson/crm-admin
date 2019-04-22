@@ -110,6 +110,7 @@ public class TalentService extends AbstractService {
             Map<String, Object> map = countNative.getWorkInfo(talent.getId());
             talent.setPosition(map.get("position") != null ? map.get("position").toString() : "");
             talent.setProjects(projectTalentDao.findProjectIdsOfTalent(talent.getId()));
+            talent.setOfferCount(projectTalentDao.getProjectOfferLength(talent.getId()));
         });
         return result;
     }
@@ -165,8 +166,13 @@ public class TalentService extends AbstractService {
         Long projectId = talent.getProjectId();
         if (projectId != null) {
             ProjectTalent projectTalent = new ProjectTalent();
-            projectTalent.setStatus(0);
-            projectTalent.setType(100);
+            if (talent.getRoleId() == 3) {
+                projectTalent.setStatus(1);
+                projectTalent.setType(1);
+            } else {
+                projectTalent.setStatus(0);
+                projectTalent.setType(100);
+            }
             projectTalent.setProjectId(projectId);
             projectTalent.setTalentId(id);
             projectTalent.setCreateUserId(talent.getCreateUserId());
@@ -224,6 +230,8 @@ public class TalentService extends AbstractService {
             });
             talent.setChances(chanceList);
             talent.setProjectCount(projectTalentDao.getProjectLengthByTalentId(id));
+            talent.setOfferCount(projectTalentDao.getProjectOfferLength(id));
+            talent.setProjects(projectTalentDao.findProjectIdsOfTalent(id));
         }
         return talent;
     }
@@ -250,10 +258,28 @@ public class TalentService extends AbstractService {
         }
     }
 
-    // 添加客户跟踪
+    // 添加人才跟踪
     public Long saveRemind(TalentRemind remind) {
         remind.setCreateTime(new Date(System.currentTimeMillis()));
         remind.setUpdateTime(new Date(System.currentTimeMillis()));
+        if (remind.getNextType() == null) {
+            remind.setFinish(true);
+        }
+        if (remind.getProjectId() != null) {
+            ProjectTalent projectTalent = new ProjectTalent();
+            if (remind.getRoleId() == 3) {
+                projectTalent.setStatus(1);
+                projectTalent.setType(1);
+            } else {
+                projectTalent.setStatus(0);
+                projectTalent.setType(100);
+            }
+            projectTalent.setProjectId(remind.getProjectId());
+            projectTalent.setTalentId(remind.getTalentId());
+            projectTalent.setCreateUserId(remind.getCreateUserId());
+            projectTalent.setCreateTime(remind.getCreateTime());
+            projectTalentDao.save(projectTalent);
+        }
         talentRemindDao.save(remind);
         Long followId = remind.getFollowRemindId();
         if (followId != null) {

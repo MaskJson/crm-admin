@@ -42,4 +42,12 @@ public class ProjectTalent extends BaseEntity {
     @ApiModelProperty(value = "修改时间=最后跟踪时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "角色id")
+    @Transient
+    private String remark;
+
+    @ApiModelProperty(value = "角色id")
+    @Transient
+    private Integer roleId;
+
 }

@@ -141,4 +141,8 @@ public class UserService extends AbstractService {
             userDao.save(user);
         }
     }
+
+    public List<User> getAllUser() {
+        return userDao.findAll();
+    }
 }

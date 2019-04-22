@@ -24,6 +24,9 @@ public class Project extends BaseEntity {
     @ApiModelProperty(value = "关联客户")
     private Long customerId;
 
+    @ApiModelProperty(value = "主顾问")
+    private Long adviseId;
+
     @ApiModelProperty(value = "关联客户的部门")
     private Long departmentId;
 

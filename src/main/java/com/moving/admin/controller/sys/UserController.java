@@ -121,9 +121,6 @@ public class UserController extends AbstractController {
         if (byUsername != null) {
             return ResultUtil.error("该用户名已被注册");
         }
-
-        String encryptPass = MD5Util.getMD5String(mgrUserTemp.getPassword());
-        mgrUserTemp.setPassword(encryptPass);
         mgrUserTemp.setCreateTime(new Date());
         mgrUserTemp.setUpdateTime(null);
         User mgrUser = userService.save(mgrUserTemp);
@@ -182,6 +179,12 @@ public class UserController extends AbstractController {
     @GetMapping("/getByRole")
     public Result<List<Map<String, Object>>> getUserByRole(Long roleId) throws Exception {
         return ResultUtil.success(teamNative.getUserByRoleId(roleId));
+    }
+
+    @ApiOperation(value = "获取所有系统用户")
+    @GetMapping("/allUsers")
+    public Result<List<User>> allUsers(Long roleId) throws Exception {
+        return ResultUtil.success(userService.getAllUser());
     }
 
 }

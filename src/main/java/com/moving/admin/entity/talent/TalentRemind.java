@@ -76,4 +76,12 @@ public class TalentRemind extends BaseEntity {
     @Transient
     private Long followRemindId;
 
+    @ApiModelProperty(value = "推荐给客户")
+    @Transient
+    private Long projectId;
+
+    @ApiModelProperty(value = "角色id")
+    @Transient
+    private Long roleId;
+
 }

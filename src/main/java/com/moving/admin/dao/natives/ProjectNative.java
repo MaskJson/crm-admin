@@ -42,21 +42,22 @@ public class ProjectNative extends AbstractNative {
         query.addScalar("type", StandardBasicTypes.INTEGER);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
-        query.addScalar("departmentName", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
     }
 
     // 获取对当前用户开放的所有项目
     public List<Map<String, Object>> getProjectsByUser(Long userId) {
-        String select = "select a.id, a.name";
-        String from = " from project a";
-        String where = " where (a.create_user_id=" + userId + " or (a.open_type=1 and date_add(a.create_time, interval 7 day) < now()) or a.part_id=" + userId +
-                " or (" + userId + " in (select ttt.user_id from team ttt where ttt.team_id=a.team_id and ttt.team_id is not null) and a.open_type=2))";
+        String select = "select a.id, a.name, c.name as customerName";
+        String from = " from project a left join customer c on a.customer_id=c.id";
+        String where = " where a.create_user_id=" + userId + " or (a.open_type=1 and date_add(a.create_time, interval 7 day) < now()) or a.part_id=" + userId +
+                " or (" + userId + " in (select ttt.user_id from team ttt where ttt.team_id=a.team_id and ttt.team_id is not null) and a.open_type=2)";
+        System.err.println(select + from + where);
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where);
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("name", StandardBasicTypes.STRING);
+        query.addScalar("customerName", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
     }

@@ -18,6 +18,7 @@ import com.moving.admin.entity.talent.Talent;
 import com.moving.admin.exception.WebException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -53,6 +54,9 @@ public class ProjectService extends AbstractService {
     @Autowired
     private DepartmentDao departmentDao;
 
+    @Autowired
+    private TeamService teamService;
+
     // 编辑项目
     public Long save(Project project) {
         if (project.getId() == null) {
@@ -63,6 +67,7 @@ public class ProjectService extends AbstractService {
                 throw new WebException(400, "您还未拥有团队，请联系管理员分配团队成员", null);
             }
             project.setCreateTime(new Date(System.currentTimeMillis()));
+            project.setFirstApplyTime(new Date(System.currentTimeMillis() + 86400000L*21));
         } else {
             project.setUpdateTime(new Date(System.currentTimeMillis()));
         }
@@ -108,13 +113,14 @@ public class ProjectService extends AbstractService {
                 }
             }
         }
+        Long id;
         if (old != null) {
             old.setStatus(0);
             old.setType(1);
             old.setCreateUserId(projectTalent.getCreateUserId());
             old.setUpdateTime(date);
             projectTalentDao.save(old);
-            return old.getId();
+            id = old.getId();
         } else {
             if (projectTalent.getId() == null) {
                 projectTalent.setCreateTime(date);
@@ -122,8 +128,19 @@ public class ProjectService extends AbstractService {
                 projectTalent.setUpdateTime(date);
             }
             projectTalentDao.save(projectTalent);
-            return projectTalent.getId();
+            id = projectTalent.getId();
         }
+        if (!StringUtils.isEmpty(projectTalent.getRemark())) {
+            ProjectRemind remind = new ProjectRemind();
+            remind.setCreateUserId(remind.getCreateUserId());
+            remind.setRemark(projectTalent.getRemark());
+            remind.setType(0);
+            remind.setStatus(100);
+            remind.setRoleId(projectTalent.getRoleId());
+            remind.setProjectTalentId(id);
+            addProjectRemind(remind);
+        }
+        return id;
     }
 
     // 添加进展人才跟踪，并同时修改对应人才状态

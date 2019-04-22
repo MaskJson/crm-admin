@@ -83,4 +83,10 @@ public class TeamController extends AbstractController {
         return ResultUtil.success(true);
     }
 
+    @ApiOperation("根据总监用户id-查看团队成员列表")
+    @GetMapping("/getMemberByUserId")
+    public Result<List<Team>> getMemberByUserId(Long id) throws Exception {
+        return ResultUtil.success(teamService.getMembersByUserId(id));
+    }
+
 }
