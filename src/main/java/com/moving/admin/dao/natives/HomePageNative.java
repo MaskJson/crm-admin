@@ -22,7 +22,7 @@ public class HomePageNative extends AbstractNative {
         Map<String, BigInteger> map = new HashMap<>();
         String countSelectTal = "select count(1)";
         String fromTal = " from talent_remind r left join talent t on r.talent_id=t.id";
-        String whereTal = " where r.create_user_id=" + userId +" and r.finish=0";
+        String whereTal = " where r.create_user_id=" + userId +" and r.finish=0 and now()>r.next_remind_time";
         String countSelectCust = "select count(1)";
         String fromCust  = " from customer_remind r left join customer c on r.customer_id=c.id";
         String whereCust = " where r.create_user_id=" + userId + " and r.finish=0";

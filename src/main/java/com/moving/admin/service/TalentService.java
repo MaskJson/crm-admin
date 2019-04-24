@@ -161,6 +161,9 @@ public class TalentService extends AbstractService {
         TalentRemind remind = talent.getRemind();
         if (remind != null) {
             remind.setTalentId(id);
+            if (remind.getNextType() == null) {
+                remind.setFinish(true);
+            }
             talentRemindDao.save(remind);
         }
         Long projectId = talent.getProjectId();
@@ -189,6 +192,7 @@ public class TalentService extends AbstractService {
             return customer.getId();
         } else {
             customer = new Customer();
+            customer.setAuditType(0);
             customer.setName(name);
             customer.setIndustry(null);
             customer.setType(0);
@@ -353,10 +357,14 @@ public class TalentService extends AbstractService {
         }
     }
 
-    public void setResume(Long talentId, String path) {
+    public void setResume(Long talentId, String path, Boolean flag) {
         Talent talent = talentDao.findById(talentId).get();
         if (talent != null) {
-            talent.setResume(path);
+            if (flag) {
+                talent.setResume(path);
+            } else {
+                talent.setResume2(path);
+            }
             talentDao.save(talent);
         }
     }

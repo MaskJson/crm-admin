@@ -26,6 +26,9 @@ public class Customer extends BaseEntity {
     @ApiModelProperty(value = "状态：0 普通客户， 2345 扩展客户， 6 客户")
     private Integer type;
 
+    @ApiModelProperty(value = "审核状态：0：待审核， 1: 审核通过，2: 未通过")
+    private Integer auditType = 1;
+
     @ApiModelProperty(value = "城市")
     private String city;
 

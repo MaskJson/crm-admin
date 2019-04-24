@@ -6,6 +6,7 @@ import com.moving.admin.service.CommonService;
 import com.moving.admin.service.CustomerService;
 import com.moving.admin.service.TalentService;
 import com.moving.admin.util.ResultUtil;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
@@ -84,9 +85,9 @@ public class CommonController extends AbstractController {
 
     @ApiOperation("人才-客户，上传")
     @GetMapping("/file")
-    public Result<Boolean> uploadFile(Integer type, Long id, String path) throws Exception {
+    public Result<Boolean> uploadFile(Integer type, Long id, String path, Boolean flag) throws Exception {
         if (type == 1) {
-            talentService.setResume(id, path);
+            talentService.setResume(id, path, flag);
         } else {
             customerService.setContractUrl(id, path);
         }

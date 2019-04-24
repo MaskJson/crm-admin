@@ -42,6 +42,9 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "简历")
     private String resume;
 
+    @ApiModelProperty(value = "附件")
+    private String resume2;
+
     @ApiModelProperty(value = "城市")
     private String city;
 

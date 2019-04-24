@@ -8,6 +8,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Map;
 
 @ApiModel("工作经历")
 @Data
@@ -53,8 +54,12 @@ public class Experience extends BaseEntity {
     @ApiModelProperty(value = "人才ID")
     private Long talentId;
 
-    @ApiModelProperty(value = "跟踪记录")
+    @ApiModelProperty(value = "人才详情")
     @Transient
     private Talent talent;
+
+    @ApiModelProperty(value = "最后一次跟踪")
+    @Transient
+    private Map<String, Object> remind;
 
 }

@@ -204,7 +204,12 @@ public class CountNative extends AbstractNative {
         query.addScalar("departmentId", StandardBasicTypes.LONG);
         query.addScalar("departmentName", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        return query.getResultList();
+        List<Map<String, Object>> talentList = query.getResultList();
+        talentList.forEach(map -> {
+            map.put("info", getWorkInfo(Long.parseLong(map.get("talentId").toString())));
+            map.put("remind", getRemindInfo(Long.parseLong(map.get("talentId").toString())));
+        });
+        return talentList;
     }
 
     // 获取未处理的诊断提醒记录

@@ -2,6 +2,7 @@ package com.moving.admin.service;
 
 import com.moving.admin.dao.customer.*;
 import com.moving.admin.dao.folder.FolderItemDao;
+import com.moving.admin.dao.natives.CountNative;
 import com.moving.admin.dao.natives.CustomerNative;
 import com.moving.admin.dao.project.ProjectDao;
 import com.moving.admin.dao.sys.UserDao;
@@ -70,6 +71,9 @@ public class CustomerService extends AbstractService {
 
     @Autowired
     private ProjectDao projectDao;
+
+    @Autowired
+    private CountNative countNative;
 
     // 添加、编辑
     public Long save(Customer customer) {
@@ -217,6 +221,7 @@ public class CustomerService extends AbstractService {
         experiences.forEach(experience -> {
             if (experience.getTalentId() != null) {
                 experience.setTalent(talentDao.findById(experience.getTalentId()).get());
+                experience.setRemind(countNative.getRemindInfo(experience.getTalentId()));
             }
             if (experience.getDepartmentId() != null) {
                 experience.setDepartment(departmentDao.findById(experience.getDepartmentId()).get().getName());
@@ -303,9 +308,7 @@ public class CustomerService extends AbstractService {
     // 获取达新建项目标准达公司，未签约先推人或者是客户
     public List<Customer> findProjectCustomers() {
         List<Integer> types = new ArrayList<>();
-        types.add(5);
-        types.add(6);
-        return customerDao.findAllByTypeIn(types);
+        return customerDao.findAllByTypeAfter(3);
     }
 
     // 上传合同
