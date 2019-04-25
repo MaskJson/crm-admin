@@ -78,6 +78,11 @@ public class ProjectPageNative extends AbstractNative {
 
     public void setFollow(Boolean follow) { where.append(" and a.follow=" + (follow ? 1 : 0)); }
 
+    public void setStatus(Integer status) {
+        String w = status != 2 ? " and a.status=" + status : " and (a.status=2 or a.status=3)";
+        where.append(w);
+    }
+
     public void appendSort(Pageable pageable) {
         super.simpleAppendSort(pageable, sort);
     }

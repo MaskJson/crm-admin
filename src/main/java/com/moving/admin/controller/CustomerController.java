@@ -114,7 +114,7 @@ public class CustomerController extends AbstractController {
 
     @ApiOperation("获取公司下所有关联人才")
     @GetMapping("/talent-all")
-    public Result<List<Experience>> getCustomerTalent(Long id) throws Exception {
+    public Result<List<Map<String, Object>>> getCustomerTalent(Long id) throws Exception {
         return ResultUtil.success(customerService.getCustomerTalents(id));
     }
 
@@ -153,6 +153,26 @@ public class CustomerController extends AbstractController {
     @GetMapping("/project/page")
     public Result<Map<String, Object>> getCustomerProjects(Long id, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
         return ResultUtil.success(customerNative.getProjectByCustomerId(id, pageable));
+    }
+
+    @ApiOperation("待审核公司列表")
+    @GetMapping("/audit/list")
+    public Result<Map<String, Object>> getAuditList(Long userId, Long roleId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        return ResultUtil.success(customerNative.getAuditList(userId, roleId, pageable));
+    }
+
+    @ApiOperation("通过审核")
+    @PostMapping("/audit/pass")
+    public Result auditCustomer(@RequestBody List<Long> ids) throws Exception {
+        customerService.auditCustomer(ids, 2);
+        return ResultUtil.success(null);
+    }
+
+    @ApiOperation("审核拒绝")
+    @PostMapping("/audit/refuse")
+    public Result refuseCustomer(@RequestBody List<Long> ids) throws Exception {
+        customerService.auditCustomer(ids, 1);
+        return ResultUtil.success(null);
     }
 
 }

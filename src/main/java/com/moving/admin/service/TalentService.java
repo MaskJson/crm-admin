@@ -128,7 +128,7 @@ public class TalentService extends AbstractService {
         Long id = talent.getId();
         experienceDao.removeAllByTalentId(id);
         talent.getExperienceList().forEach(item -> {
-            Long customerId = addCustomerFromTalentInfo(item.getCompany());
+            Long customerId = addCustomerFromTalentInfo(item.getCompany(), talent.getCreateUserId());
             Long departmentId = commonService.addDepartmentFromTalentInfo(customerId, item.getDepartment());
             Experience experience = experienceDao.findExperienceByCustomerIdAndDepartmentIdAndTalentId(item.getCustomerId(), item.getDepartmentId(), id);
 //            if (experience == null) {
@@ -144,7 +144,7 @@ public class TalentService extends AbstractService {
         });
         friendDao.removeAllByTalentId(id);
         talent.getFriends().forEach(friend -> {
-            Long customerId = addCustomerFromTalentInfo(friend.getCompany());
+            Long customerId = addCustomerFromTalentInfo(friend.getCompany(), talent.getCreateUserId());
             Long departmentId = commonService.addDepartmentFromTalentInfo(customerId, friend.getDepartment());
             friend.setTalentId(id);
             friend.setCustomerId(customerId);
@@ -153,7 +153,7 @@ public class TalentService extends AbstractService {
         });
         chanceDao.removeAllByTalentId(id);
         talent.getChances().forEach(chance -> {
-            Long customerId = addCustomerFromTalentInfo(chance.getCompany());
+            Long customerId = addCustomerFromTalentInfo(chance.getCompany(), talent.getCreateUserId());
             chance.setTalentId(id);
             chance.setCustomerId(customerId);
             chanceDao.save(chance);
@@ -186,7 +186,7 @@ public class TalentService extends AbstractService {
     }
 
     // 添加客户，去重
-    public Long addCustomerFromTalentInfo(String name) {
+    public Long addCustomerFromTalentInfo(String name, Long userId) {
         Customer customer = customerDao.findByName(name);
         if (customer != null) {
             return customer.getId();
@@ -194,6 +194,7 @@ public class TalentService extends AbstractService {
             customer = new Customer();
             customer.setAuditType(0);
             customer.setName(name);
+            customer.setCreateUserId(userId);
             customer.setIndustry(null);
             customer.setType(0);
             customerDao.save(customer);

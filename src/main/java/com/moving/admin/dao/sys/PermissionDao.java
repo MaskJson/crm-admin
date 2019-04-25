@@ -13,8 +13,8 @@ public interface PermissionDao extends JpaRepository<Permission, Long>, JpaSpeci
 
     List<Permission> findByTitle(String title);
 
-    List<Permission> findByParentIdOrderBySortOrder(Long parentId);
+    List<Permission> findByParentIdOrderBySortOrderAsc(Long parentId);
 
-    List<Permission> findByLevelOrderBySortOrder(Integer level);
+    List<Permission> findByLevelOrderBySortOrderAsc(Integer level);
 
 }

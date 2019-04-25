@@ -147,6 +147,7 @@ public class UserController extends AbstractController {
         }
         user.setCreateTime(oldUser.getCreateTime());
         user.setUpdateTime(new Date());
+        user.setPassword(oldUser.getPassword());
         User mgrUser = userService.update(user);
         if (mgrUser == null) {
             return ResultUtil.error("修改失败");

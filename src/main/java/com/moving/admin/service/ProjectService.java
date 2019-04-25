@@ -134,8 +134,8 @@ public class ProjectService extends AbstractService {
             ProjectRemind remind = new ProjectRemind();
             remind.setCreateUserId(remind.getCreateUserId());
             remind.setRemark(projectTalent.getRemark());
-            remind.setType(0);
-            remind.setStatus(100);
+            remind.setType(100);
+            remind.setStatus(0);
             remind.setRoleId(projectTalent.getRoleId());
             remind.setProjectTalentId(id);
             addProjectRemind(remind);
@@ -157,8 +157,8 @@ public class ProjectService extends AbstractService {
             return null;
         }
         if (projectRemind.getRoleId() == 3 && projectRemind.getType() == 100) {
-            projectRemind.setType(1);
-            projectRemind.setStatus(1);
+            projectTalent.setType(1);
+            projectTalent.setStatus(1);
         }
         projectRemindDao.save(projectRemind);
         // 跟进后修改人才进展状态
@@ -252,7 +252,16 @@ public class ProjectService extends AbstractService {
         return report.getId();
     }
 
-    // 项目总监获取诊断报告
-
+    // 修改项目状态
+    public Boolean changeProjectStatus(Long id, Integer status) {
+        Project project = projectDao.findById(id).get();
+        if (project != null) {
+            project.setStatus(status);
+            projectDao.save(project);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }

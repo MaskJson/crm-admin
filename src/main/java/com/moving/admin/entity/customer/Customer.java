@@ -26,7 +26,7 @@ public class Customer extends BaseEntity {
     @ApiModelProperty(value = "状态：0 普通客户， 2345 扩展客户， 6 客户")
     private Integer type;
 
-    @ApiModelProperty(value = "审核状态：0：待审核， 1: 审核通过，2: 未通过")
+    @ApiModelProperty(value = "审核状态：0：待审核， 1: 未通过，2: 审核通过")
     private Integer auditType = 1;
 
     @ApiModelProperty(value = "城市")
@@ -55,6 +55,12 @@ public class Customer extends BaseEntity {
 
     @ApiModelProperty(value = "合同")
     private String contractUrl;
+
+    @ApiModelProperty(value = "合同开始时间")
+    private Date contactTimeStart;
+
+    @ApiModelProperty(value = "合同结束时间")
+    private Date contactTimeEnd;
 
     @ApiModelProperty(value = "关注状态")
     private Boolean follow;

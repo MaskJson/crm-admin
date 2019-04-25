@@ -23,7 +23,7 @@ public class PermissionService extends AbstractService {
 
     // 根据层级获取菜单
     public List<Permission> findByLevelOrderBySortOrder(Integer level) {
-        return permissionDao.findByLevelOrderBySortOrder(level);
+        return permissionDao.findByLevelOrderBySortOrderAsc(level);
     }
 
     // 获取角色
@@ -43,7 +43,7 @@ public class PermissionService extends AbstractService {
 
     // 根据父级菜单id获取菜单
     public List<Permission> findByParentIdOrderBySortOrder(Long parentId) {
-        return permissionDao.findByParentIdOrderBySortOrder(parentId);
+        return permissionDao.findByParentIdOrderBySortOrderAsc(parentId);
     }
 
     // 获取登录用户的菜单

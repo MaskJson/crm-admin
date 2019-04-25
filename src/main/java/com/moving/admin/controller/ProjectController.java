@@ -62,7 +62,7 @@ public class ProjectController extends AbstractController {
     @ApiOperation("获取项目列表")
     @GetMapping("/list")
     public Result<Map<String, Object>> getList(
-            Long folderId, Long teamId, Long customerId, String industry, String city, Boolean follow, Long userId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+            Long folderId, Long teamId, Long customerId, String industry, String city, Boolean follow, Long userId, Integer status, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
             ) throws Exception {
         ProjectPageNative projectNative = new ProjectPageNative();
         projectNative.filterUserIdIsInTeam(userId);
@@ -83,6 +83,9 @@ public class ProjectController extends AbstractController {
         }
         if (follow != null) {
             projectNative.setFollow(follow);
+        }
+        if (status != null) {
+            projectNative.setStatus(status);
         }
         projectNative.appendSort(pageable);
         return ResultUtil.success(projectNative.getResult(entityManager));
@@ -151,5 +154,18 @@ public class ProjectController extends AbstractController {
     public Result<List<Map<String, Object>>> getProjectByUser(Long userId) throws Exception {
         return ResultUtil.success(projectNative.getProjectsByUser(userId));
     }
+
+    @ApiOperation("修改项目状态")
+    @PostMapping("/changeStatus")
+    public Result<Boolean> changeProjectStatus(Long id, Integer status) throws Exception {
+        Boolean flag = projectService.changeProjectStatus(id, status);
+        if (flag) {
+            return ResultUtil.success(true);
+        } else {
+            return ResultUtil.error("项目异常，修改失败");
+        }
+    }
+
+
 
 }

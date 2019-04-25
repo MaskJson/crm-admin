@@ -23,6 +23,9 @@ public class ProjectRemind extends BaseEntity {
     @ApiModelProperty(value = "跟踪类型")
     private Integer type;
 
+    @ApiModelProperty(value = "是否为跟踪备注")
+    private Boolean remind = false;
+
     @ApiModelProperty(value = "改变状态为")
     private Integer status;
 

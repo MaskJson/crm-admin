@@ -50,8 +50,11 @@ public class CustomerRemind extends BaseEntity {
     @ApiModelProperty(value = "见面内容")
     private String meetNotice;
 
-    @ApiModelProperty(value = "签约时间")
-    private Date contactTime;
+    @ApiModelProperty(value = "合同开始时间")
+    private Date contactTimeStart;
+
+    @ApiModelProperty(value = "合同开始时间")
+    private Date contactTimeEnd;
 
     @ApiModelProperty(value = "创建者ID")
     private Long createUserId;

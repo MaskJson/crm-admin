@@ -112,6 +112,7 @@ public class CustomerService extends AbstractService {
     public Page<Customer> getCustomerList(Long id, String name, String industry, Long folderId, Boolean follow, Integer type, Long userId, Pageable pageable) {
         Page<Customer> result = customerDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
+            list.add(cb.equal(root.get("auditType"), 2));
             if (id != null) {
                 list.add(cb.equal(root.get("id"), id));
             }
@@ -124,9 +125,11 @@ public class CustomerService extends AbstractService {
             if (follow != null) {
                 list.add(cb.equal(root.get("follow"), follow));
             }
-            if (type != null) {
-                list.add(cb.equal(root.get("createUserId"), userId));
-                list.add(cb.equal(root.get("type"), type));
+            if (userId != null) {
+                list.add(cb.equal(root.get("followUserId"), userId));
+                if (type != null) {
+                    list.add(cb.equal(root.get("type"), type == 10 ? 1 : type));
+                }
             }
             if (folderId != null) {
                 List<FolderItem> folderItems = folderItemDao.findAllByFolderIdAndAndType(folderId, 1);
@@ -156,7 +159,7 @@ public class CustomerService extends AbstractService {
     }
 
     // 添加客户跟踪
-    public Long saveRemind(@RequestBody CustomerRemind remind) {
+    public Long saveRemind(CustomerRemind remind) {
         remind.setCreateTime(new Date(System.currentTimeMillis()));
         remind.setUpdateTime(new Date(System.currentTimeMillis()));
         if (remind.getNextType() == null) {
@@ -174,7 +177,11 @@ public class CustomerService extends AbstractService {
         if (customer != null) {
             // 签约后类型为客户
             Integer status = remind.getStatus();
-            customer.setType(status == 5 && remind.getContactTime() != null ? 6 : status);
+            customer.setType(status == 5 ? 6 : status);
+            if (status == 5) {
+                customer.setContactTimeStart(remind.getContactTimeStart());
+                customer.setContactTimeEnd(remind.getContactTimeEnd());
+            }
             customerDao.save(customer);
         }
         return remind.getId();
@@ -216,18 +223,8 @@ public class CustomerService extends AbstractService {
     }
 
     // 获取该公司下所有相关人才,talentId 去重
-    public List<Experience> getCustomerTalents(Long id) {
-        List<Experience> experiences = experienceDao.findAllByCustomerIdOrderByDepartmentId(id);
-        experiences.forEach(experience -> {
-            if (experience.getTalentId() != null) {
-                experience.setTalent(talentDao.findById(experience.getTalentId()).get());
-                experience.setRemind(countNative.getRemindInfo(experience.getTalentId()));
-            }
-            if (experience.getDepartmentId() != null) {
-                experience.setDepartment(departmentDao.findById(experience.getDepartmentId()).get().getName());
-            }
-        });
-        return experiences;
+    public List<Map<String, Object>> getCustomerTalents(Long id) {
+        return customerNative.getTalentsByCustomerId(id);
     }
 
     // 获取公司下所有部门
@@ -318,6 +315,16 @@ public class CustomerService extends AbstractService {
             customer.setContractUrl(path);
             customerDao.save(customer);
         }
+    }
+
+    public void auditCustomer(List<Long> ids, Integer auditType) {
+        ids.forEach(id -> {
+            Customer customer = customerDao.findById(id).get();
+            if (customer != null) {
+                customer.setAuditType(auditType);
+                customerDao.save(customer);
+            }
+        });
     }
 
 }

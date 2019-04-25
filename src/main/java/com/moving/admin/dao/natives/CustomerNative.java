@@ -1,23 +1,37 @@
 package com.moving.admin.dao.natives;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
+import com.moving.admin.dao.project.ProjectTalentDao;
+import com.moving.admin.dao.sys.TeamDao;
 import com.moving.admin.entity.customer.Customer;
+import com.moving.admin.entity.sys.Team;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class CustomerNative extends AbstractNative {
+
+    @Autowired
+    private TeamDao teamDao;
+
+    @Autowired
+    private CountNative countNative;
+
+    @Autowired
+    private ProjectTalentDao projectTalentDao;
 
     // 获取客户下所有联系人及联系记录
     public List<Map<String, Object>> getAllCustomerContactById(Long customerId, String name, Long departmentId, String position, String phone) {
@@ -94,6 +108,65 @@ public class CustomerNative extends AbstractNative {
         map.put("content", query.getResultList());
         map.put("totalElements", getTotal(countSelect + from + where));
         return map;
+    }
+
+    // 获取当前项目总监相关的待审核的公司, 管理员可查看所有
+    public Map<String, Object> getAuditList(Long userId, Long roleId, Pageable pageable) {
+        Map<String, Object> map = new HashMap<>();
+        Team team = teamDao.findTeamByUserIdAndLevel(userId, 1);
+        if (team == null && roleId == 3) {
+            map.put("content", new ArrayList<>());
+            map.put("totalElements", 0);
+            return map;
+        }
+        String teamWhere = "";
+        if (team != null) {
+            teamWhere =  "or c.create_user_id in(select user_id from team where team_id=" + team.getId() + ")";
+        }
+        String select = "select c.id, c.name, c.create_time as createTime, c.audit_type as auditType, u.nick_name as createUser";
+        String countSelect = "select count(1)";
+        String from = " from customer c left join sys_user u on c.create_user_id=u.id";
+        String where = " where c.audit_type<>2 and (c.create_user_id="+userId+teamWhere+") ";
+        String sort = " order by audit_type asc";
+        if (roleId == 1) {
+            where = " where c.audit_type<>2";
+        }
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort + limitStr(pageable));
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("name", StandardBasicTypes.STRING);
+        query.addScalar("createUser", StandardBasicTypes.STRING);
+        query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("auditType", StandardBasicTypes.INTEGER);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        map.put("content", query.getResultList());
+        map.put("totalElements", getTotal(countSelect + from + where));
+        return map;
+    }
+
+    // 获取公司人才库
+    public List<Map<String, Object>> getTalentsByCustomerId(Long id) {
+        String sql = "select e.talent_id as talentId, e.position, t.status, t.name as talentName, t.follow_user_id as followUserId, e.department_id as departmentId, d.name as department" +
+                " from experience e left join department d on e.department_id=d.id left join talent t on e.talent_id=t.id" +
+                " where e.customer_id=" + id +
+                " order by e.department_id";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
+        query.addScalar("talentId", StandardBasicTypes.LONG);
+        query.addScalar("followUserId", StandardBasicTypes.LONG);
+        query.addScalar("position", StandardBasicTypes.STRING);
+        query.addScalar("department", StandardBasicTypes.STRING);
+        query.addScalar("talentName", StandardBasicTypes.STRING);
+        query.addScalar("status", StandardBasicTypes.INTEGER);
+        query.addScalar("departmentId", StandardBasicTypes.LONG);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        List<Map<String, Object>> list = query.getResultList();
+        list.forEach(item -> {
+            Long talentId = Long.parseLong(item.get("talentId").toString());
+            item.put("remind", countNative.getRemindInfo(talentId));
+            item.put("progress", projectTalentDao.getProjectLengthByTalentId(talentId));
+        });
+        return query.getResultList();
     }
 
     // 获取分页sql

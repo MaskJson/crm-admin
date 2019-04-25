@@ -21,6 +21,9 @@ public class Project extends BaseEntity {
     @GenericGenerator(name = "id_generator", strategy = "identity")
     private Long id;
 
+    @ApiModelProperty(value = "项目状态 1: 进展中 2：暂停 3：失败 4：成功")
+    private Integer status = 1;
+
     @ApiModelProperty(value = "关联客户")
     private Long customerId;
 

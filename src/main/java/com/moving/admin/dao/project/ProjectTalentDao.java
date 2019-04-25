@@ -13,7 +13,7 @@ public interface ProjectTalentDao extends JpaRepository<ProjectTalent, Long>, Jp
     // 获取该项目下的所有人才
     List<ProjectTalent> findAllByProjectId(Long projectId);
 
-    // 通过人才id获取关联的项目数，不包括已淘汰的
+    // 通过人才id获取关联的项目数，不包括已淘汰的    进展项目数   判断常规跟踪的权限
     @Query("select count(id) from ProjectTalent where talentId=:talentId and status<7")
     Long getProjectLengthByTalentId(@Param("talentId") Long talentId);
 
@@ -35,8 +35,8 @@ public interface ProjectTalentDao extends JpaRepository<ProjectTalent, Long>, Jp
     // 查看人才是否被其他系统用户列为项目进展人才
     List<ProjectTalent> findAllByTalentIdAndCreateUserIdNotAndStatusNotIn(Long talentId, Long createUserId, List<Integer> status);
 
-    // 获取人才处于非结束的项目ids
-    @Query("select projectId from ProjectTalent where talentId=:talentId and status<7")
+    // 获取人才关联的所有项目ids
+    @Query("select projectId from ProjectTalent where talentId=:talentId")
     List<Long> findProjectIdsOfTalent(@Param("talentId") Long talentId);
 
     // 获取该人才在其他项目且处于进展中的记录
