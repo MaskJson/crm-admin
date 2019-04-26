@@ -1,10 +1,12 @@
 package com.moving.admin.dao.natives;
 
+import com.moving.admin.dao.project.ProjectTalentDao;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,9 @@ import java.util.Map;
 @Service
 public class CountNative extends AbstractNative {
 
+    @Autowired
+    private ProjectTalentDao projectTalentDao;
+
     // 获取人才常规跟踪的待办列表
     public Map<String, Object> talentRemindPendingList(Long userId, Integer type, Pageable pageable) {
         Map<String, Object> map = new HashMap<>();
@@ -25,7 +30,7 @@ public class CountNative extends AbstractNative {
                 " r.meet_address as meetAddress, r.create_time as createTime, t.name, t.phone, t.status as talentStatus, t.follow_user_id as followUserId, t.id as talentId";
         String countSelect = "select count(1)";
         String from = " from talent_remind r left join talent t on r.talent_id=t.id";
-        String where = " where r.create_user_id=" + userId +" and r.finish=0 and now()>r.next_remind_time";
+        String where = " where r.create_user_id=" + userId +" and r.finish=0 and r.status<>10 and now()>r.next_remind_time";
         String sort = " order by r.id asc";
         if (type != null) {
             where = where + " and r.type=" + type;
@@ -90,7 +95,7 @@ public class CountNative extends AbstractNative {
 
     // 获取人才地图
     public List<Map<String, Object>> getTalentMapByUserId(Long userId) {
-        String select = "select id, name as talentName, status, follow_user_id as followUserId, city, phone, sex";
+        String select = "select id, name as talentName, status, follow_user_id as followUserId, type as talentType";
         String from = " from talent";
         String where = " where id in(select distinct talent_id from talent_remind where create_user_id=" + userId + ") " +
                 "or id in(select distinct pt.talent_id from project_remind pr left join project_talent pt on pt.id=pr.project_talent_id where pr.create_user_id=" + userId +")";
@@ -100,19 +105,24 @@ public class CountNative extends AbstractNative {
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("talentName", StandardBasicTypes.STRING);
         query.addScalar("status", StandardBasicTypes.INTEGER);
+        query.addScalar("talentType", StandardBasicTypes.INTEGER);
         query.addScalar("followUserId", StandardBasicTypes.LONG);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> talentList = query.getResultList();
         talentList.forEach(map -> {
-            map.put("info", getWorkInfo(Long.parseLong(map.get("id").toString())));
-            map.put("remind", getRemindInfo(Long.parseLong(map.get("id").toString())));
+            Long id = Long.parseLong(map.get("id").toString());
+            map.put("info", getWorkInfo(id));
+            map.put("remind", getRemindInfo(id));
+            map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
+            map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
+            map.put("offerCount", projectTalentDao.getProjectOfferLength(id));
         });
         return talentList;
     }
 
     // 获取我联系过的且被收藏的人才
     public List<Map<String, Object>> getFolderTalentsByUserId(Long userId) {
-        String sql = "select t.id, t.name as talentName, t.status, t.follow_user_id as followUserId, t.city, t.phone  from talent t where t.id in (select item_id from folder_item where type=2) and (t.id in " +
+        String sql = "select t.id, t.name as talentName, t.status, t.follow_user_id as followUserId, t.type as talentType  from talent t where t.id in (select item_id from folder_item where type=2) and (t.id in " +
                 "(select distinct tr.talent_id from talent_remind tr where tr.create_user_id=" + userId + ") " +
                 "or  t.id in (select distinct project_talent_id from project_remind where create_user_id=" + userId +"))";
         Session session = entityManager.unwrap(Session.class);
@@ -122,12 +132,17 @@ public class CountNative extends AbstractNative {
         query.addScalar("phone", StandardBasicTypes.STRING);
         query.addScalar("talentName", StandardBasicTypes.STRING);
         query.addScalar("status", StandardBasicTypes.INTEGER);
+        query.addScalar("talentType", StandardBasicTypes.INTEGER);
         query.addScalar("followUserId", StandardBasicTypes.LONG);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> talentList = query.getResultList();
         talentList.forEach(map -> {
-            map.put("info", getWorkInfo(Long.parseLong(map.get("id").toString())));
-            map.put("remind", getRemindInfo(Long.parseLong(map.get("id").toString())));
+            Long id = Long.parseLong(map.get("id").toString());
+            map.put("info", getWorkInfo(id));
+            map.put("remind", getRemindInfo(id));
+            map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
+            map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
+            map.put("offerCount", projectTalentDao.getProjectOfferLength(id));
         });
         return talentList;
     }
@@ -178,7 +193,7 @@ public class CountNative extends AbstractNative {
     // 获取我联系过的经过各个状态的项目进展人才
     public List<Map<String, Object>> getProjectStatusTalents(Long userId) {
         String select = "select pr.status as remindStatus, pt.id, pt.project_id as projectId, pt.talent_id as talentId, pt.status, pt.type, pt.create_time as createTime, pt.update_time as updateTime," +
-                " p.name as projectName, t.name as talentName, t.status as talentStatus, t.follow_user_id as followuserId, c.id as customerId, c.name as customerName," +
+                " p.name as projectName, t.name as talentName, t.status as talentStatus, t.type as talentType, t.follow_user_id as followuserId, c.id as customerId, c.name as customerName," +
                 " d.id as departmentId, d.name as departmentName";
         String from = " from project_remind pr left join project_talent pt on pr.project_talent_id=pt.id " +
                 " left join project p on pt.project_id=p.id left join talent t on pt.talent_id=t.id" +
@@ -193,6 +208,7 @@ public class CountNative extends AbstractNative {
         query.addScalar("talentId", StandardBasicTypes.LONG);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("type", StandardBasicTypes.INTEGER);
+        query.addScalar("talentType", StandardBasicTypes.INTEGER);
         query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("projectName", StandardBasicTypes.STRING);
@@ -206,8 +222,12 @@ public class CountNative extends AbstractNative {
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> talentList = query.getResultList();
         talentList.forEach(map -> {
-            map.put("info", getWorkInfo(Long.parseLong(map.get("talentId").toString())));
-            map.put("remind", getRemindInfo(Long.parseLong(map.get("talentId").toString())));
+            Long id = Long.parseLong(map.get("talentId").toString());
+            map.put("info", getWorkInfo(id));
+            map.put("remind", getRemindInfo(id));
+            map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
+            map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
+            map.put("offerCount", projectTalentDao.getProjectOfferLength(id));
         });
         return talentList;
     }

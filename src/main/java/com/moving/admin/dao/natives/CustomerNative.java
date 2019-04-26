@@ -146,7 +146,7 @@ public class CustomerNative extends AbstractNative {
 
     // 获取公司人才库
     public List<Map<String, Object>> getTalentsByCustomerId(Long id) {
-        String sql = "select e.talent_id as talentId, e.position, t.status, t.name as talentName, t.follow_user_id as followUserId, e.department_id as departmentId, d.name as department" +
+        String sql = "select e.talent_id as talentId, e.position, t.status, t.type as talentType, t.name as talentName, t.follow_user_id as followUserId, e.department_id as departmentId, d.name as department" +
                 " from experience e left join department d on e.department_id=d.id left join talent t on e.talent_id=t.id" +
                 " where e.customer_id=" + id +
                 " order by e.department_id";
@@ -158,6 +158,7 @@ public class CustomerNative extends AbstractNative {
         query.addScalar("department", StandardBasicTypes.STRING);
         query.addScalar("talentName", StandardBasicTypes.STRING);
         query.addScalar("status", StandardBasicTypes.INTEGER);
+        query.addScalar("talentType", StandardBasicTypes.INTEGER);
         query.addScalar("departmentId", StandardBasicTypes.LONG);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
@@ -165,8 +166,10 @@ public class CustomerNative extends AbstractNative {
             Long talentId = Long.parseLong(item.get("talentId").toString());
             item.put("remind", countNative.getRemindInfo(talentId));
             item.put("progress", projectTalentDao.getProjectLengthByTalentId(talentId));
+            item.put("projects", projectTalentDao.findProjectIdsOfTalent(talentId));
+            item.put("offerCount", projectTalentDao.getProjectOfferLength(talentId));
         });
-        return query.getResultList();
+        return list;
     }
 
     // 获取分页sql
