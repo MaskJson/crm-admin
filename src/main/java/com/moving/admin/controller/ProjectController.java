@@ -112,12 +112,12 @@ public class ProjectController extends AbstractController {
 
     @ApiOperation("添加人才进展跟踪记录")
     @PostMapping("/remind/add")
-    public Result<Long> addProjectRemind(@RequestBody ProjectRemind projectRemind) throws Exception {
-        Long id = projectService.addProjectRemind(projectRemind);
-        if (id == null) {
+    public Result<ProjectRemind> addProjectRemind(@RequestBody ProjectRemind projectRemind) throws Exception {
+        ProjectRemind remind = projectService.addProjectRemind(projectRemind);
+        if (remind.getId() == null) {
             return ResultUtil.error("该人才已在其他项目入职或进去保证期, 请刷新");
         } else {
-            return ResultUtil.success(id);
+            return ResultUtil.success(remind);
         }
     }
 
@@ -166,6 +166,10 @@ public class ProjectController extends AbstractController {
         }
     }
 
-
+    @ApiOperation("状态回退")
+    @PostMapping("/talent/reBack")
+    public Result<Integer> reBack(Long projectTalentId, Integer status) throws Exception {
+        return ResultUtil.success(projectService.reBack(projectTalentId, status));
+    }
 
 }

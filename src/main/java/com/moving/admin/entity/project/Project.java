@@ -9,6 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @ApiModel("项目")
 @Data
@@ -150,5 +151,9 @@ public class Project extends BaseEntity {
     @ApiModelProperty(value = "部门名称")
     @Transient
     private String department;
+
+    @ApiModelProperty(value = "顾问")
+    @Transient
+    private List<Long> advisers;
 
 }

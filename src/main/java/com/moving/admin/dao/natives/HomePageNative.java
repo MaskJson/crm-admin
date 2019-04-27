@@ -45,7 +45,7 @@ public class HomePageNative extends AbstractNative {
         String fromWhere = getCountProjectFrom() + getTeamMemberSql(roleId, userId);
         String sort = " order by p.id desc, pt.status asc, pt.create_time asc";
         if (type == 1) {
-            select = select + ", (select count(1) from talent_remind tr where pt.talent_id=tr.talent_id and date_add(tr.create_time, interval 3 day)>now()) as remindCount ";
+            select = select + ", (select count(1) from project_remind pr where pr.project_talent_id=pt.id and date_add(pr.create_time, interval 3 day)>now() and pr.type=99) as remindCount ";
         }
         switch (type) {
             case 1: fromWhere = fromWhere + qiDong(status, userId); break;
@@ -108,8 +108,8 @@ public class HomePageNative extends AbstractNative {
         } else {
             switch (status) {
                 case 1:
-                case 2: return " and pt.status=0 and p.first_apply_time>now() and (select count(1) from talent_remind tr " +
-                        " where pt.talent_id=tr.talent_id and date_add(tr.create_time, interval 3 day)>now())" + (status==1 ? ">0":"<1");
+                case 2: return " and pt.status=0 and p.first_apply_time>now() and (select count(1) from project_remind pr " +
+                        " where pr.project_talent_id=pt.id and date_add(pr.create_time, interval 3 day)>now() and pr.type=99)" + (status==1 ? ">0":"<1");
                 case 3: return "and p.first_apply_time<now()";
                 default: return " and pt.status=0";
             }

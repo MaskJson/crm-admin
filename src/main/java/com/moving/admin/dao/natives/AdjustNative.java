@@ -20,15 +20,16 @@ public class AdjustNative extends AbstractNative {
     @Autowired
     private CountNative countNative;
 
-    private String talentSelect = "select pt.id as id, t.id as talentId, t.name as name, t.city as city, " +
-                                     "t.salary as salary, t.phone as phone, t.tag as tag, t.status as status, pt.type as type, pt.update_time as updateTime";
-    private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id";
+    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, t.name as name, t.city as city, " +
+                                     "t.salary as salary, t.phone as phone, t.tag as tag, t.status as status, pt.type as type, pt.update_time as updateTime," +
+                                     "p.name as projectName, c.name as customerName";
+    private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id left join customer c on c.id=p.customer_id";
     private String talentWhere = " where pt.status=";
     private String talentSort = " order by pt.update_time desc";
 
-    // 根据状态获取项目人才
+    // 根据状态获取项目人才, 当projectId 为null时，获取所有项目的
     public List<Map<String, Object>> getProjectTalent(Integer status, Long projectId, Long userId) {
-        String sql = talentSelect + talentFrom + talentWhere + status + " and pt.project_id=" + projectId + " and pt.create_user_id=" + userId + talentSort;
+        String sql = talentSelect + talentFrom + talentWhere + status + (projectId != null ? (" and pt.project_id=" + projectId) : "" ) + " and pt.create_user_id=" + userId + talentSort;
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
@@ -38,15 +39,17 @@ public class AdjustNative extends AbstractNative {
         query.addScalar("salary", StandardBasicTypes.STRING);
         query.addScalar("phone", StandardBasicTypes.STRING);
         query.addScalar("tag", StandardBasicTypes.STRING);
+        query.addScalar("projectName", StandardBasicTypes.STRING);
+        query.addScalar("customerName", StandardBasicTypes.STRING);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("type", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
         list.forEach(item -> {
-            item.put("position", countNative.getWorkInfo(Long.parseLong(item.get("id").toString())).get("position"));
+            item.put("position", countNative.getWorkInfo(Long.parseLong(item.get("talentId").toString())).get("position"));
         });
-        return query.getResultList();
+        return list;
     }
 
     // 获取该项目已关联的人才

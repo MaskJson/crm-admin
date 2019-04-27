@@ -2,17 +2,11 @@ package com.moving.admin.service;
 
 import com.moving.admin.dao.customer.DepartmentDao;
 import com.moving.admin.dao.natives.ProjectNative;
-import com.moving.admin.dao.project.ProjectDao;
-import com.moving.admin.dao.project.ProjectRemindDao;
-import com.moving.admin.dao.project.ProjectReportDao;
-import com.moving.admin.dao.project.ProjectTalentDao;
+import com.moving.admin.dao.project.*;
 import com.moving.admin.dao.sys.TeamDao;
 import com.moving.admin.dao.talent.TalentDao;
 import com.moving.admin.entity.customer.Department;
-import com.moving.admin.entity.project.Project;
-import com.moving.admin.entity.project.ProjectRemind;
-import com.moving.admin.entity.project.ProjectReport;
-import com.moving.admin.entity.project.ProjectTalent;
+import com.moving.admin.entity.project.*;
 import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.talent.Talent;
 import com.moving.admin.exception.WebException;
@@ -57,7 +51,11 @@ public class ProjectService extends AbstractService {
     @Autowired
     private TeamService teamService;
 
+    @Autowired
+    private ProjectAdviserDao projectAdviserDao;
+
     // 编辑项目
+    @Transactional
     public Long save(Project project) {
         if (project.getId() == null) {
             Team team = teamDao.findTeamByUserIdAndLevel(project.getCreateUserId(), 1);
@@ -72,6 +70,16 @@ public class ProjectService extends AbstractService {
             project.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         projectDao.save(project);
+        Long projectId = project.getId();
+        List<ProjectAdviser> list = new ArrayList<>();
+        project.getAdvisers().forEach(itemId -> {
+            ProjectAdviser projectAdviser = new ProjectAdviser();
+            projectAdviser.setProjectId(projectId);
+            projectAdviser.setUserId(itemId);
+            list.add(projectAdviser);
+        });
+        projectAdviserDao.deleteAllByProjectId(projectId);
+        projectAdviserDao.saveAll(list);
         return project.getId();
     }
 
@@ -86,7 +94,7 @@ public class ProjectService extends AbstractService {
         Project project = projectDao.findById(id).get();
         if (project != null) {
             project.setFollow(follow);
-            save(project);
+            projectDao.save(project);
         }
     }
 
@@ -145,7 +153,7 @@ public class ProjectService extends AbstractService {
 
     // 添加进展人才跟踪，并同时修改对应人才状态
     @Transactional
-    public Long addProjectRemind(ProjectRemind projectRemind) {
+    public ProjectRemind addProjectRemind(ProjectRemind projectRemind) {
         // 查找是否存在已处于其他项目的进展中的入职状态或保证期状态， 若存在，抛异常
         ProjectTalent projectTalent = projectTalentDao.findById(projectRemind.getProjectTalentId()).get();
         List<ProjectTalent> pts = projectTalentDao.findAllByTalentIdAndProjectIdNotAndStatusBetween(projectTalent.getTalentId(), projectTalent.getProjectId(), 5, 6);
@@ -156,15 +164,17 @@ public class ProjectService extends AbstractService {
             projectTalentDao.save(projectTalent);
             return null;
         }
-        if (projectRemind.getRoleId() == 3 && projectRemind.getType() == 100) {
-            projectTalent.setType(1);
-            projectTalent.setStatus(1);
-        }
+
         projectRemindDao.save(projectRemind);
         // 跟进后修改人才进展状态
         if (projectTalent != null) {
-            projectTalent.setType(projectRemind.getType());
-            projectTalent.setStatus(projectRemind.getStatus());
+            if (projectRemind.getRoleId() == 3 && projectRemind.getType() == 100) {
+                projectTalent.setType(1);
+                projectTalent.setStatus(1);
+            } else {
+                projectTalent.setType(projectRemind.getType());
+                projectTalent.setStatus(projectRemind.getStatus());
+            }
             projectTalent.setUpdateTime(new Date());
             projectTalentDao.save(projectTalent);
             if (projectRemind.getStatus() == 5) {
@@ -178,7 +188,7 @@ public class ProjectService extends AbstractService {
                 });
             }
         }
-        return projectRemind.getId();
+        return projectRemind;
     }
 
     // 项目总监-推荐给客户二次审核
@@ -262,6 +272,31 @@ public class ProjectService extends AbstractService {
         } else {
             return false;
         }
+    }
+
+    // 项目进展回退
+    public int reBack(Long projectTalentId, Integer status) {
+        ProjectTalent projectTalent = projectTalentDao.findById(projectTalentId).get();
+        if (projectTalent != null) {
+            if (status == 1) {
+                projectTalent.setStatus(0);
+                projectTalent.setType(0);
+                projectTalentDao.save(projectTalent);
+                return 0;
+            }
+            System.err.println("back");
+            List<ProjectRemind> reminds = projectRemindDao.findAllByProjectTalentIdOrderByCreateTimeDesc(projectTalentId);
+            for (int i=0; i<reminds.size(); i++) {
+                ProjectRemind remind = reminds.get(i);
+                if (remind.getStatus() == status && remind.getStatus() != remind.getPrevStatus()) {
+                    projectTalent.setStatus(remind.getPrevStatus());
+                    projectTalent.setType(remind.getPrevType());
+                    projectTalentDao.save(projectTalent);
+                    return remind.getPrevStatus();
+                };
+            }
+        }
+        return -1;
     }
 
 }

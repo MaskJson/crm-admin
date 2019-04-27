@@ -172,6 +172,7 @@ public class CountNative extends AbstractNative {
 
     // 获取人才地图的最后一份工作信息
     public Map<String, Object> getWorkInfo(Long talentId) {
+        System.err.println(talentId);
         String sql = "select e.customer_id as customerId, e.department_id as departmentId, e.position, c.name as customerName, d.name as departmentName" +
                 " from experience e left join customer c on e.customer_id=c.id left join department d on e.department_id=d.id" +
                 " where e.status=1 and e.talent_id=" + talentId;
