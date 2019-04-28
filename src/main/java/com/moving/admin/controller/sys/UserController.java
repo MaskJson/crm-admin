@@ -188,4 +188,18 @@ public class UserController extends AbstractController {
         return ResultUtil.success(userService.getAllUser());
     }
 
+    @ApiOperation(value = "修改密码")
+    @PostMapping("/changePassword1")
+    public Result<Boolean> changePassword(Long userId, String oldPassword, String newPassword) throws Exception {
+        userService.changePassword(userId, oldPassword, newPassword);
+        return ResultUtil.success(true);
+    }
+
+    @ApiOperation(value = "系统管理员修改用户密码修改密码")
+    @PostMapping("/changePassword2")
+    public Result<Boolean> changePassword(Long userId, String password) throws Exception {
+        userService.changePassword2(userId, password);
+        return ResultUtil.success(true);
+    }
+
 }

@@ -145,4 +145,27 @@ public class UserService extends AbstractService {
     public List<User> getAllUser() {
         return userDao.findAll();
     }
+
+
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
+        User user = userDao.findById(userId).get();
+        if (user != null) {
+            if (user.getPassword() == oldPassword) {
+                user.setPassword(newPassword);
+                userDao.save(user);
+            }
+        } else {
+            throw new WebException(400, "修改异常", null);
+        }
+    }
+
+    public void changePassword2(Long userId, String password) {
+        User user = userDao.findById(userId).get();
+        if (user != null) {
+            user.setPassword(password);
+            userDao.save(user);
+        } else {
+            throw new WebException(400, "修改异常", null);
+        }
+    }
 }
