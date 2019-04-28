@@ -33,7 +33,7 @@ public class TaskNative extends AbstractNative {
     /////// 定时任务
     //// 专属人才转普通人才判定
 
-    private String update = "update talent t set t.type=0, t.follow_user_id=null";
+    private String update = "update talent t set t.type=0, t.follow_user_id=null where";
 
     // 不在项目进展中的  专属人才、30天内没有跟踪，置为普通人才
     @Transactional

@@ -108,6 +108,7 @@ public class ProjectService extends AbstractService {
         if (talentId != null) {
             Talent talent = talentDao.findById(talentId).get();
             if (talent != null) {
+                talent.setStatus(10);
                 List<Integer> status = new ArrayList<Integer>();
                 status.add(7);
                 status.add(8);
@@ -117,8 +118,8 @@ public class ProjectService extends AbstractService {
                     talent.setType(0);
                     talent.setFollowUserId(null);
                     talent.setUpdateTime(new Date(System.currentTimeMillis()));
-                    talentDao.save(talent);
                 }
+                talentDao.save(talent);
             }
         }
         Long id;
@@ -284,7 +285,6 @@ public class ProjectService extends AbstractService {
                 projectTalentDao.save(projectTalent);
                 return 0;
             }
-            System.err.println("back");
             List<ProjectRemind> reminds = projectRemindDao.findAllByProjectTalentIdOrderByCreateTimeDesc(projectTalentId);
             for (int i=0; i<reminds.size(); i++) {
                 ProjectRemind remind = reminds.get(i);

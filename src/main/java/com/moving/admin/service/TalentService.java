@@ -76,7 +76,7 @@ public class TalentService extends AbstractService {
     }
 
     // 分页查询
-    public Page<Talent> getCustomerList(String city, String name, String industry, String aptness, Long folderId, Boolean follow, Pageable pageable) {
+    public Page<Talent> getCustomerList(String city, String name, String industry, String aptness, Long folderId, Pageable pageable) {
         Page<Talent> result = talentDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
             if (!StringUtils.isEmpty(city)) {
@@ -91,9 +91,6 @@ public class TalentService extends AbstractService {
             if (!StringUtils.isEmpty(industry)) {
                 list.add(cb.like(root.get("industry"), "%" + industry + "%"));
             }
-            if (follow != null) {
-                list.add(cb.equal(root.get("follow"), follow));
-            }
             if (folderId != null) {
                 List<FolderItem> folderItems = folderItemDao.findAllByFolderIdAndAndType(folderId, 2);
                 List<Long> ids = new ArrayList<>();
@@ -103,6 +100,7 @@ public class TalentService extends AbstractService {
                 Expression<Long> exp = root.<Long>get("id");
                 list.add(cb.and(exp.in(ids)));
             }
+
             Predicate[] predicates = new Predicate[list.size()];
             return query.where(list.toArray(predicates)).getRestriction();
         }, pageable);
@@ -111,6 +109,7 @@ public class TalentService extends AbstractService {
             talent.setPosition(map.get("position") != null ? map.get("position").toString() : "");
             talent.setProjects(projectTalentDao.findProjectIdsOfTalent(talent.getId()));
             talent.setOfferCount(projectTalentDao.getProjectOfferLength(talent.getId()));
+            talent.setProgress(projectTalentDao.getProjectLengthByTalentId(talent.getId()));
         });
         return result;
     }
@@ -237,6 +236,7 @@ public class TalentService extends AbstractService {
             talent.setProjectCount(projectTalentDao.getProjectLengthByTalentId(id));
             talent.setOfferCount(projectTalentDao.getProjectOfferLength(id));
             talent.setProjects(projectTalentDao.findProjectIdsOfTalent(id));
+            talent.setProgress(projectTalentDao.getProjectLengthByTalentId(id));
         }
         return talent;
     }
@@ -333,7 +333,7 @@ public class TalentService extends AbstractService {
                 if ((remind.getCreateTime().getTime() + 2592000000L) < System.currentTimeMillis()) {
                     throw new WebException(400, "您近一个月内未对该人才进行常规跟踪，不满足设定条件", null);
                 }
-                if (talent.getSex() == null || StringUtils.isEmpty(talent.getPhone()) || StringUtils.isEmpty(talent.getPosition())) {
+                if (talent.getSex() == null || StringUtils.isEmpty(talent.getPhone())) {
                     throw new WebException(400, "专属人才性别、手机、工作经历等信息必须填写完整", "info");
                 }
                 List<Experience> experiences = experienceDao.findAllByTalentId(id);

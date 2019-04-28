@@ -31,13 +31,14 @@ public class ProjectNative extends AbstractNative {
 
     // 获取人才的项目经历
     public List<Map<String, Object>> getTalentProjects(Long talentId) {
-        String select = "select pt.id, pt.type, pt.status, pt.update_time as updateTime, p.id as projectId, p.name as projectName, c.name as customerName";
+        String select = "select pt.id, pt.create_user_id as createUserId, pt.type, pt.status, pt.update_time as updateTime, p.id as projectId, p.name as projectName, c.name as customerName";
         String whereFrom = " from project_talent pt left join project p on pt.project_id = p.id left join customer c on p.customer_id=c.id" +
                 " where pt.talent_id=" + talentId;
         String sort = " order by c.name, p.name, pt.update_time desc";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + whereFrom + sort);
         query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("createUserId", StandardBasicTypes.LONG);
         query.addScalar("projectId", StandardBasicTypes.LONG);
         query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("customerName", StandardBasicTypes.STRING);

@@ -56,8 +56,8 @@ public class TalentController extends AbstractController {
 
     @ApiOperation("分页查询")
     @GetMapping("/list")
-    public Result<Page<Talent>> list(String city, String name, String industry, String aptness, Long folderId, Boolean follow, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        Page<Talent> result = talentService.getCustomerList(city, name, industry, aptness, folderId, follow, pageable);
+    public Result<Page<Talent>> list(String city, String name, String industry, String aptness, Long folderId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        Page<Talent> result = talentService.getCustomerList(city, name, industry, aptness, folderId, pageable);
         return ResultUtil.success(result);
     }
 

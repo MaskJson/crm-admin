@@ -11,11 +11,11 @@ public class TaskService {
     @Autowired
     private TaskNative taskNative;
 
-    // 每天凌晨执行定时任务
-//    @Scheduled(cron = "0 50 23 * * ?")
-    @Scheduled(cron = "*/5 * * * * ?")
+    // 每天凌晨执行人才类型定时任务
+    @Scheduled(cron = "0 50 23 * * ?")
     public void checkTalentType() {
-
+        taskNative.talentTaskWithoutProject();
+        taskNative.talentTaskWithFinish();
     }
 
 }

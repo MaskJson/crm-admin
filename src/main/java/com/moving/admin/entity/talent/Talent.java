@@ -169,4 +169,8 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "角色id")
     @Transient
     private Long roleId;
+
+    @ApiModelProperty(value = "项目进展数")
+    @Transient
+    private Long progress;
 }

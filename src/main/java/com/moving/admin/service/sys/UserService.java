@@ -153,6 +153,8 @@ public class UserService extends AbstractService {
             if (user.getPassword() == oldPassword) {
                 user.setPassword(newPassword);
                 userDao.save(user);
+            } else {
+                throw new WebException(400, "原密码输入有误", null);
             }
         } else {
             throw new WebException(400, "修改异常", null);
