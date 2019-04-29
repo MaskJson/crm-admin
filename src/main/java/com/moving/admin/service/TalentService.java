@@ -2,6 +2,7 @@ package com.moving.admin.service;
 
 import com.moving.admin.dao.customer.CustomerDao;
 import com.moving.admin.dao.natives.CountNative;
+import com.moving.admin.dao.natives.TalentNative;
 import com.moving.admin.dao.project.ProjectTalentDao;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.entity.customer.Customer;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import sun.rmi.runtime.Log;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
@@ -68,6 +70,9 @@ public class TalentService extends AbstractService {
     @Autowired
     private CountNative countNative;
 
+    @Autowired
+    private TalentNative talentNative;
+
     // 手机号验证重复
     public Talent checkPhone(String phone) {
         Talent talent = null;
@@ -76,7 +81,7 @@ public class TalentService extends AbstractService {
     }
 
     // 分页查询
-    public Page<Talent> getCustomerList(String city, String name, String industry, String aptness, Long folderId, Pageable pageable) {
+    public Page<Talent> getCustomerList(String city, String name, String industry, String aptness, Long folderId, String customerName, Pageable pageable) {
         Page<Talent> result = talentDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
             if (!StringUtils.isEmpty(city)) {
@@ -91,16 +96,21 @@ public class TalentService extends AbstractService {
             if (!StringUtils.isEmpty(industry)) {
                 list.add(cb.like(root.get("industry"), "%" + industry + "%"));
             }
+            List<Long> ids = new ArrayList<>();
             if (folderId != null) {
                 List<FolderItem> folderItems = folderItemDao.findAllByFolderIdAndAndType(folderId, 2);
-                List<Long> ids = new ArrayList<>();
                 folderItems.forEach(folderItem -> {
                     ids.add(folderItem.getItemId());
                 });
+            }
+            if (!StringUtils.isEmpty(customerName)) {
+                // 查询项目经历中有这些公司的人才
+                ids.addAll(talentNative.getTalentIds(customerName));
+            }
+            if (folderId != null || !StringUtils.isEmpty(customerName)) {
                 Expression<Long> exp = root.<Long>get("id");
                 list.add(cb.and(exp.in(ids)));
             }
-
             Predicate[] predicates = new Predicate[list.size()];
             return query.where(list.toArray(predicates)).getRestriction();
         }, pageable);
