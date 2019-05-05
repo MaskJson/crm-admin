@@ -165,7 +165,6 @@ public class ProjectService extends AbstractService {
             projectTalentDao.save(projectTalent);
             return null;
         }
-
         projectRemindDao.save(projectRemind);
         // 跟进后修改人才进展状态
         if (projectTalent != null) {
@@ -178,7 +177,8 @@ public class ProjectService extends AbstractService {
             }
             projectTalent.setUpdateTime(new Date());
             projectTalentDao.save(projectTalent);
-            if (projectRemind.getStatus() == 5) {
+            Integer status = projectRemind.getPrevStatus();
+            if (status == 6) {
                 // 若该项目入职，则改变其在其他项目进展状态
                 List<ProjectTalent> list = projectTalentDao.findAllByTalentIdAndProjectIdNotAndStatusLessThan(projectTalent.getTalentId(), projectTalent.getProjectId(), 7);
                 list.forEach(pt -> {
@@ -187,6 +187,15 @@ public class ProjectService extends AbstractService {
                     pt.setUpdateTime(new Date());
                     projectTalentDao.save(pt);
                 });
+            }
+            Talent talent = talentDao.findById(projectTalent.getTalentId()).get();
+            if (talent != null) {
+                switch (status) {
+                    case 1: talent.setStatus(10);break;
+                    case 7: talent.setStatus(2);break;
+                    case 8: talent.setStatus(1);break;
+                }
+                talentDao.save(talent);
             }
         }
         return projectRemind;

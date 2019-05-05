@@ -29,8 +29,10 @@ public class ProjectRemind extends BaseEntity {
     @ApiModelProperty(value = "改变状态为")
     private Integer status;
 
+    @ApiModelProperty(value = "上次状态")
     private Integer prevStatus;
 
+    @ApiModelProperty(value = "上次跟踪类型")
     private Integer prevType;
 
     @ApiModelProperty(value = "跟踪备注")
@@ -44,6 +46,35 @@ public class ProjectRemind extends BaseEntity {
 
     @ApiModelProperty(value = "项目人才id")
     private Long projectTalentId;
+
+    // 特定状态下的乱七八糟字段
+    // 面试
+    @ApiModelProperty(value = "面试时间")
+    private Date interviewTime;
+    @ApiModelProperty(value = "提醒类型")
+    private Integer remindType;
+    @ApiModelProperty(value = "面试官")
+    private String interviewTone;
+    @ApiModelProperty(value = "是否是终试")
+    private Boolean isLast;
+
+    // 签订offer
+    @ApiModelProperty(value = "岗位")
+    private String position;
+    @ApiModelProperty(value = "年薪")
+    private double yearSalary;
+    @ApiModelProperty(value = "收费")
+    private double charge;
+    @ApiModelProperty(value = "确认日期")
+    private Date sureTime;
+    @ApiModelProperty(value = "预计上班时间")
+    private Date workTime;
+
+    // 入职
+    @ApiModelProperty(value = "入职时间")
+    private Date entryTime;
+    @ApiModelProperty(value = "试用期结束")
+    private Date probationTime;
 
     @ApiModelProperty(value = "角色id")
     @Transient

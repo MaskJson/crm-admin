@@ -1,5 +1,7 @@
 package com.moving.admin.dao.natives;
 
+import com.moving.admin.dao.project.ProjectRemindDao;
+import com.moving.admin.entity.project.ProjectRemind;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,36 +23,51 @@ public class AdjustNative extends AbstractNative {
     @Autowired
     private CountNative countNative;
 
-    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, t.name as name, t.city as city, " +
-                                     "t.salary as salary, t.phone as phone, t.tag as tag, t.status as status, pt.type as type, pt.update_time as updateTime," +
+    @Autowired
+    private ProjectRemindDao projectRemindDao;
+
+    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, t.name as name, " +
+                                     "t.phone as phone, pt.type as type, pt.update_time as updateTime," +
                                      "p.name as projectName, c.name as customerName";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id left join customer c on c.id=p.customer_id";
     private String talentWhere = " where pt.status=";
-    private String talentSort = " order by pt.update_time desc";
+    private String talentSort = " order by pt.update_time asc";
 
     // 根据状态获取项目人才, 当projectId 为null时，获取所有项目的
     public List<Map<String, Object>> getProjectTalent(Integer status, Long projectId, Long userId) {
-        String sql = talentSelect + talentFrom + talentWhere + status + (projectId != null ? (" and pt.project_id=" + projectId) : "" ) + " and pt.create_user_id=" + userId + talentSort;
+        String sql = talentSelect + talentFrom + talentWhere + status
+                + (projectId != null ? (" and pt.project_id=" + projectId) : "" ) + " and (pt.create_user_id=" + userId +
+                " or p.create_user_id="+userId+" )" +
+                talentSort;
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("talentId", StandardBasicTypes.LONG);
+        query.addScalar("createUserId", StandardBasicTypes.LONG);
         query.addScalar("name", StandardBasicTypes.STRING);
-        query.addScalar("city", StandardBasicTypes.STRING);
-        query.addScalar("salary", StandardBasicTypes.STRING);
         query.addScalar("phone", StandardBasicTypes.STRING);
-        query.addScalar("tag", StandardBasicTypes.STRING);
         query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("customerName", StandardBasicTypes.STRING);
-        query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("type", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
         list.forEach(item -> {
-            item.put("position", countNative.getWorkInfo(Long.parseLong(item.get("talentId").toString())).get("position"));
+//            item.put("position", countNative.getWorkInfo(Long.parseLong(item.get("talentId").toString())).get("position"));
+            ProjectRemind remind = getLastRemindByStatus(status, Long.parseLong(item.get("id").toString()));
+            item.put("remind", remind != null ? remind : new HashMap<>());
         });
         return list;
+    }
+
+    // 获取进展人才当前状态下的最后一次跟踪
+    public ProjectRemind getLastRemindByStatus(Integer status, Long projectTalentId) {
+        List<ProjectRemind> list = projectRemindDao.findAllByProjectTalentIdAndStatusOrderByCreateTimeDesc(projectTalentId, status);
+        if (list.size()>0) {
+            return list.get(0);
+        } else {
+            return null;
+        }
     }
 
     // 获取该项目已关联的人才
