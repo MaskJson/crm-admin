@@ -54,20 +54,14 @@ public class AdjustNative extends AbstractNative {
         List<Map<String, Object>> list = query.getResultList();
         list.forEach(item -> {
 //            item.put("position", countNative.getWorkInfo(Long.parseLong(item.get("talentId").toString())).get("position"));
-            ProjectRemind remind = getLastRemindByStatus(status, Long.parseLong(item.get("id").toString()));
-            item.put("remind", remind != null ? remind : new HashMap<>());
+            item.put("remind", getLastRemindByStatus(Long.parseLong(item.get("id").toString())));
         });
         return list;
     }
 
     // 获取进展人才当前状态下的最后一次跟踪
-    public ProjectRemind getLastRemindByStatus(Integer status, Long projectTalentId) {
-        List<ProjectRemind> list = projectRemindDao.findAllByProjectTalentIdAndStatusOrderByCreateTimeDesc(projectTalentId, status);
-        if (list.size()>0) {
-            return list.get(0);
-        } else {
-            return null;
-        }
+    public List<ProjectRemind> getLastRemindByStatus(Long projectTalentId) {
+        return projectRemindDao.findAllByProjectTalentIdOrderByCreateTimeDesc(projectTalentId);
     }
 
     // 获取该项目已关联的人才

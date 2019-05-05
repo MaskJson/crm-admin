@@ -12,7 +12,5 @@ public interface ProjectRemindDao extends JpaRepository<ProjectRemind, Long>, Jp
 
     List<ProjectRemind> findAllByProjectTalentIdOrderByCreateTimeDesc(Long projectTalentId);
 
-    // 进展人才某状态的跟踪记录
-    List<ProjectRemind> findAllByProjectTalentIdAndStatusOrderByCreateTimeDesc(Long projectTalentId, Integer status);
 
 }
