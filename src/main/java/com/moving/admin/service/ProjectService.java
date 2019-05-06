@@ -175,6 +175,9 @@ public class ProjectService extends AbstractService {
                 projectTalent.setType(projectRemind.getType());
                 projectTalent.setStatus(projectRemind.getStatus());
             }
+            if (projectRemind.getStatus() == 6) {
+                projectTalent.setProbationTime(projectRemind.getProbationTime());
+            }
             projectTalent.setUpdateTime(new Date());
             projectTalentDao.save(projectTalent);
             Integer status = projectRemind.getPrevStatus();
