@@ -48,6 +48,9 @@ public class ProjectRemind extends BaseEntity {
     private Long projectTalentId;
 
     // 特定状态下的乱七八糟字段
+    // 推荐
+    @ApiModelProperty(value = "推荐理由")
+    private String recommendation;
     // 面试
     @ApiModelProperty(value = "面试时间")
     private Date interviewTime;
@@ -75,6 +78,12 @@ public class ProjectRemind extends BaseEntity {
     private Date entryTime;
     @ApiModelProperty(value = "试用期结束")
     private Date probationTime;
+
+    // 反馈
+    @ApiModelProperty(value = "人才反馈")
+    private String talentRemark;
+    @ApiModelProperty(value = "客户反馈")
+    private String customerRemark;
 
     @ApiModelProperty(value = "角色id")
     @Transient

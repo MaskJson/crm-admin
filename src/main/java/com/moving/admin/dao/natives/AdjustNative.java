@@ -26,7 +26,7 @@ public class AdjustNative extends AbstractNative {
     @Autowired
     private ProjectRemindDao projectRemindDao;
 
-    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, t.name as name, " +
+    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, t.name as name, " +
                                      "t.phone as phone, pt.type as type, pt.update_time as updateTime," +
                                      "p.name as projectName, c.name as customerName";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id left join customer c on c.id=p.customer_id";

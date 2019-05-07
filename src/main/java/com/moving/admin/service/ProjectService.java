@@ -167,7 +167,11 @@ public class ProjectService extends AbstractService {
         }
         projectRemindDao.save(projectRemind);
         // 跟进后修改人才进展状态
+        Integer status = projectRemind.getStatus();
         if (projectTalent != null) {
+            if (projectRemind.getType() == 100) {
+                projectTalent.setRecommendation(projectRemind.getRecommendation());
+            }
             if (projectRemind.getRoleId() == 3 && projectRemind.getType() == 100) {
                 projectTalent.setType(1);
                 projectTalent.setStatus(1);
@@ -175,12 +179,11 @@ public class ProjectService extends AbstractService {
                 projectTalent.setType(projectRemind.getType());
                 projectTalent.setStatus(projectRemind.getStatus());
             }
-            if (projectRemind.getStatus() == 6) {
+            if (status == 6) {
                 projectTalent.setProbationTime(projectRemind.getProbationTime());
             }
             projectTalent.setUpdateTime(new Date());
             projectTalentDao.save(projectTalent);
-            Integer status = projectRemind.getPrevStatus();
             if (status == 6) {
                 // 若该项目入职，则改变其在其他项目进展状态
                 List<ProjectTalent> list = projectTalentDao.findAllByTalentIdAndProjectIdNotAndStatusLessThan(projectTalent.getTalentId(), projectTalent.getProjectId(), 7);
@@ -294,6 +297,7 @@ public class ProjectService extends AbstractService {
             if (status == 1) {
                 projectTalent.setStatus(0);
                 projectTalent.setType(0);
+                projectTalent.setUpdateTime(new Date());
                 projectTalentDao.save(projectTalent);
                 return 0;
             }
@@ -303,6 +307,7 @@ public class ProjectService extends AbstractService {
                 if (remind.getStatus() == status && remind.getStatus() != remind.getPrevStatus()) {
                     projectTalent.setStatus(remind.getPrevStatus());
                     projectTalent.setType(remind.getPrevType());
+                    projectTalent.setUpdateTime(new Date());
                     projectTalentDao.save(projectTalent);
                     return remind.getPrevStatus();
                 };

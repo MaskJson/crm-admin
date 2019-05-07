@@ -45,6 +45,9 @@ public class ProjectTalent extends BaseEntity {
     @ApiModelProperty(value = "试用期结束")
     private Date probationTime;
 
+    @ApiModelProperty(value = "推荐理由")
+    private String recommendation;
+
     @ApiModelProperty(value = "角色id")
     @Transient
     private String remark;
