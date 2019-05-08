@@ -27,7 +27,7 @@ public class AdjustNative extends AbstractNative {
     private ProjectRemindDao projectRemindDao;
 
     private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, t.name as name, " +
-                                     "t.phone as phone, pt.type as type, pt.update_time as updateTime," +
+                                     "t.phone as phone, pt.type as type, pt.update_time as updateTime, pt.recommendation, pt.kill_remark as killRemark" +
                                      "p.name as projectName, c.name as customerName";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id left join customer c on c.id=p.customer_id";
     private String talentWhere = " where pt.status=";
@@ -45,6 +45,8 @@ public class AdjustNative extends AbstractNative {
         query.addScalar("talentId", StandardBasicTypes.LONG);
         query.addScalar("createUserId", StandardBasicTypes.LONG);
         query.addScalar("name", StandardBasicTypes.STRING);
+        query.addScalar("recommendation", StandardBasicTypes.STRING);
+        query.addScalar("killRemark", StandardBasicTypes.STRING);
         query.addScalar("phone", StandardBasicTypes.STRING);
         query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("customerName", StandardBasicTypes.STRING);

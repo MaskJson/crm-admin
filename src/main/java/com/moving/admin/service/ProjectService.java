@@ -181,6 +181,8 @@ public class ProjectService extends AbstractService {
             }
             if (status == 6) {
                 projectTalent.setProbationTime(projectRemind.getProbationTime());
+            } else if (status == 8){
+                projectTalent.setKillRemark(projectRemind.getKillRemark());
             }
             projectTalent.setUpdateTime(new Date());
             projectTalentDao.save(projectTalent);

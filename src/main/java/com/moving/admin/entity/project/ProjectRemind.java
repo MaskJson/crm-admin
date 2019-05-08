@@ -51,6 +51,9 @@ public class ProjectRemind extends BaseEntity {
     // 推荐
     @ApiModelProperty(value = "推荐理由")
     private String recommendation;
+    // 推荐
+    @ApiModelProperty(value = "淘汰理由")
+    private String killRemark;
     // 面试
     @ApiModelProperty(value = "面试时间")
     private Date interviewTime;
