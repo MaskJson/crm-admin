@@ -29,7 +29,7 @@ public class PerformanceNative extends AbstractNative {
             " left join project p on pt.project_id=p.id left join talent t on pt.talent_id=t.id" +
             " left join customer c on p.customer_id=c.id left join department d on p.department_id=d.id" +
             " left join sys_user u on u.id=pt.create_user_id";
-    private String where = " where pt.create_user_id=";
+    private String where = " where pr.create_user_id=";
     private String sort = " group by pr.project_talent_id, pr.status order by c.id,p.id, pt.status, pt.update_time desc ";
 
     // 日、周、月绩效
@@ -44,7 +44,10 @@ public class PerformanceNative extends AbstractNative {
     }
     // 周、月报
     public void getPerformanceReport(Long userId, Long roleId, String time) {
+        String where = "";
+        switch (Integer.parseInt(roleId.toString())) {
 
+        }
     }
 
     public List<Map<String, Object>> getProjectStatusTalents(String where) {
