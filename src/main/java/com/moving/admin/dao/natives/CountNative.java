@@ -1,5 +1,6 @@
 package com.moving.admin.dao.natives;
 
+import com.moving.admin.dao.project.ProjectRemindDao;
 import com.moving.admin.dao.project.ProjectTalentDao;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
@@ -21,6 +22,9 @@ public class CountNative extends AbstractNative {
 
     @Autowired
     private ProjectTalentDao projectTalentDao;
+
+    @Autowired
+    private ProjectRemindDao projectRemindDao;
 
     // 获取人才常规跟踪的待办列表
     public Map<String, Object> talentRemindPendingList(Long userId, Integer type, Pageable pageable) {
@@ -225,6 +229,7 @@ public class CountNative extends AbstractNative {
             Long id = Long.parseLong(map.get("talentId").toString());
             map.put("info", getWorkInfo(id));
             map.put("remind", getRemindInfo(id));
+            map.put("reminds", projectRemindDao.findAllByProjectTalentIdAndCreateUserIdOrderByCreateTimeDesc(Long.parseLong(map.get("id").toString()), userId));
             map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
             map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
             map.put("offerCount", projectTalentDao.getProjectOfferLength(id));

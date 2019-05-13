@@ -12,5 +12,7 @@ public interface ProjectRemindDao extends JpaRepository<ProjectRemind, Long>, Jp
 
     List<ProjectRemind> findAllByProjectTalentIdOrderByCreateTimeDesc(Long projectTalentId);
 
+    List<ProjectRemind> findAllByProjectTalentIdAndCreateUserIdOrderByCreateTimeDesc(Long projectTalentId, Long createUserId);
 
+    List<ProjectRemind> findAllById(Long id);
 }

@@ -26,8 +26,8 @@ public class AdjustNative extends AbstractNative {
     @Autowired
     private ProjectRemindDao projectRemindDao;
 
-    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, t.name as name, " +
-                                     "t.phone as phone, pt.type as type, pt.update_time as updateTime, pt.recommendation, pt.kill_remark as killRemark" +
+    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, t.name as name," +
+                                     "t.phone as phone, pt.type as type, pt.update_time as updateTime, pt.recommendation, pt.kill_remark as killRemark," +
                                      "p.name as projectName, c.name as customerName";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id left join customer c on c.id=p.customer_id";
     private String talentWhere = " where pt.status=";
@@ -56,12 +56,12 @@ public class AdjustNative extends AbstractNative {
         List<Map<String, Object>> list = query.getResultList();
         list.forEach(item -> {
 //            item.put("position", countNative.getWorkInfo(Long.parseLong(item.get("talentId").toString())).get("position"));
-            item.put("remind", getLastRemindByStatus(Long.parseLong(item.get("id").toString())));
+            item.put("reminds", getLastRemindByStatus(Long.parseLong(item.get("id").toString())));
         });
         return list;
     }
 
-    // 获取进展人才当前状态下的最后一次跟踪
+    // 获取进展人才当前状态下的跟踪
     public List<ProjectRemind> getLastRemindByStatus(Long projectTalentId) {
         return projectRemindDao.findAllByProjectTalentIdOrderByCreateTimeDesc(projectTalentId);
     }
