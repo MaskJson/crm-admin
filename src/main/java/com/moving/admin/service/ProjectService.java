@@ -175,7 +175,7 @@ public class ProjectService extends AbstractService {
             if (projectRemind.getRoleId() == 3 && projectRemind.getType() == 100) {
                 projectTalent.setType(1);
                 projectTalent.setStatus(1);
-            } else {
+            } else if (projectRemind.getType() != 99){
                 projectTalent.setType(projectRemind.getType());
                 projectTalent.setStatus(projectRemind.getStatus());
             }
