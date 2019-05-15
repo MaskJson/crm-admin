@@ -257,7 +257,7 @@ public class TeamService extends AbstractService {
                 t.setTeamId(connectTeamId);
             });
             teamDao.saveAll(teams);
-//            actionConnect(userId, connectUserId);
+            actionConnect(userId, connectUserId);
             // 删除离职的用户及团队记录
             teamDao.delete(team);
             userDao.deleteById(userId);
@@ -281,7 +281,7 @@ public class TeamService extends AbstractService {
                 teamDao.delete(team);
             }
         });
-//        actionConnect(userId, connectUserId);
+        actionConnect(userId, connectUserId);
         userDao.deleteById(userId);
     }
 
@@ -299,11 +299,11 @@ public class TeamService extends AbstractService {
                 talent.setFollowUserId(connectUserId);
             }
         });
-        List<TalentRemind> talentReminds = talentRemindDao.findAllByCreateUserId(userId);
-        talentReminds.forEach(talentRemind -> {
-            talentRemind.setCreateUserId(connectUserId);
-        });
-        talentRemindDao.saveAll(talentReminds);
+//        List<TalentRemind> talentReminds = talentRemindDao.findAllByCreateUserId(userId);
+//        talentReminds.forEach(talentRemind -> {
+//            talentRemind.setCreateUserId(connectUserId);
+//        });
+//        talentRemindDao.saveAll(talentReminds);
         talentDao.saveAll(talents);
         // 项目进展人才相关
         List<ProjectTalent> projectTalents = projectTalentDao.findAllByCreateUserId(userId);
@@ -311,16 +311,16 @@ public class TeamService extends AbstractService {
             projectTalent.setCreateUserId(connectUserId);
         });
         projectTalentDao.saveAll(projectTalents);
-        List<ProjectReport> projectReports = projectReportDao.findAllByCreateUserId(userId);
-        projectReports.forEach(projectReport -> {
-            projectReport.setCreateUserId(connectUserId);
-        });
-        projectReportDao.saveAll(projectReports);
-        List<ProjectRemind> projectReminds = projectRemindDao.findAllByCreateUserId(userId);
-        projectReminds.forEach(projectRemind -> {
-            projectRemind.setCreateUserId(connectUserId);
-        });
-        projectRemindDao.saveAll(projectReminds);
+//        List<ProjectReport> projectReports = projectReportDao.findAllByCreateUserId(userId);
+//        projectReports.forEach(projectReport -> {
+//            projectReport.setCreateUserId(connectUserId);
+//        });
+//        projectReportDao.saveAll(projectReports);
+//        List<ProjectRemind> projectReminds = projectRemindDao.findAllByCreateUserId(userId);
+//        projectReminds.forEach(projectRemind -> {
+//            projectRemind.setCreateUserId(connectUserId);
+//        });
+//        projectRemindDao.saveAll(projectReminds);
     }
 }
 
