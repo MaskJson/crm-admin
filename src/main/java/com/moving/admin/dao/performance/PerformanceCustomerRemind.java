@@ -7,11 +7,13 @@ import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class PerformanceCustomerRemind  extends AbstractNative {
 
     private final String select = "select cr.type,cr.status,cr.remark,cr.meet_time as meetTime,cr.meet_address as meetAddress,cr.meet_notice as meetNotice,cr.contact_time_start as contactTimeStart," +

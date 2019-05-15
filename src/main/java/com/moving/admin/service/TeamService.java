@@ -257,7 +257,7 @@ public class TeamService extends AbstractService {
                 t.setTeamId(connectTeamId);
             });
             teamDao.saveAll(teams);
-            actionConnect(userId, connectUserId);
+//            actionConnect(userId, connectUserId);
             // 删除离职的用户及团队记录
             teamDao.delete(team);
             userDao.deleteById(userId);
@@ -281,7 +281,7 @@ public class TeamService extends AbstractService {
                 teamDao.delete(team);
             }
         });
-        actionConnect(userId, connectUserId);
+//        actionConnect(userId, connectUserId);
         userDao.deleteById(userId);
     }
 

@@ -1,6 +1,7 @@
 package com.moving.admin.controller;
 
 import com.moving.admin.bean.Result;
+import com.moving.admin.dao.performance.PerformanceCustomerRemind;
 import com.moving.admin.dao.performance.PerformanceNative;
 import com.moving.admin.dao.performance.PerformanceTalentRemind;
 import com.moving.admin.util.ResultUtil;
@@ -25,6 +26,9 @@ public class PerformanceController extends AbstractController {
     @Autowired
     private PerformanceTalentRemind performanceTalentRemind;
 
+    @Autowired
+    private PerformanceCustomerRemind performanceCustomerRemind;
+
     @ApiOperation("个人项目进展绩效")
     @GetMapping("/project/info")
     public Result<List<Map<String, Object>>> getPerformance(Long userId, Integer flag, String time) throws Exception {
@@ -47,6 +51,18 @@ public class PerformanceController extends AbstractController {
     @GetMapping("/talent/infos")
     public Result<List<Map<String, Object>>> getTalentRemindPerformanceReport(Long userId, Long roleId, Integer flag, String time) throws Exception {
         return ResultUtil.success(performanceTalentRemind.getPerformanceReport(userId, roleId, flag, time));
+    }
+
+    @ApiOperation("个人客户常规跟踪绩效")
+    @GetMapping("/customer/info")
+    public Result<List<Map<String, Object>>> getCustomerRemindPerformance(Long userId, Integer flag, String time) throws Exception {
+        return ResultUtil.success(performanceCustomerRemind.getPerformance(userId, flag, time));
+    }
+
+    @ApiOperation("上级获取客户常规跟踪报表")
+    @GetMapping("/customer/infos")
+    public Result<List<Map<String, Object>>> getCustomerRemindPerformanceReport(Long userId, Long roleId, Integer flag, String time) throws Exception {
+        return ResultUtil.success(performanceCustomerRemind.getPerformanceReport(userId, roleId, flag, time));
     }
 
 }
