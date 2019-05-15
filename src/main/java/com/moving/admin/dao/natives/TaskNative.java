@@ -80,6 +80,12 @@ public class TaskNative extends AbstractNative {
         });
     }
 
+    // 进入保证期且已到通过保证期时间的，改变进展人才的状态为成功状态
+    @Transactional
+    public void projectTalentTask() {
+
+    }
+
     // 获取该人才是在项目进展的数量
     public String projectWhere(String id) {
         return " (select count(1) from project_talent pt where pt.talent_id=" + id + ")";
