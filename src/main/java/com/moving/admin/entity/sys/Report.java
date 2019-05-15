@@ -17,7 +17,6 @@ import java.util.Date;
 @Table(name = "report")
 public class Report extends BaseEntity {
 
-
     @Id
     @GeneratedValue(generator = "id_generator")
     @GenericGenerator(name = "id_generator", strategy = "identity")
@@ -26,7 +25,7 @@ public class Report extends BaseEntity {
     // 类型 1 日报 2 周报 3 月报
     private Integer type;
 
-    private Integer userId;
+    private Integer createUserId;
 
     private String content;
 

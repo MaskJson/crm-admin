@@ -32,11 +32,13 @@ public class PerformanceTalentRemind extends AbstractNative {
         String whereStr = "";
         if (StringUtils.isEmpty(time)) {
             time = "now()";
+        } else {
+            time = "'"+time+"'";
         }
         switch (flag) {
-            case 1: whereStr = " and to_days(tr.create_time) = to_days('"+time+"')";break;
-            case 2: whereStr = " and YEARWEEK(date_format(tr.create_time, '%Y-%m-%d')) = YEARWEEK('"+time+"', '%Y-%m-%d')";break;
-            case 3: whereStr = " and DATE_FORMAT(tr.create_time, '%Y%m') = '"+time+"'";break;
+            case 1: whereStr = " and to_days(tr.create_time) = to_days("+time+")";break;
+            case 2: whereStr = " and YEARWEEK(date_format(tr.create_time, '%Y-%m-%d')) = YEARWEEK("+time+", '%Y-%m-%d')";break;
+            case 3: whereStr = " and DATE_FORMAT(tr.create_time, '%Y%m') = "+time;break;
         }
         return getTalentReminds(where + userId + whereStr);
     }
@@ -45,6 +47,8 @@ public class PerformanceTalentRemind extends AbstractNative {
         String where = "";
         if (StringUtils.isEmpty(time)) {
             time = "now()";
+        } else {
+            time = "'"+time+"'";
         }
         switch (Integer.parseInt(roleId.toString())) {
             case 2:
@@ -54,9 +58,9 @@ public class PerformanceTalentRemind extends AbstractNative {
             case 1: where = " where tr.create_user_id in (select user_id from team where level=1)";break;
         }
         switch (flag) {
-            case 1:where = where + " and to_days(tr.create_time) = to_days('"+time+"')";break;
-            case 2:where = where + " and YEARWEEK(date_format(tr.create_time, '%Y-%m-%d')) = YEARWEEK('"+time+"', '%Y-%m-%d')";break;
-            case 3:where = where + " and DATE_FORMAT(tr.create_time, '%Y%m') = '"+time+"'";break;
+            case 1:where = where + " and to_days(tr.create_time) = to_days("+time+")";break;
+            case 2:where = where + " and YEARWEEK(date_format(tr.create_time, '%Y-%m-%d')) = YEARWEEK("+time+", '%Y-%m-%d')";break;
+            case 3:where = where + " and DATE_FORMAT(tr.create_time, '%Y%m') = "+time;break;
         }
         return getTalentReminds(where);
     }

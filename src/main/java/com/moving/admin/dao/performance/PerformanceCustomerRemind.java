@@ -27,11 +27,13 @@ public class PerformanceCustomerRemind  extends AbstractNative {
         String whereStr = "";
         if (StringUtils.isEmpty(time)) {
             time = "now()";
+        } else {
+            time = "'"+time+"'";
         }
         switch (flag) {
-            case 1: whereStr = " and to_days(tr.create_time) = to_days('"+time+"')";break;
-            case 2: whereStr = " and YEARWEEK(date_format(tr.create_time, '%Y-%m-%d')) = YEARWEEK('"+time+"', '%Y-%m-%d')";break;
-            case 3: whereStr = " and DATE_FORMAT(tr.create_time, '%Y%m') = '"+time+"'";break;
+            case 1: whereStr = " and to_days(cr.create_time) = to_days("+time+")";break;
+            case 2: whereStr = " and YEARWEEK(date_format(cr.create_time, '%Y-%m-%d')) = YEARWEEK("+time+", '%Y-%m-%d')";break;
+            case 3: whereStr = " and DATE_FORMAT(cr.create_time, '%Y%m') = "+time;break;
         }
         return getCustomerReminds(where + userId + whereStr);
     }
@@ -40,18 +42,20 @@ public class PerformanceCustomerRemind  extends AbstractNative {
         String where = "";
         if (StringUtils.isEmpty(time)) {
             time = "now()";
+        } else {
+            time = "'"+time+"'";
         }
         switch (Integer.parseInt(roleId.toString())) {
             case 2:
             case 6:
-            case 7: where = " where tr.create_user_id in(select user_id from team where parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
-            case 3: where = " where tr.create_user_id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
-            case 1: where = " where tr.create_user_id in (select user_id from team where level=1)";break;
+            case 7: where = " where cr.create_user_id in(select user_id from team where parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
+            case 3: where = " where cr.create_user_id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
+            case 1: where = " where cr.create_user_id in (select user_id from team where level=1)";break;
         }
         switch (flag) {
-            case 1:where = where + " and to_days(tr.create_time) = to_days('"+time+"')";break;
-            case 2:where = where + " and YEARWEEK(date_format(tr.create_time, '%Y-%m-%d')) = YEARWEEK('"+time+"', '%Y-%m-%d')";break;
-            case 3:where = where + " and DATE_FORMAT(tr.create_time, '%Y%m') = '"+time+"'";break;
+            case 1:where = where + " and to_days(cr.create_time) = to_days("+time+")";break;
+            case 2:where = where + " and YEARWEEK(date_format(cr.create_time, '%Y-%m-%d')) = YEARWEEK("+time+", '%Y-%m-%d')";break;
+            case 3:where = where + " and DATE_FORMAT(cr.create_time, '%Y%m') = "+time;break;
         }
         return getCustomerReminds(where);
     }
