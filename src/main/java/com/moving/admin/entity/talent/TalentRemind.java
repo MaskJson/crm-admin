@@ -16,8 +16,7 @@ import java.util.Date;
 public class TalentRemind extends BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "id_generator")
-    @GenericGenerator(name = "id_generator", strategy = "identity")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ApiModelProperty(value = "人才ID")

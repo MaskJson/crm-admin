@@ -16,8 +16,7 @@ import java.util.Date;
 public class ProjectReport extends BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "id_generator")
-    @GenericGenerator(name = "id_generator", strategy = "identity")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ApiModelProperty(value = "诊断类型：1：提醒顾问诊断、2：诊断报告")

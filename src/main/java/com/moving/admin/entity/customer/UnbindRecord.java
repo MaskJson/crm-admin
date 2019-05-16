@@ -4,12 +4,8 @@ import com.moving.admin.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @ApiModel("客户取消列名记录")
@@ -19,8 +15,7 @@ import java.util.Date;
 public class UnbindRecord extends BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "id_generator")
-    @GenericGenerator(name = "id_generator", strategy = "identity")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ApiModelProperty(value = "用户id")

@@ -15,8 +15,7 @@ import java.util.List;
 public class Role extends BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "id_generator")
-    @GenericGenerator(name = "id_generator", strategy = "identity")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String roleName;

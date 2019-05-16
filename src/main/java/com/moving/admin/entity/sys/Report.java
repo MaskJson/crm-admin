@@ -5,10 +5,7 @@ import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @ApiModel("绩效报告")
@@ -18,8 +15,7 @@ import java.util.Date;
 public class Report extends BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "id_generator")
-    @GenericGenerator(name = "id_generator", strategy = "identity")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // 类型 1 日报 2 周报 3 月报

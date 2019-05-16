@@ -18,8 +18,7 @@ import java.util.List;
 public class Project extends BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "id_generator")
-    @GenericGenerator(name = "id_generator", strategy = "identity")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ApiModelProperty(value = "项目状态 1: 进展中 2：暂停 3：失败 4：成功")
