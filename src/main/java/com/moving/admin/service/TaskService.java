@@ -16,6 +16,7 @@ public class TaskService {
     public void checkTalentType() {
         taskNative.talentTaskWithoutProject();
         taskNative.talentTaskWithFinish();
+        taskNative.projectTalentTask();
     }
 
 }

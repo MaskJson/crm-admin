@@ -83,7 +83,10 @@ public class TaskNative extends AbstractNative {
     // 进入保证期且已到通过保证期时间的，改变进展人才的状态为成功状态
     @Transactional
     public void projectTalentTask() {
-
+        String sql = "update project_talent set status=7 where status=6 and now() > probation_time";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery query = session.createNativeQuery(sql);
+        query.executeUpdate();
     }
 
     // 获取该人才是在项目进展的数量
