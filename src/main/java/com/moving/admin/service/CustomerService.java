@@ -79,6 +79,11 @@ public class CustomerService extends AbstractService {
     public Long save(Customer customer) {
         if (customer.getId() != null) {
             customer.setUpdateTime(new Date(System.currentTimeMillis()));
+        } else {
+            Long roleId = customer.getRoleId();
+            if (roleId != 3 && roleId != 1) {
+                customer.setAuditType(0);
+            }
         }
         customerDao.save(customer);
         return customer.getId();

@@ -114,6 +114,7 @@ public class CustomerNative extends AbstractNative {
     public Map<String, Object> getAuditList(Long userId, Long roleId, Pageable pageable) {
         Map<String, Object> map = new HashMap<>();
         Team team = teamDao.findTeamByUserIdAndLevel(userId, 1);
+
         if (team == null && roleId == 3) {
             map.put("content", new ArrayList<>());
             map.put("totalElements", 0);

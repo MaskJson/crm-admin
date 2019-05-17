@@ -91,4 +91,8 @@ public class Customer extends BaseEntity {
     @ApiModelProperty(value = "拓展用户name")
     @Transient
     private String followUser;
+
+    @ApiModelProperty(value = "用户角色")
+    @Transient
+    private Long roleId;
 }

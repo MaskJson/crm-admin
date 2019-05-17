@@ -17,7 +17,7 @@ import java.util.Map;
 public class PerformanceCustomerRemind  extends AbstractNative {
 
     private final String select = "select cr.type,cr.status,cr.remark,cr.meet_time as meetTime,cr.meet_address as meetAddress,cr.meet_notice as meetNotice,cr.contact_time_start as contactTimeStart," +
-            "cr.contact_time_end as contactTimeEnd,cr.create_time as createTime,u.nick_name as createUser,cr.create_user_id as createUserId,cc.name as contactName";
+            "cr.contact_time_end as contactTimeEnd,cr.create_time as createTime,u.nick_name as createUser,cr.create_user_id as createUserId,cc.name as contactName, c.name as customerName";
     private final String from = " from customer_remind cr left join customer_contact cc on cc.id=cr.contact_id left join sys_user u on u.id=cr.create_user_id left join customer c on c.id=cr.customer_id";
     private final String sort = " order by cr.create_user_id,cr.customer_id,cr.create_time desc ";
     private final String where = " where cr.create_user_id=";
@@ -74,6 +74,7 @@ public class PerformanceCustomerRemind  extends AbstractNative {
         query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("createUser", StandardBasicTypes.STRING);
         query.addScalar("contactName", StandardBasicTypes.STRING);
+        query.addScalar("customerName", StandardBasicTypes.STRING);
         query.addScalar("createUserId", StandardBasicTypes.LONG);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
