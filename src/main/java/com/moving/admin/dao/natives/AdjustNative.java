@@ -26,16 +26,16 @@ public class AdjustNative extends AbstractNative {
     @Autowired
     private ProjectRemindDao projectRemindDao;
 
-    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, t.name as name," +
-                                     "t.phone as phone, pt.type as type, pt.update_time as updateTime, pt.recommendation, pt.kill_remark as killRemark," +
-                                     "p.name as projectName, c.name as customerName";
+    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, t.name as name, t.name as talentName," +
+                                     "t.phone as phone, pt.type as type, pt.status, pt.update_time as updateTime, pt.recommendation, pt.kill_remark as killRemark," +
+                                     "p.name as projectName,p.id as projectId, c.name as customerName";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id left join customer c on c.id=p.customer_id";
     private String talentWhere = " where pt.status=";
     private String talentSort = " order by pt.update_time asc";
 
     // 根据状态获取项目人才, 当projectId 为null时，获取所有项目的
     public List<Map<String, Object>> getProjectTalent(Integer status, Long projectId, Long userId) {
-        String sql = talentSelect + talentFrom + talentWhere + status
+        String sql = talentSelect + talentFrom + (status != null ? (talentWhere + status) : " where 1=1")
                 + (projectId != null ? (" and pt.project_id=" + projectId) : "" ) + " and (pt.create_user_id=" + userId +
                 " or p.create_user_id="+userId+" )" +
                 talentSort;
@@ -43,14 +43,17 @@ public class AdjustNative extends AbstractNative {
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("talentId", StandardBasicTypes.LONG);
+        query.addScalar("projectId", StandardBasicTypes.LONG);
         query.addScalar("createUserId", StandardBasicTypes.LONG);
         query.addScalar("name", StandardBasicTypes.STRING);
+        query.addScalar("talentName", StandardBasicTypes.STRING);
         query.addScalar("recommendation", StandardBasicTypes.STRING);
         query.addScalar("killRemark", StandardBasicTypes.STRING);
         query.addScalar("phone", StandardBasicTypes.STRING);
         query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("customerName", StandardBasicTypes.STRING);
         query.addScalar("type", StandardBasicTypes.INTEGER);
+        query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
