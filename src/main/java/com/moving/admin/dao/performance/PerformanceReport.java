@@ -16,7 +16,7 @@ import java.util.Map;
 @Service
 public class PerformanceReport extends AbstractNative {
 
-    private final String select = "select r.id, r.content, r.create_user_id as createUserId, r.create_time as createTime, u.nick_name as createUser";
+    private final String select = "select r.id, r.content, r.create_user_id as createUserId, r.create_time as createTime, u.nick_name as createUser, u.role_id as roleId";
     private final String from  = " from report r left join sys_user u on r.create_user_id=u.id";
     private final String sort = " order by r.create_time";
     private final String where = " where r.create_user_id=";
@@ -61,7 +61,7 @@ public class PerformanceReport extends AbstractNative {
 
     // 获取下级成员
     public List<Map<String, Object>> getMembers(Long userId, Long roleId) {
-        String selectFrom = "select id as createUserId, nick_name as name from sys_user";
+        String selectFrom = "select id as createUserId, nick_name as nickName, role_id as roleId as name from sys_user";
         String where = "";
         switch (Integer.parseInt(roleId.toString())) {
             case 2:
@@ -73,7 +73,8 @@ public class PerformanceReport extends AbstractNative {
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(selectFrom + where);
         query.addScalar("createUserId", StandardBasicTypes.LONG);
-        query.addScalar("name", StandardBasicTypes.STRING);
+        query.addScalar("nickName", StandardBasicTypes.STRING);
+        query.addScalar("roleId", StandardBasicTypes.LONG);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
     }
