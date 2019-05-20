@@ -1,6 +1,7 @@
 package com.moving.admin.entity.customer;
 
 import com.moving.admin.entity.BaseEntity;
+import com.moving.admin.entity.sys.User;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -79,6 +80,10 @@ public class Customer extends BaseEntity {
     @ApiModelProperty(value = "关联项目数")
     @Transient
     private Long projectCount;
+
+    @ApiModelProperty(value = "负责人")
+    @Transient
+    private User user;
 
     @ApiModelProperty(value = "最后跟踪时间")
     @Transient

@@ -122,7 +122,7 @@ public class CustomerNative extends AbstractNative {
         }
         String teamWhere = "";
         if (team != null) {
-            teamWhere =  "or c.create_user_id in(select user_id from team where team_id=" + team.getId() + ")";
+            teamWhere =  " or c.create_user_id in(select user_id from team where team_id=" + team.getId() + ")";
         }
         String select = "select c.id, c.name, c.create_time as createTime, c.audit_type as auditType, u.nick_name as createUser";
         String countSelect = "select count(1)";

@@ -2,16 +2,13 @@ package com.moving.admin.service;
 
 import com.moving.admin.dao.customer.*;
 import com.moving.admin.dao.folder.FolderItemDao;
-import com.moving.admin.dao.natives.CountNative;
+import com.moving.admin.dao.natives.CommonNative;
 import com.moving.admin.dao.natives.CustomerNative;
 import com.moving.admin.dao.project.ProjectDao;
 import com.moving.admin.dao.sys.UserDao;
-import com.moving.admin.dao.talent.ExperienceDao;
-import com.moving.admin.dao.talent.TalentDao;
 import com.moving.admin.entity.customer.*;
 import com.moving.admin.entity.folder.FolderItem;
 import com.moving.admin.entity.sys.User;
-import com.moving.admin.entity.talent.Experience;
 import com.moving.admin.exception.WebException;
 import com.moving.admin.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +46,6 @@ public class CustomerService extends AbstractService {
     private FolderItemDao folderItemDao;
 
     @Autowired
-    private ExperienceDao experienceDao;
-
-    @Autowired
-    private TalentDao talentDao;
-
-    @Autowired
     private CustomerContactDao customerContactDao;
 
     @Autowired
@@ -73,7 +64,7 @@ public class CustomerService extends AbstractService {
     private ProjectDao projectDao;
 
     @Autowired
-    private CountNative countNative;
+    private CommonNative commonNative;
 
     // 添加、编辑
     public Long save(Customer customer) {
@@ -114,7 +105,7 @@ public class CustomerService extends AbstractService {
     }
 
     // 分页查询
-    public Page<Customer> getCustomerList(Long id, String name, String industry, Long folderId, Boolean follow, Integer type, Long userId, Pageable pageable) {
+    public Page<Customer> getCustomerList(Long id, String name, String industry, Long folderId, Boolean follow, Integer type, Long userId, Long roleId, Pageable pageable) {
         Page<Customer> result = customerDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
             list.add(cb.equal(root.get("auditType"), 2));
@@ -131,7 +122,13 @@ public class CustomerService extends AbstractService {
                 list.add(cb.equal(root.get("follow"), follow));
             }
             if (userId != null) {
-                list.add(cb.equal(root.get("followUserId"), userId));
+                List<Long> ids = new ArrayList<>();
+                ids.add(userId);
+                if (roleId == 2 || roleId == 3 || roleId == 6 || roleId == 7) {
+                    ids.addAll(commonNative.getMemberIds(userId, roleId));
+                }
+                Expression<Long> exp = root.<Long>get("followUserId");
+                list.add(cb.and(exp.in(ids)));
                 if (type != null) {
                     list.add(cb.equal(root.get("type"), type == 10 ? 1 : type));
                 }
@@ -150,6 +147,7 @@ public class CustomerService extends AbstractService {
         }, pageable);
         result.forEach(customer -> {
             customer.setProjectCount(projectDao.getCountByCustomerId(customer.getId()));
+            customer.setUser(userDao.findById(customer.getFollowUserId()).get());
         });
         return result;
     }

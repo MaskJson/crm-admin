@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,27 @@ public class CommonNative extends AbstractNative {
         query.addScalar("name", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
+    }
+
+    // 获取下级成员ids
+    public List<Long> getMemberIds(Long userId, Long roleId) {
+        String sql = "";
+        switch (Integer.parseInt(roleId.toString())) {
+            case 2:
+            case 6:
+            case 7: sql = " select user_id from team where parent_id in(select id from team where level in(2,3,4) and user_id="+userId+")";break;
+            case 3: sql = " select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+")";break;
+        }
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
+        query.addScalar("user_id", StandardBasicTypes.LONG);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        List<Long> ids = new ArrayList<>();
+        List<Map<String, Object>> list = query.getResultList();
+        list.forEach(item -> {
+            ids.add(Long.parseLong(item.get("user_id").toString()));
+        });
+        return ids;
     }
 
     public void appendSort(Pageable pageable) {

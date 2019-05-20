@@ -52,8 +52,8 @@ public class CustomerController extends AbstractController {
 
     @ApiOperation("分页查询")
     @GetMapping("/list")
-    public Result<Page<Customer>> list(Long id, String name, String industry, Long folderId, Boolean follow, Integer type, Long userId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        Page<Customer> result = customerService.getCustomerList(id, name, industry, folderId, follow, type, userId, pageable);
+    public Result<Page<Customer>> list(Long id, String name, String industry, Long folderId, Boolean follow, Integer type, Long userId, Long roleId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        Page<Customer> result = customerService.getCustomerList(id, name, industry, folderId, follow, type, userId, roleId, pageable);
         return ResultUtil.success(result);
     }
 
