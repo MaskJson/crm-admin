@@ -169,14 +169,15 @@ public class ProjectService extends AbstractService {
         // 跟进后修改人才进展状态
         Integer status = projectRemind.getStatus();
         if (projectTalent != null) {
-            if (projectRemind.getType() == 100) {
+            Integer type = projectRemind.getType();
+            if (type == 100) {
                 projectTalent.setRecommendation(projectRemind.getRecommendation());
             }
-            if (projectRemind.getRoleId() == 3 && projectRemind.getType() == 100) {
+            if (projectRemind.getRoleId() == 3 &&  type == 100) {
                 projectTalent.setType(1);
                 projectTalent.setStatus(1);
-            } else if (projectRemind.getType() != 99){
-                projectTalent.setType(projectRemind.getType());
+            } else if (type != 99){
+                projectTalent.setType(type);
                 projectTalent.setStatus(projectRemind.getStatus());
             }
             if (status == 6) {
