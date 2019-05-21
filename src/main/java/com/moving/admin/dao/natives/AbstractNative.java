@@ -1,5 +1,6 @@
 package com.moving.admin.dao.natives;
 
+import com.moving.admin.service.AbstractService;
 import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityManager;
@@ -7,7 +8,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
 
-public abstract class AbstractNative<T> {
+public abstract class AbstractNative<T> extends AbstractService {
 
     @PersistenceContext
     protected EntityManager entityManager;

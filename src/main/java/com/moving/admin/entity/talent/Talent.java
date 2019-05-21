@@ -149,6 +149,10 @@ public class Talent extends BaseEntity {
     @Transient
     private TalentRemind remind;
 
+    @ApiModelProperty(value = "最近一条待跟进跟踪")
+    @Transient
+    private TalentRemind followRemind;
+
     @ApiModelProperty(value = "关联项目数")
     @Transient
     private Long projectCount;
@@ -172,4 +176,6 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "项目进展数")
     @Transient
     private Long progress;
+
+
 }

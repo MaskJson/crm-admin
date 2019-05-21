@@ -3,8 +3,10 @@ package com.moving.admin.dao.natives;
 import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
 import com.moving.admin.dao.project.ProjectTalentDao;
 import com.moving.admin.dao.sys.TeamDao;
+import com.moving.admin.dao.talent.TalentRemindDao;
 import com.moving.admin.entity.customer.Customer;
 import com.moving.admin.entity.sys.Team;
+import com.moving.admin.service.AbstractService;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
@@ -32,6 +34,9 @@ public class CustomerNative extends AbstractNative {
 
     @Autowired
     private ProjectTalentDao projectTalentDao;
+
+    @Autowired
+    private TalentRemindDao talentRemindDao;
 
     // 获取客户下所有联系人及联系记录
     public List<Map<String, Object>> getAllCustomerContactById(Long customerId, String name, Long departmentId, String position, String phone) {
@@ -169,6 +174,7 @@ public class CustomerNative extends AbstractNative {
             item.put("progress", projectTalentDao.getProjectLengthByTalentId(talentId));
             item.put("projects", projectTalentDao.findProjectIdsOfTalent(talentId));
             item.put("offerCount", projectTalentDao.getProjectOfferLength(talentId));
+            item.put("followRemind", talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(talentId, false, super.getCurrentUserId()));
         });
         return list;
     }

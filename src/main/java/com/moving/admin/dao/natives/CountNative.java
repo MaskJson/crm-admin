@@ -2,6 +2,7 @@ package com.moving.admin.dao.natives;
 
 import com.moving.admin.dao.project.ProjectRemindDao;
 import com.moving.admin.dao.project.ProjectTalentDao;
+import com.moving.admin.dao.talent.TalentRemindDao;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
@@ -25,6 +26,9 @@ public class CountNative extends AbstractNative {
 
     @Autowired
     private ProjectRemindDao projectRemindDao;
+
+    @Autowired
+    private TalentRemindDao talentRemindDao;
 
     // 获取人才常规跟踪的待办列表
     public Map<String, Object> talentRemindPendingList(Long userId, Integer type, Pageable pageable) {
@@ -59,7 +63,8 @@ public class CountNative extends AbstractNative {
         query.addScalar("talentStatus", StandardBasicTypes.INTEGER);
         query.addScalar("followUserId", StandardBasicTypes.LONG);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        map.put("content", query.getResultList());
+        List<Map<String, Object>> list = query.getResultList();
+        map.put("content", list);
         map.put("totalElements", getTotal(countSelect + from + where));
         return map;
     }
@@ -120,6 +125,7 @@ public class CountNative extends AbstractNative {
             map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
             map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
             map.put("offerCount", projectTalentDao.getProjectOfferLength(id));
+            map.put("followRemind", talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(id, false, super.getCurrentUserId()));
         });
         return talentList;
     }
@@ -147,6 +153,7 @@ public class CountNative extends AbstractNative {
             map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
             map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
             map.put("offerCount", projectTalentDao.getProjectOfferLength(id));
+            map.put("followRemind", talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(id, false, super.getCurrentUserId()));
         });
         return talentList;
     }
@@ -233,6 +240,7 @@ public class CountNative extends AbstractNative {
             map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
             map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
             map.put("offerCount", projectTalentDao.getProjectOfferLength(id));
+            map.put("followRemind", talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(id, false, super.getCurrentUserId()));
         });
         return talentList;
     }

@@ -120,6 +120,8 @@ public class TalentService extends AbstractService {
             talent.setProjects(projectTalentDao.findProjectIdsOfTalent(talent.getId()));
             talent.setOfferCount(projectTalentDao.getProjectOfferLength(talent.getId()));
             talent.setProgress(projectTalentDao.getProjectLengthByTalentId(talent.getId()));
+            // 获取最后一次未跟进的常规跟踪
+            talent.setFollowRemind(talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(talent.getId(), false, super.getCurrentUserId()));
         });
         return result;
     }
@@ -248,6 +250,8 @@ public class TalentService extends AbstractService {
             talent.setOfferCount(projectTalentDao.getProjectOfferLength(id));
             talent.setProjects(projectTalentDao.findProjectIdsOfTalent(id));
             talent.setProgress(projectTalentDao.getProjectLengthByTalentId(id));
+            // 获取最后一次未跟进的常规跟踪
+            talent.setFollowRemind(talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(talent.getId(), false, super.getCurrentUserId()));
         }
         return talent;
     }
