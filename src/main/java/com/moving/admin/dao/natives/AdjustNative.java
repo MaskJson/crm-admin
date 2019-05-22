@@ -35,7 +35,7 @@ public class AdjustNative extends AbstractNative {
 
     // 根据状态获取项目人才, 当projectId 为null时，获取所有项目的
     public List<Map<String, Object>> getProjectTalent(Integer status, Long projectId, Long userId) {
-        String sql = talentSelect + talentFrom + (status != null ? (talentWhere +(status == 1 ? 0 + " or status=1" : status)) : " where 1=1")
+        String sql = talentSelect + talentFrom + (status != null ? (talentWhere +(status == 1 ? 0 + " or pt.status=1" : status)) : " where 1=1")
                 + (projectId != null ? (" and pt.project_id=" + projectId) : "" ) + " and (pt.create_user_id=" + userId +
                 " or p.create_user_id="+userId+" )" +
                 talentSort;
