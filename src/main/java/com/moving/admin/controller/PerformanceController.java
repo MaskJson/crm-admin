@@ -84,7 +84,7 @@ public class PerformanceController extends AbstractController {
     @GetMapping("/report/infos")
     public Result<Map<String, Object>> getReportPerformanceReport(Long userId, Long roleId, Integer flag, String time) throws Exception {
         List<Map<String, Object>> reports = performanceReport.getPerformanceReport(userId, roleId, flag, time);
-        List<Map<String, Object>> members = performanceReport.getMembers(userId, roleId);
+        List<Map<String, Object>> members = performanceReport.getMembers(userId, roleId, flag);
         Map<String, Object> map = new HashMap<>();
         map.put("reports", reports);
         map.put("members", members);

@@ -147,7 +147,9 @@ public class CustomerService extends AbstractService {
         }, pageable);
         result.forEach(customer -> {
             customer.setProjectCount(projectDao.getCountByCustomerId(customer.getId()));
-            customer.setUser(userDao.findById(customer.getFollowUserId()).get());
+            if (customer.getFollowUserId() != null) {
+                customer.setUser(userDao.findById(customer.getFollowUserId()).get());
+            }
         });
         return result;
     }

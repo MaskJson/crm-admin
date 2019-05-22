@@ -35,7 +35,7 @@ public class PermissionService extends AbstractService {
     public List<Permission> findPermissionsByRoleId(Long roleId) {
         List<Long> permissionIds = rolePermissionDao.findPermissionIdsByRoleId(roleId);
         if (permissionIds != null && permissionIds.size() > 0) {
-            List<Permission> permissions = permissionDao.findByIdIn(permissionIds);
+            List<Permission> permissions = permissionDao.findByIdInOrderBySortOrderAsc(permissionIds);
             return permissions;
         }
         return null;
@@ -43,7 +43,7 @@ public class PermissionService extends AbstractService {
 
     // 根据父级菜单id获取菜单
     public List<Permission> findByParentIdOrderBySortOrder(Long parentId) {
-        return permissionDao.findByParentIdOrderBySortOrderAsc(parentId);
+        return permissionDao.findAllByParentIdOrderBySortOrderAsc(parentId);
     }
 
     // 获取登录用户的菜单
@@ -52,7 +52,7 @@ public class PermissionService extends AbstractService {
         if (roleId != null) {
             List<Long> permissionIds = rolePermissionDao.findPermissionIdsByRoleId(roleId);
             if (permissionIds != null && permissionIds.size() > 0) {
-                List<Permission> list = permissionDao.findByIdIn(permissionIds);
+                List<Permission> list = permissionDao.findByIdInOrderBySortOrderAsc(permissionIds);
                 List<Permission> menuList = new ArrayList<>();
                 List<Permission> secondMenuList = new ArrayList<>();
                 List<Permission> buttonPermissions = new ArrayList<>();

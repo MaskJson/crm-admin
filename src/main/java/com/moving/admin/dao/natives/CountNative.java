@@ -64,6 +64,12 @@ public class CountNative extends AbstractNative {
         query.addScalar("followUserId", StandardBasicTypes.LONG);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
+        list.forEach(item -> {
+            Long id = Long.parseLong(item.get("talentId").toString());
+            item.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
+            item.put("offerCount", projectTalentDao.getProjectOfferLength(id));
+            item.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
+        });
         map.put("content", list);
         map.put("totalElements", getTotal(countSelect + from + where));
         return map;

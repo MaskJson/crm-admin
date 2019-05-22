@@ -44,11 +44,12 @@ public class PerformanceReport extends AbstractNative {
         } else {
             time = "'"+time+"'";
         }
+        String levelFilter = flag == 1 ? "" : " level is null and ";
         switch (Integer.parseInt(roleId.toString())) {
             case 2:
             case 6:
-            case 7: where = " where r.create_user_id in(select user_id from team where parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
-            case 3: where = " where r.create_user_id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
+            case 7: where = " where r.create_user_id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
+            case 3: where = " where r.create_user_id in (select user_id from team where "+levelFilter+" team_id in(select id from team where level=1 and user_id="+userId+"))";break;
             case 1: where = " where r.create_user_id in (select user_id from team where level=1)";break;
         }
         switch (flag) {
@@ -60,14 +61,15 @@ public class PerformanceReport extends AbstractNative {
     }
 
     // 获取下级成员
-    public List<Map<String, Object>> getMembers(Long userId, Long roleId) {
-        String selectFrom = "select id as createUserId, nick_name as nickName, role_id as roleId as name from sys_user";
+    public List<Map<String, Object>> getMembers(Long userId, Long roleId, Integer flag) {
+        String selectFrom = "select id as createUserId, nick_name as nickName, role_id as roleId  from sys_user";
         String where = "";
+        String levelFilter = flag == 1 ? "" : " level is null and ";
         switch (Integer.parseInt(roleId.toString())) {
             case 2:
             case 6:
-            case 7: where = " where id in(select user_id from team where parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
-            case 3: where = " where id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
+            case 7: where = " where id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
+            case 3: where = " where id in (select user_id from team where "+levelFilter+" team_id in(select id from team where level=1 and user_id="+userId+"))";break;
             case 1: where = " where id in (select user_id from team where level=1)";break;
         }
         Session session = entityManager.unwrap(Session.class);
