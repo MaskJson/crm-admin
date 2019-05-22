@@ -147,6 +147,7 @@ public class ProjectService extends AbstractService {
             remind.setStatus(0);
             remind.setRoleId(projectTalent.getRoleId());
             remind.setProjectTalentId(id);
+            remind.setCreateUserId(projectTalent.getCreateUserId());
             addProjectRemind(remind);
         }
         return id;
