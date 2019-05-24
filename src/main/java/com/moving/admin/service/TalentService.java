@@ -114,6 +114,7 @@ public class TalentService extends AbstractService {
             Predicate[] predicates = new Predicate[list.size()];
             return query.where(list.toArray(predicates)).getRestriction();
         }, pageable);
+        Long userId = super.getCurrentUserId();
         result.forEach(talent -> {
             Map<String, Object> map = countNative.getWorkInfo(talent.getId());
             talent.setPosition(map.get("position") != null ? map.get("position").toString() : "");
@@ -121,7 +122,8 @@ public class TalentService extends AbstractService {
             talent.setOfferCount(projectTalentDao.getProjectOfferLength(talent.getId()));
             talent.setProgress(projectTalentDao.getProjectLengthByTalentId(talent.getId()));
             // 获取最后一次未跟进的常规跟踪
-            talent.setFollowRemind(talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(talent.getId(), false, super.getCurrentUserId()));
+            List<TalentRemind> reminds = talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(talent.getId(), false, userId);
+            talent.setFollowRemind(reminds != null && reminds.size() > 0 ? reminds.get(0) : null);
         });
         return result;
     }
@@ -251,7 +253,8 @@ public class TalentService extends AbstractService {
             talent.setProjects(projectTalentDao.findProjectIdsOfTalent(id));
             talent.setProgress(projectTalentDao.getProjectLengthByTalentId(id));
             // 获取最后一次未跟进的常规跟踪
-            talent.setFollowRemind(talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(talent.getId(), false, super.getCurrentUserId()));
+            List<TalentRemind> reminds = talentRemindDao.findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(talent.getId(), false, super.getCurrentUserId());
+            talent.setFollowRemind(reminds != null && reminds.size() > 0 ? reminds.get(0) : null);
         }
         return talent;
     }

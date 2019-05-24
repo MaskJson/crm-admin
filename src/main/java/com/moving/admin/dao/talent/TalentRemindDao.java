@@ -22,6 +22,6 @@ public interface TalentRemindDao extends JpaRepository<TalentRemind, Long>, JpaS
     List<TalentRemind> findAllByCreateUserId(Long createUserId);
 
     // 获取最后一次未跟进的跟踪
-    TalentRemind findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(Long talentId, Boolean finish, Long createUserId);
+    List<TalentRemind> findByTalentIdAndFinishAndCreateUserIdOrderByCreateTimeDesc(Long talentId, Boolean finish, Long createUserId);
 
 }
