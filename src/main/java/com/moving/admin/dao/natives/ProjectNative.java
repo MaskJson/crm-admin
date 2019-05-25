@@ -60,7 +60,7 @@ public class ProjectNative extends AbstractNative {
     // 获取该人才的项目进展跟踪记录
     public List<Map<String, Object>> getProjectRemindByProjectTalentId(Long id) {
         String sql = "select pr.status, pr.type, pr.create_time as createTime, pr.remark, u.nick_name as createUser," +
-                "pr.recommendation,pr.kill_remark as killRemark,pr.interview_tone as interviewTone,pr.is_last as isLast," +
+                "pr.recommendation,pr.kill_remark as killRemark,pr.interview_time as interviewTime,pr.interview_tone as interviewTone,pr.is_last as isLast," +
                 "pr.position,pr.year_salary as yearSalary,pr.charge,pr.sure_time as sureTime,pr.work_time as workTime," +
                 "pr.entry_time as entryTime,pr.probation_time as probationTime,pr.talent_remark as talentRemark,pr.customer_remark as customerRemark" +
                 " from project_remind pr left join sys_user u on u.id=pr.create_user_id" +
@@ -81,6 +81,7 @@ public class ProjectNative extends AbstractNative {
         query.addScalar("yearSalary", StandardBasicTypes.DOUBLE);
         query.addScalar("charge", StandardBasicTypes.DOUBLE);
         query.addScalar("sureTime", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("interviewTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("workTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("entryTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("probationTime", StandardBasicTypes.TIMESTAMP);
