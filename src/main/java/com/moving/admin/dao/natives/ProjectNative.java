@@ -32,7 +32,7 @@ public class ProjectNative extends AbstractNative {
     // 获取人才的项目经历
     public List<Map<String, Object>> getTalentProjects(Long talentId) {
         String select = "select pt.id, pt.create_user_id as createUserId,pt.recommendation, pt.kill_remark as killRemark,pt.probation_time as probationTime," +
-                " pt.type, pt.status, pt.update_time as updateTime, p.id as projectId, p.name as projectName, c.name as customerName";
+                " pt.type, pt.status, pt.update_time as updateTime, pt.remark_status as remarkStatus, p.id as projectId, p.name as projectName, c.name as customerName";
         String whereFrom = " from project_talent pt left join project p on pt.project_id = p.id left join customer c on p.customer_id=c.id" +
                 " where pt.talent_id=" + talentId;
         String sort = " order by c.name, p.name, pt.update_time desc";
@@ -49,6 +49,7 @@ public class ProjectNative extends AbstractNative {
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("probationTime", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("remarkStatus", StandardBasicTypes.INTEGER);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
         list.forEach(item -> {
@@ -62,7 +63,7 @@ public class ProjectNative extends AbstractNative {
         String sql = "select pr.status, pr.type, pr.create_time as createTime, pr.remark, u.nick_name as createUser," +
                 "pr.recommendation,pr.kill_remark as killRemark,pr.interview_time as interviewTime,pr.interview_tone as interviewTone,pr.is_last as isLast," +
                 "pr.position,pr.year_salary as yearSalary,pr.charge,pr.sure_time as sureTime,pr.work_time as workTime," +
-                "pr.entry_time as entryTime,pr.probation_time as probationTime,pr.talent_remark as talentRemark,pr.customer_remark as customerRemark" +
+                "pr.entry_time as entryTime,pr.probation_time as probationTime,pr.talent_remark as talentRemark,pr.customer_remark as customerRemark, pr.remark_status as remarkStatus" +
                 " from project_remind pr left join sys_user u on u.id=pr.create_user_id" +
                 " where project_talent_id=" + id +
                 " order by pr.status desc, pr.create_time desc";
@@ -87,6 +88,7 @@ public class ProjectNative extends AbstractNative {
         query.addScalar("probationTime", StandardBasicTypes.TIMESTAMP);
         query.addScalar("talentRemark", StandardBasicTypes.STRING);
         query.addScalar("customerRemark", StandardBasicTypes.STRING);
+        query.addScalar("remarkStatus", StandardBasicTypes.INTEGER);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
     }

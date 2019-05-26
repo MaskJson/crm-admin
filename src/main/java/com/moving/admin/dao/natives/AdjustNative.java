@@ -27,8 +27,8 @@ public class AdjustNative extends AbstractNative {
     private ProjectRemindDao projectRemindDao;
 
     private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, t.name as name, t.name as talentName," +
-                                     "t.phone as phone, pt.type as type, pt.status, pt.update_time as updateTime, pt.recommendation, pt.kill_remark as killRemark," +
-                                     "p.name as projectName,p.id as projectId, c.name as customerName";
+                                     "t.phone as phone, pt.type as type, pt.status, pt.update_time as updateTime, pt.recommendation, pt.kill_remark as killRemark,pt.remark_status as remarkStatus," +
+                                     "p.name as projectName,p.id as projectId, c.name as customerName,";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id left join customer c on c.id=p.customer_id";
     private String talentWhere = " where pt.status=";
     private String talentSort = " order by pt.update_time asc";
@@ -55,6 +55,7 @@ public class AdjustNative extends AbstractNative {
         query.addScalar("type", StandardBasicTypes.INTEGER);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("remarkStatus", StandardBasicTypes.INTEGER);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
         list.forEach(item -> {
