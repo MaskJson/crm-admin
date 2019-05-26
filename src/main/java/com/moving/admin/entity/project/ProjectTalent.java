@@ -41,6 +41,9 @@ public class ProjectTalent extends BaseEntity {
     @ApiModelProperty(value = "修改时间=最后跟踪时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "反馈状态")
+    private Integer remarkStatus;
+
     @ApiModelProperty(value = "试用期结束")
     private Date probationTime;
 

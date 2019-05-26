@@ -186,6 +186,10 @@ public class ProjectService extends AbstractService {
             } else if (status == 8){
                 projectTalent.setKillRemark(projectRemind.getKillRemark());
             }
+            Integer remarkStatus = projectRemind.getRemarkStatus();
+            if (type == 16 && remarkStatus != null && remarkStatus > 2) {
+                projectTalent.setStatus(remarkStatus);
+            }
             projectTalent.setUpdateTime(new Date());
             projectTalentDao.save(projectTalent);
             if (status == 6) {
@@ -309,6 +313,9 @@ public class ProjectService extends AbstractService {
             for (int i=0; i<reminds.size(); i++) {
                 ProjectRemind remind = reminds.get(i);
                 if (remind.getStatus() == status && remind.getStatus() != remind.getPrevStatus()) {
+                    if (remind.getPrevStatus() != null && remind.getPrevStatus() == 3) {
+                        projectTalent.setRemarkStatus(null);
+                    }
                     projectTalent.setStatus(remind.getPrevStatus());
                     projectTalent.setType(remind.getPrevType());
                     projectTalent.setUpdateTime(new Date());

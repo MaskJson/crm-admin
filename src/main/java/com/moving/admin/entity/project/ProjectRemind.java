@@ -86,6 +86,8 @@ public class ProjectRemind extends BaseEntity {
     private String talentRemark;
     @ApiModelProperty(value = "客户反馈")
     private String customerRemark;
+    @ApiModelProperty(value = "反馈状态")
+    private Integer remarkStatus;
 
     @ApiModelProperty(value = "角色id")
     @Transient
