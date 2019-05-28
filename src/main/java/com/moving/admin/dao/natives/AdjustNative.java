@@ -21,9 +21,6 @@ import java.util.Map;
 public class AdjustNative extends AbstractNative {
 
     @Autowired
-    private CountNative countNative;
-
-    @Autowired
     private ProjectRemindDao projectRemindDao;
 
     private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, t.name as name, t.name as talentName," +

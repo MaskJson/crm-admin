@@ -297,6 +297,7 @@ public class TalentService extends AbstractService {
                 projectTalent.setStatus(0);
                 projectTalent.setType(100);
             }
+            projectTalent.setRecommendation(remind.getRemark() != null ? remind.getRemark() : remind.getSituation());
             projectTalent.setProjectId(remind.getProjectId());
             projectTalent.setTalentId(remind.getTalentId());
             projectTalent.setCreateUserId(remind.getCreateUserId());

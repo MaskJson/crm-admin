@@ -323,13 +323,31 @@ public class CustomerService extends AbstractService {
     }
 
     public void auditCustomer(List<Long> ids, Integer auditType) {
-        ids.forEach(id -> {
-            Customer customer = customerDao.findById(id).get();
-            if (customer != null) {
-                customer.setAuditType(auditType);
-                customerDao.save(customer);
-            }
-        });
+        if (auditType == 1) {
+            List<Customer> customers = customerDao.findAllById(ids);
+            customerDao.deleteAll(customers);
+        } else {
+            ids.forEach(id -> {
+                Customer customer = customerDao.findById(id).get();
+                if (customer != null) {
+                    customer.setAuditType(auditType);
+                    customerDao.save(customer);
+                }
+            });
+        }
+    }
+
+    public void getCustomerByNameAndId(Long id, String name) {
+        List<Customer> customers = customerDao.findAllByNameAndIdIsNot(name, id);
+        if (customers.size() > 0) {
+            throw new WebException(400, "该客户名称已存在", null);
+        }
+        Customer customer = customerDao.findById(id).get();
+        if (customer != null) {
+            customer.setName(name);
+            customer.setAuditType(2);
+            customerDao.save(customer);
+        }
     }
 
 }

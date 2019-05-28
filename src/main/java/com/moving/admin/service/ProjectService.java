@@ -143,6 +143,7 @@ public class ProjectService extends AbstractService {
             ProjectRemind remind = new ProjectRemind();
             remind.setCreateUserId(remind.getCreateUserId());
             remind.setRemark(projectTalent.getRemark());
+            remind.setRecommendation(projectTalent.getRemark());
             remind.setType(100);
             remind.setStatus(0);
             remind.setRoleId(projectTalent.getRoleId());
@@ -220,17 +221,28 @@ public class ProjectService extends AbstractService {
     public void reviewToCustomer(Long projectTalentId, Long projectRemindId, Boolean flag, Long userId) {
         ProjectTalent projectTalent = projectTalentDao.findById(projectTalentId).get();
         ProjectRemind followRemind = projectRemindDao.findById(projectRemindId).get();
+        List<ProjectRemind> reminds = projectRemindDao.findAllByProjectTalentIdAndStatusAndType(projectTalentId, 0, 100);
         if (projectTalent != null && projectTalent.getType() == 100) {
             if (flag) { // 推荐成功
                 if (followRemind != null) {
                     followRemind.setType(1);
                     followRemind.setStatus(1);
                     projectRemindDao.save(followRemind);
+                } else {
+                    reminds.forEach(remind -> {
+                        remind.setType(101);
+                    });
+                    projectRemindDao.saveAll(reminds);
                 }
             } else { // 淘汰
                 if (followRemind != null) {
                     followRemind.setType(101); // 未推荐成功
                     projectRemindDao.save(followRemind);
+                } else {
+                    reminds.forEach(remind -> {
+                        remind.setType(101);
+                    });
+                    projectRemindDao.saveAll(reminds);
                 }
                 // 新增总监淘汰记录
                 ProjectRemind remind = new ProjectRemind();

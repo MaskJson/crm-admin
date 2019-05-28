@@ -53,7 +53,7 @@ public class ProjectTalent extends BaseEntity {
     @ApiModelProperty(value = "淘汰理由")
     private String killRemark;
 
-    @ApiModelProperty(value = "角色id")
+    @ApiModelProperty(value = "推荐备注 = 推荐理由")
     @Transient
     private String remark;
 

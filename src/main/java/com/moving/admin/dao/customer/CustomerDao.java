@@ -19,4 +19,7 @@ public interface CustomerDao extends JpaRepository<Customer, Long>, JpaSpecifica
     // 获取所有相关客户，createUserId - followUserId
     List<Customer> findAllByCreateUserIdOrFollowUserId(Long createUserId, Long followUserId);
 
+    // 根据id和name排重
+    List<Customer> findAllByNameAndIdIsNot(String name, Long id);
+
 }
