@@ -172,4 +172,10 @@ public class ProjectController extends AbstractController {
         return ResultUtil.success(projectService.reBack(projectTalentId, status));
     }
 
+    @ApiOperation("获取当前用户推荐的且被淘汰的进展人才")
+    @GetMapping("/getKills")
+    public Result<Map<String, Object>> getKills(Long userId, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        return ResultUtil.success(projectNative.getKillProjectTalents(userId, pageable));
+    }
+
 }

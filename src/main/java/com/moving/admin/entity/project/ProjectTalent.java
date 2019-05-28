@@ -53,6 +53,9 @@ public class ProjectTalent extends BaseEntity {
     @ApiModelProperty(value = "淘汰理由")
     private String killRemark;
 
+    @ApiModelProperty(value = "淘汰跟进状态：-1：待跟进， 1：已跟进")
+    private Integer killStatus;
+
     @ApiModelProperty(value = "推荐备注 = 推荐理由")
     @Transient
     private String remark;

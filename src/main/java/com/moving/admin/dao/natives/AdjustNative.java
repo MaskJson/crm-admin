@@ -1,6 +1,7 @@
 package com.moving.admin.dao.natives;
 
 import com.moving.admin.dao.project.ProjectRemindDao;
+import com.moving.admin.dao.project.ProjectTalentDao;
 import com.moving.admin.entity.project.ProjectRemind;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
@@ -23,7 +24,11 @@ public class AdjustNative extends AbstractNative {
     @Autowired
     private ProjectRemindDao projectRemindDao;
 
-    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, t.name as name, t.name as talentName," +
+    @Autowired
+    private ProjectTalentDao projectTalentDao;
+
+    private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, " +
+                                     "t.follow_user_id as followUserId, t.name as name, t.name as talentName, t.type as talentType," +
                                      "t.phone as phone, pt.type as type, pt.status, pt.update_time as updateTime, pt.recommendation, pt.kill_remark as killRemark,pt.remark_status as remarkStatus," +
                                      "p.name as projectName,p.id as projectId, c.name as customerName";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id left join customer c on c.id=p.customer_id";
@@ -40,6 +45,8 @@ public class AdjustNative extends AbstractNative {
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("talentId", StandardBasicTypes.LONG);
+        query.addScalar("talentType", StandardBasicTypes.INTEGER);
+        query.addScalar("followUserId", StandardBasicTypes.LONG);
         query.addScalar("projectId", StandardBasicTypes.LONG);
         query.addScalar("createUserId", StandardBasicTypes.LONG);
         query.addScalar("name", StandardBasicTypes.STRING);
@@ -57,7 +64,10 @@ public class AdjustNative extends AbstractNative {
         List<Map<String, Object>> list = query.getResultList();
         list.forEach(item -> {
 //            item.put("position", countNative.getWorkInfo(Long.parseLong(item.get("talentId").toString())).get("position"));
-            item.put("reminds", getLastRemindByStatus(Long.parseLong(item.get("id").toString())));
+            Long talentId = Long.parseLong(item.get("talentId").toString());
+            Long projectTalentId = Long.parseLong(item.get("id").toString());
+            item.put("reminds", getLastRemindByStatus(projectTalentId));
+            item.put("progress", projectTalentDao.getProjectLengthByTalentId(talentId));
         });
         return list;
     }

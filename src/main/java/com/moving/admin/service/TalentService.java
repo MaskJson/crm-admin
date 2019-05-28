@@ -282,6 +282,7 @@ public class TalentService extends AbstractService {
     }
 
     // 添加人才跟踪
+    @Transactional
     public Long saveRemind(TalentRemind remind) {
         remind.setCreateTime(new Date(System.currentTimeMillis()));
         remind.setUpdateTime(new Date(System.currentTimeMillis()));
@@ -303,6 +304,15 @@ public class TalentService extends AbstractService {
             projectTalent.setCreateUserId(remind.getCreateUserId());
             projectTalent.setCreateTime(remind.getCreateTime());
             projectTalentDao.save(projectTalent);
+        }
+        // 淘汰跟进
+        if (remind.getProjectTalentId() != null) {
+            ProjectTalent projectTalent = projectTalentDao.findById(remind.getProjectTalentId()).get();
+            if (projectTalent != null) {
+//                projectTalent.setKillStatus(1);
+                projectTalent.setUpdateTime(new Date());
+                projectTalentDao.save(projectTalent);
+            }
         }
         talentRemindDao.save(remind);
         Long followId = remind.getFollowRemindId();

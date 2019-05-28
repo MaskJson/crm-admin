@@ -5,10 +5,12 @@ import com.moving.admin.dao.natives.ProjectNative;
 import com.moving.admin.dao.project.*;
 import com.moving.admin.dao.sys.TeamDao;
 import com.moving.admin.dao.talent.TalentDao;
+import com.moving.admin.dao.talent.TalentRemindDao;
 import com.moving.admin.entity.customer.Department;
 import com.moving.admin.entity.project.*;
 import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.talent.Talent;
+import com.moving.admin.entity.talent.TalentRemind;
 import com.moving.admin.exception.WebException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,16 +42,13 @@ public class ProjectService extends AbstractService {
     private TalentDao talentDao;
 
     @Autowired
-    private CommonService commonService;
+    private TalentService talentService;
 
     @Autowired
     private TeamDao teamDao;
 
     @Autowired
-    private DepartmentDao departmentDao;
-
-    @Autowired
-    private TeamService teamService;
+    private TalentRemindDao talentRemindDao;
 
     @Autowired
     private ProjectAdviserDao projectAdviserDao;
@@ -160,12 +159,25 @@ public class ProjectService extends AbstractService {
         // 查找是否存在已处于其他项目的进展中的入职状态或保证期状态， 若存在，抛异常
         ProjectTalent projectTalent = projectTalentDao.findById(projectRemind.getProjectTalentId()).get();
         List<ProjectTalent> pts = projectTalentDao.findAllByTalentIdAndProjectIdNotAndStatusBetween(projectTalent.getTalentId(), projectTalent.getProjectId(), 5, 6);
+        if (projectRemind.getTalentRemind() != null) {
+            TalentRemind talentRemind = projectRemind.getTalentRemind();
+            talentRemind.setCreateTime(new Date());
+            talentRemind.setRemark(StringUtils.isEmpty(projectRemind.getRemark()) ? projectRemind.getKillRemark() : projectRemind.getRemark());
+//            talentRemindDao.save(talentRemind);
+            talentService.saveRemind(talentRemind);
+        }
         if (pts.size() > 0) {
             projectTalent.setStatus(8);
             projectTalent.setType(200);
+//            projectTalent.setKillStatus(-1);
+            projectTalent.setKillRemark("该人才已在其他项目入职或进入保证期");
             projectTalent.setUpdateTime(new Date());
             projectTalentDao.save(projectTalent);
             return null;
+        }
+        if (projectRemind.getType() == 100 && projectRemind.getRoleId() == 3) {
+            projectRemind.setStatus(1);
+            projectRemind.setType(1);
         }
         projectRemindDao.save(projectRemind);
         // 跟进后修改人才进展状态
@@ -186,9 +198,13 @@ public class ProjectService extends AbstractService {
                 projectTalent.setProbationTime(projectRemind.getProbationTime());
             } else if (status == 8){
                 projectTalent.setKillRemark(projectRemind.getKillRemark());
+//                projectTalent.setKillStatus(-1);
             }
             Integer remarkStatus = projectRemind.getRemarkStatus();
             if (type == 16 && remarkStatus != null && remarkStatus > 2) {
+                if (remarkStatus == 8) {
+//                    projectTalent.setKillStatus(-1);
+                }
                 projectTalent.setStatus(remarkStatus);
             }
             projectTalent.setUpdateTime(new Date());
@@ -199,6 +215,8 @@ public class ProjectService extends AbstractService {
                 list.forEach(pt -> {
                     pt.setType(200);
                     pt.setStatus(8);
+//                    projectTalent.setKillStatus(-1);
+                    projectTalent.setKillRemark("该人才已在其他项目入职或进入保证期");
                     pt.setUpdateTime(new Date());
                     projectTalentDao.save(pt);
                 });
@@ -220,7 +238,10 @@ public class ProjectService extends AbstractService {
     @Transactional
     public void reviewToCustomer(Long projectTalentId, Long projectRemindId, Boolean flag, Long userId) {
         ProjectTalent projectTalent = projectTalentDao.findById(projectTalentId).get();
-        ProjectRemind followRemind = projectRemindDao.findById(projectRemindId).get();
+        ProjectRemind followRemind = null;
+        if (projectRemindId != null) {
+            followRemind = projectRemindDao.findById(projectRemindId).get();
+        }
         List<ProjectRemind> reminds = projectRemindDao.findAllByProjectTalentIdAndStatusAndType(projectTalentId, 0, 100);
         if (projectTalent != null && projectTalent.getType() == 100) {
             if (flag) { // 推荐成功
@@ -244,6 +265,7 @@ public class ProjectService extends AbstractService {
                     });
                     projectRemindDao.saveAll(reminds);
                 }
+//                projectTalent.setKillStatus(-1);
                 // 新增总监淘汰记录
                 ProjectRemind remind = new ProjectRemind();
                 remind.setType(15);
@@ -255,6 +277,10 @@ public class ProjectService extends AbstractService {
             }
             projectTalent.setType(flag ? 1 : 15);
             projectTalent.setStatus(flag ? 1 : 8);
+            if (!flag) {
+//                projectTalent.setKillStatus(-1);
+                projectTalent.setKillRemark("推荐审核未通过");
+            }
             projectTalent.setUpdateTime(new Date(System.currentTimeMillis()));
             projectTalentDao.save(projectTalent);
         }
@@ -325,6 +351,9 @@ public class ProjectService extends AbstractService {
             for (int i=0; i<reminds.size(); i++) {
                 ProjectRemind remind = reminds.get(i);
                 if (remind.getStatus() == status && remind.getStatus() != remind.getPrevStatus()) {
+//                    if (remind.getStatus() == 8) {
+//                        projectTalent.setKillStatus(1);
+//                    }
                     if (remind.getPrevStatus() != null && remind.getPrevStatus() == 3) {
                         projectTalent.setRemarkStatus(null);
                     }

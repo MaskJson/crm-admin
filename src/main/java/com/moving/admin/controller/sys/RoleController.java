@@ -112,7 +112,6 @@ public class RoleController {
         for (int j = 0; j < strings.length; j++) {
             ids.add(Long.parseLong(strings[j]));
         }
-        System.err.println(ids.size());
         permissionService.deleteByRoleId(roleId);
         //分配新权限
         for (Long permId : ids) {

@@ -1,6 +1,7 @@
 package com.moving.admin.entity.project;
 
 import com.moving.admin.entity.BaseEntity;
+import com.moving.admin.entity.talent.TalentRemind;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -88,6 +89,14 @@ public class ProjectRemind extends BaseEntity {
     private String customerRemark;
     @ApiModelProperty(value = "反馈状态")
     private Integer remarkStatus;
+
+    @ApiModelProperty(value = "淘汰跟进状态")
+    @Transient
+    private Integer killStatus;
+
+    @ApiModelProperty(value = "淘汰跟进状态")
+    @Transient
+    private TalentRemind talentRemind;
 
     @ApiModelProperty(value = "角色id")
     @Transient

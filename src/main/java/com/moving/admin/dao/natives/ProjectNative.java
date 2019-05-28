@@ -1,18 +1,26 @@
 package com.moving.admin.dao.natives;
 
+import com.moving.admin.dao.project.ProjectTalentDao;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
+import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class ProjectNative extends AbstractNative {
+
+    @Autowired
+    private ProjectTalentDao projectTalentDao;
 
     // 获取项目的诊断报告记录
     public List<Map<String, Object>> getDiagnosisByProjectId(Long projectId) {
@@ -32,7 +40,8 @@ public class ProjectNative extends AbstractNative {
     // 获取人才的项目经历
     public List<Map<String, Object>> getTalentProjects(Long talentId) {
         String select = "select pt.id, pt.create_user_id as createUserId,pt.recommendation, pt.kill_remark as killRemark,pt.probation_time as probationTime," +
-                " pt.type, pt.status, pt.update_time as updateTime, pt.remark_status as remarkStatus, p.id as projectId, p.name as projectName, c.name as customerName";
+                " pt.type, pt.status, pt.update_time as updateTime, pt.remark_status as remarkStatus, p.id as projectId, p.name as projectName," +
+                "p.create_user_id as projectCreateUserId, c.name as customerName";
         String whereFrom = " from project_talent pt left join project p on pt.project_id = p.id left join customer c on p.customer_id=c.id" +
                 " where pt.talent_id=" + talentId;
         String sort = " order by c.name, p.name, pt.update_time desc";
@@ -40,6 +49,7 @@ public class ProjectNative extends AbstractNative {
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + whereFrom + sort);
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("createUserId", StandardBasicTypes.LONG);
+        query.addScalar("projectCreateUserId", StandardBasicTypes.LONG);
         query.addScalar("projectId", StandardBasicTypes.LONG);
         query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("recommendation", StandardBasicTypes.STRING);
@@ -109,6 +119,48 @@ public class ProjectNative extends AbstractNative {
         query.addScalar("customerName", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.getResultList();
+    }
+
+    // 获取当前用户推荐的被淘汰的进展人才
+    public Map<String, Object> getKillProjectTalents(Long userId, Pageable pageable) {
+        Map<String, Object> map = new HashMap<>();
+        String select = "select pt.id, p.id as projectId, p.name as projectName, t.id as talentId, t.follow_user_id as followUserId, t.type as talentType, t.name as talentName, pt.kill_remark as killRemark, pt.update_time as updateTime";
+        String count = "select count(1) ";
+        String sql = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id" +
+                " where pt.status=8 and pt.create_user_id="+userId+" order by pt.update_time desc ";
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + sql + limitStr(pageable));
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("projectId", StandardBasicTypes.LONG);
+        query.addScalar("talentType", StandardBasicTypes.INTEGER);
+        query.addScalar("followUserId", StandardBasicTypes.LONG);
+        query.addScalar("projectName", StandardBasicTypes.STRING);
+        query.addScalar("talentId", StandardBasicTypes.LONG);
+        query.addScalar("talentName", StandardBasicTypes.STRING);
+        query.addScalar("killRemark", StandardBasicTypes.STRING);
+        query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        List<Map<String, Object>> list = query.getResultList();
+        list.forEach(item -> {
+            Long id = Long.parseLong(item.get("talentId").toString());
+            item.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
+        });
+        map.put("content", list);
+        map.put("totalElements", getTotal(count + sql));
+        return map;
+    }
+
+    // 获取分页sql
+    public String limitStr(Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        int start = pageable.getPageNumber()*pageSize;
+        return " limit " + start + "," + pageSize;
+    }
+
+    // 获取总数
+    public BigInteger getTotal(String sql) {
+        Query query = entityManager.createNativeQuery(sql);
+        return objectToBigInteger(query.getSingleResult());
     }
 
     public void appendSort(Pageable pageable) {}

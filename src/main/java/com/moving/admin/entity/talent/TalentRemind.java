@@ -83,4 +83,8 @@ public class TalentRemind extends BaseEntity {
     @Transient
     private Long roleId;
 
+    @ApiModelProperty(value = "淘汰跟进的进展人才id")
+    @Transient
+    private Long projectTalentId;
+
 }

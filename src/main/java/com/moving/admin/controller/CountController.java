@@ -81,10 +81,11 @@ public class CountController extends AbstractController {
     @GetMapping("/home")
     public Result<Map<String, BigInteger>> getHomeCount(Long userId, Long roleId) throws Exception {
         Map<String, BigInteger> map = homePageNative.homeCountRemind(userId);
-        if (roleId == 2 || roleId == 3 || roleId == 6) {
-            map = homePageNative.homeCountProjectTalent(map, userId, roleId);
-        }
-        return ResultUtil.success(homePageNative.homeCountProjectTalent(map, userId, roleId));
+//        if (roleId == 2 || roleId == 3 || roleId == 6) {
+//            map = homePageNative.homeCountProjectTalent(map, userId, roleId);
+//        }
+//        return ResultUtil.success(homePageNative.homeCountProjectTalent(map, userId, roleId));
+        return ResultUtil.success(map);
     }
 
     @ApiOperation("项目进展提醒统计")
