@@ -226,7 +226,7 @@ public class ProjectService extends AbstractService {
                 switch (status) {
                     case 1: talent.setStatus(10);break;
                     case 7: talent.setStatus(2);break;
-                    case 8: talent.setStatus(1);break;
+//                    case 8: talent.setStatus(1);break;
                 }
                 talentDao.save(talent);
             }
