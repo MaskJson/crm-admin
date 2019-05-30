@@ -282,7 +282,12 @@ public class TeamService extends AbstractService {
             }
         });
         actionConnect(userId, connectUserId);
-        userDao.deleteById(userId);
+        User user = userDao.findById(userId).get();
+        if (user != null) {
+            user.setStatus(0);
+            userDao.save(user);
+        }
+//        userDao.deleteById(userId);
     }
 
     /**

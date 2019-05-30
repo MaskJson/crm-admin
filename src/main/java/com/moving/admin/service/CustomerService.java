@@ -337,11 +337,16 @@ public class CustomerService extends AbstractService {
         }
     }
 
-    public void getCustomerByNameAndId(Long id, String name) {
+    public List<Customer> filterCustomer(Long id, String name) {
         List<Customer> customers = customerDao.findAllByNameAndIdIsNot(name, id);
-        if (customers.size() > 0) {
-            throw new WebException(400, "该客户名称已存在", null);
-        }
+        return customers;
+    }
+
+    public void getCustomerByNameAndId(Long id, String name) {
+//        List<Customer> customers = customerDao.findAllByNameAndIdIsNot(name, id);
+//        if (customers.size() > 0) {
+//            throw new WebException(400, "该客户名称已存在", null);
+//        }
         Customer customer = customerDao.findById(id).get();
         if (customer != null) {
             customer.setName(name);

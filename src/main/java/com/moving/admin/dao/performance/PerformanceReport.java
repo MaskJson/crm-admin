@@ -65,12 +65,13 @@ public class PerformanceReport extends AbstractNative {
         String selectFrom = "select id as createUserId, nick_name as nickName, role_id as roleId  from sys_user";
         String where = "";
         String levelFilter = flag == 1 ? "" : " level is null and ";
+        String roleFilter = flag == 1 ? " (role_id=4 or role_id=5) " : " role_id <> 4 and role_id <> 5 ";
         switch (Integer.parseInt(roleId.toString())) {
             case 2:
             case 6:
-            case 7: where = " where id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
-            case 3: where = " where id in (select user_id from team where "+levelFilter+" team_id in(select id from team where level=1 and user_id="+userId+"))";break;
-            case 1: where = " where id in (select user_id from team where level=1)";break;
+            case 7: where = " where "+roleFilter+" and id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
+            case 3: where = " where "+roleFilter+" and id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
+            case 1: where = " where "+roleFilter+" and id in (select user_id from team where level=1)";break;
         }
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(selectFrom + where);

@@ -30,8 +30,9 @@ public class AdjustNative extends AbstractNative {
     private String talentSelect = "select pt.id as id, pt.talent_id as talentId, pt.create_user_id as createUserId, pt.probation_time as probationTime, " +
                                      "t.follow_user_id as followUserId, t.name as name, t.name as talentName, t.type as talentType," +
                                      "t.phone as phone, pt.type as type, pt.status, pt.update_time as updateTime, pt.recommendation, pt.kill_remark as killRemark,pt.remark_status as remarkStatus," +
-                                     "p.name as projectName,p.id as projectId, c.name as customerName";
-    private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id left join customer c on c.id=p.customer_id";
+                                     "p.name as projectName,p.id as projectId, c.name as customerName, u.nick_name as createUser";
+    private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id " +
+            "left join customer c on c.id=p.customer_id left join sys_user u on u.id=pt.create_user_id";
     private String talentWhere = " where pt.status=";
     private String talentSort = " order by pt.update_time asc";
 
@@ -54,6 +55,7 @@ public class AdjustNative extends AbstractNative {
         query.addScalar("recommendation", StandardBasicTypes.STRING);
         query.addScalar("killRemark", StandardBasicTypes.STRING);
         query.addScalar("phone", StandardBasicTypes.STRING);
+        query.addScalar("createUser", StandardBasicTypes.STRING);
         query.addScalar("projectName", StandardBasicTypes.STRING);
         query.addScalar("customerName", StandardBasicTypes.STRING);
         query.addScalar("type", StandardBasicTypes.INTEGER);

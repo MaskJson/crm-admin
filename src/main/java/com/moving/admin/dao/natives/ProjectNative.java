@@ -41,8 +41,8 @@ public class ProjectNative extends AbstractNative {
     public List<Map<String, Object>> getTalentProjects(Long talentId) {
         String select = "select pt.id, pt.create_user_id as createUserId,pt.recommendation, pt.kill_remark as killRemark,pt.probation_time as probationTime," +
                 " pt.type, pt.status, pt.update_time as updateTime, pt.remark_status as remarkStatus, p.id as projectId, p.name as projectName," +
-                "p.create_user_id as projectCreateUserId, c.name as customerName";
-        String whereFrom = " from project_talent pt left join project p on pt.project_id = p.id left join customer c on p.customer_id=c.id" +
+                "p.create_user_id as projectCreateUserId, c.name as customerName, u.nick_name as createUser";
+        String whereFrom = " from project_talent pt left join project p on pt.project_id = p.id left join customer c on p.customer_id=c.id left join sys_user u on u.id=pt.create_user_id" +
                 " where pt.talent_id=" + talentId;
         String sort = " order by c.name, p.name, pt.update_time desc";
         Session session = entityManager.unwrap(Session.class);
@@ -55,6 +55,7 @@ public class ProjectNative extends AbstractNative {
         query.addScalar("recommendation", StandardBasicTypes.STRING);
         query.addScalar("killRemark", StandardBasicTypes.STRING);
         query.addScalar("customerName", StandardBasicTypes.STRING);
+        query.addScalar("createUser", StandardBasicTypes.STRING);
         query.addScalar("type", StandardBasicTypes.INTEGER);
         query.addScalar("status", StandardBasicTypes.INTEGER);
         query.addScalar("updateTime", StandardBasicTypes.TIMESTAMP);
