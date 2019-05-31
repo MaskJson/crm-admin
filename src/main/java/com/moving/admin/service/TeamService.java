@@ -260,7 +260,12 @@ public class TeamService extends AbstractService {
             actionConnect(userId, connectUserId);
             // 删除离职的用户及团队记录
             teamDao.delete(team);
-            userDao.deleteById(userId);
+            User user = userDao.findById(userId).get();
+            if (user != null) {
+                user.setStatus(0);
+                userDao.save(user);
+            }
+//            userDao.deleteById(userId);
         } else {
             throw new WebException(400, "数据有误，请刷新页面", null);
         }
