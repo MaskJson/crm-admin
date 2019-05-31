@@ -103,7 +103,9 @@ public class PerformanceNative extends AbstractNative {
         List<Map<String, Object>> talentList = query.getResultList();
         talentList.forEach(map -> {
             Long id = Long.parseLong(map.get("talentId").toString());
-            map.put("reminds", projectRemindDao.findAllById(Long.parseLong(map.get("remindId").toString())));
+            map.put("reminds", projectRemindDao.findAllByProjectTalentIdOrderByCreateTimeDesc(Long.parseLong(map.get("id").toString())));
+            List<ProjectRemind> reminds = projectRemindDao.findAllById(Long.parseLong(map.get("remindId").toString()));
+            map.put("remind", reminds.size() > 0 ? reminds.get(0) : new HashMap<>());
             map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
             map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
             map.put("offerCount", projectTalentDao.getProjectOfferLength(id));
