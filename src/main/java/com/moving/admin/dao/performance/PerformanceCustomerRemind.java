@@ -1,14 +1,11 @@
 package com.moving.admin.dao.performance;
 
-import com.moving.admin.dao.customer.CustomerRemindDao;
 import com.moving.admin.dao.natives.AbstractNative;
-import com.moving.admin.entity.customer.CustomerRemind;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -20,11 +17,8 @@ import java.util.Map;
 @Service
 public class PerformanceCustomerRemind  extends AbstractNative {
 
-    @Autowired
-    private CustomerRemindDao customerRemindDao;
-
     private final String select = "select cr.id,cr.type,cr.status,cr.remark,cr.meet_time as meetTime,cr.meet_address as meetAddress,cr.meet_notice as meetNotice,cr.contact_time_start as contactTimeStart," +
-            "cr.contact_time_end as contactTimeEnd,cr.create_time as createTime,u.nick_name as createUser,cr.create_user_id as createUserId,cc.name as contactName, c.name as customerName";
+            "cr.contact_time_end as contactTimeEnd,cr.create_time as createTime,u.nick_name as createUser,cr.create_user_id as createUserId,cc.name as contactName,c.id as customerId, c.name as customerName";
     private final String from = " from customer_remind cr left join customer_contact cc on cc.id=cr.contact_id left join sys_user u on u.id=cr.create_user_id left join customer c on c.id=cr.customer_id";
     private final String sort = " order by cr.create_user_id,cr.customer_id,cr.create_time desc ";
     private final String where = " where cr.create_user_id=";
@@ -73,6 +67,17 @@ public class PerformanceCustomerRemind  extends AbstractNative {
     }
 
     public List<Map<String, Object>> getCustomerReminds(String where) {
+        List<Map<String, Object>> list = getList(where);
+        list.forEach(item -> {
+            Long id = Long.parseLong(item.get("id").toString());
+            Long customerId = Long.parseLong(item.get("customerId").toString());
+            List<Map<String, Object>> reminds = getList(" where c.id="+customerId+" and cr.id<"+id);
+            item.put("prev", reminds.size()>0?reminds.get(0):new HashMap<>());
+        });
+        return list;
+    }
+
+    public List<Map<String, Object>> getList(String where) {
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort);
         query.addScalar("type", StandardBasicTypes.INTEGER);
@@ -89,13 +94,9 @@ public class PerformanceCustomerRemind  extends AbstractNative {
         query.addScalar("customerName", StandardBasicTypes.STRING);
         query.addScalar("createUserId", StandardBasicTypes.LONG);
         query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("customerId", StandardBasicTypes.LONG);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
-        list.forEach(item -> {
-            Long id = Long.parseLong(item.get("id").toString());
-            List<CustomerRemind> reminds = customerRemindDao.findAllByIdBeforeOrderByCreateTimeDesc(id);
-            item.put("prev", reminds.size()>0?reminds.get(0):new HashMap<>());
-        });
         return list;
     }
 

@@ -2,8 +2,6 @@ package com.moving.admin.dao.performance;
 
 import com.moving.admin.dao.natives.AbstractNative;
 import com.moving.admin.dao.natives.CountNative;
-import com.moving.admin.dao.talent.TalentRemindDao;
-import com.moving.admin.entity.talent.TalentRemind;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
@@ -23,9 +21,6 @@ public class PerformanceTalentRemind extends AbstractNative {
 
     @Autowired
     private CountNative countNative;
-
-    @Autowired
-    private TalentRemindDao talentRemindDao;
 
     private final String select = "select tr.id,tr.type,tr.remark,tr.situation,tr.cause,tr.salary,tr.meet_time as meetTime,tr.meet_address as meetAddress," +
             "t.id as talentId,t.name as talentName,u.nick_name as createUser,tr.create_time as createTime,tr.create_user_id as createUserId";
@@ -77,6 +72,18 @@ public class PerformanceTalentRemind extends AbstractNative {
     }
 
     public List<Map<String, Object>> getTalentReminds(String where) {
+        List<Map<String, Object>> list = getList(where);
+        list.forEach(item -> {
+            item.put("info", countNative.getWorkInfo(Long.parseLong(item.get("talentId").toString())));
+            Long id = Long.parseLong(item.get("id").toString());
+            Long talentId = Long.parseLong(item.get("talentId").toString());
+            List<Map<String, Object>> reminds = getList(" where t.id="+talentId+" and tr.id<"+id);
+            item.put("prev", reminds.size()>0?reminds.get(0):new HashMap<>());
+        });
+        return list;
+    }
+
+    public List<Map<String, Object>> getList(String where) {
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort);
         query.addScalar("id", StandardBasicTypes.LONG);
@@ -94,12 +101,6 @@ public class PerformanceTalentRemind extends AbstractNative {
         query.addScalar("createTime", StandardBasicTypes.TIMESTAMP);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
-        list.forEach(item -> {
-            item.put("info", countNative.getWorkInfo(Long.parseLong(item.get("talentId").toString())));
-            Long id = Long.parseLong(item.get("id").toString());
-            List<TalentRemind> reminds = talentRemindDao.findAllByIdBeforeOrderByCreateTimeDesc(id);
-            item.put("prev", reminds.size()>0?reminds.get(0):new HashMap<>());
-        });
         return list;
     }
 
