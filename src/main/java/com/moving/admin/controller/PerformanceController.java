@@ -1,6 +1,7 @@
 package com.moving.admin.controller;
 
 import com.moving.admin.bean.Result;
+import com.moving.admin.dao.natives.CommonNative;
 import com.moving.admin.dao.performance.PerformanceCustomerRemind;
 import com.moving.admin.dao.performance.PerformanceNative;
 import com.moving.admin.dao.performance.PerformanceReport;
@@ -38,6 +39,9 @@ public class PerformanceController extends AbstractController {
     @Autowired
     private ReportDao reportDao;
 
+    @Autowired
+    private CommonNative commonNative;
+
     @ApiOperation("个人项目进展绩效")
     @GetMapping("/project/info")
     public Result<List<Map<String, Object>>> getPerformance(Long userId, Integer flag, String time) throws Exception {
@@ -46,8 +50,8 @@ public class PerformanceController extends AbstractController {
 
     @ApiOperation("上级获取项目进展报表")
     @GetMapping("/project/infos")
-    public Result<List<Map<String, Object>>> getPerformanceReport(Long userId, Long roleId, Integer flag, String time) throws Exception {
-        return ResultUtil.success(performanceNative.getPerformanceReport(userId, roleId, flag, time));
+    public Result<List<Map<String, Object>>> getPerformanceReport(Long userId, Long roleId, Integer flag, String time, Long memberId) throws Exception {
+        return ResultUtil.success(performanceNative.getPerformanceReport(userId, roleId, flag, time, memberId));
     }
 
     @ApiOperation("个人人才常规跟踪绩效")
@@ -58,8 +62,8 @@ public class PerformanceController extends AbstractController {
 
     @ApiOperation("上级获取人才常规跟踪报表")
     @GetMapping("/talent/infos")
-    public Result<List<Map<String, Object>>> getTalentRemindPerformanceReport(Long userId, Long roleId, Integer flag, String time) throws Exception {
-        return ResultUtil.success(performanceTalentRemind.getPerformanceReport(userId, roleId, flag, time));
+    public Result<List<Map<String, Object>>> getTalentRemindPerformanceReport(Long userId, Long roleId, Integer flag, String time, Long memberId) throws Exception {
+        return ResultUtil.success(performanceTalentRemind.getPerformanceReport(userId, roleId, flag, time, memberId));
     }
 
     @ApiOperation("个人客户常规跟踪绩效")
@@ -70,8 +74,8 @@ public class PerformanceController extends AbstractController {
 
     @ApiOperation("上级获取客户常规跟踪报表")
     @GetMapping("/customer/infos")
-    public Result<List<Map<String, Object>>> getCustomerRemindPerformanceReport(Long userId, Long roleId, Integer flag, String time) throws Exception {
-        return ResultUtil.success(performanceCustomerRemind.getPerformanceReport(userId, roleId, flag, time));
+    public Result<List<Map<String, Object>>> getCustomerRemindPerformanceReport(Long userId, Long roleId, Integer flag, String time, Long memberId) throws Exception {
+        return ResultUtil.success(performanceCustomerRemind.getPerformanceReport(userId, roleId, flag, time, memberId));
     }
 
     @ApiOperation("个人报告")
@@ -82,8 +86,8 @@ public class PerformanceController extends AbstractController {
 
     @ApiOperation("上级获取报告报表")
     @GetMapping("/report/infos")
-    public Result<Map<String, Object>> getReportPerformanceReport(Long userId, Long roleId, Integer flag, String time) throws Exception {
-        List<Map<String, Object>> reports = performanceReport.getPerformanceReport(userId, roleId, flag, time);
+    public Result<Map<String, Object>> getReportPerformanceReport(Long userId, Long roleId, Integer flag, String time, Long memberId) throws Exception {
+        List<Map<String, Object>> reports = performanceReport.getPerformanceReport(userId, roleId, flag, time, memberId);
         List<Map<String, Object>> members = performanceReport.getMembers(userId, roleId, flag);
         Map<String, Object> map = new HashMap<>();
         map.put("reports", reports);
@@ -98,5 +102,12 @@ public class PerformanceController extends AbstractController {
         Report rp = reportDao.save(report);
         return ResultUtil.success(rp.getId());
     }
+
+    @ApiOperation("个人报告")
+    @GetMapping("/members")
+    public Result<List<Map<String, Object>>> getMembers(Long userId, Long roleId, Integer flag) throws Exception {
+        return ResultUtil.success(commonNative.getMembers(userId, roleId, flag));
+    }
+
 
 }

@@ -10,4 +10,7 @@ public interface CustomerRemindDao  extends JpaRepository<CustomerRemind, Long>,
 
     List<CustomerRemind> findAllByCustomerIdOrderByIdDesc(Long customerId);
 
+    // prev reminds by id
+    List<CustomerRemind> findAllByIdBeforeOrderByCreateTimeDesc(Long id);
+
 }

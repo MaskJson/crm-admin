@@ -63,6 +63,28 @@ public class CommonNative extends AbstractNative {
         return ids;
     }
 
+    // 获取下级成员
+    public List<Map<String, Object>> getMembers(Long userId, Long roleId, Integer flag) {
+        String selectFrom = "select id, nick_name as nickName, role_id as roleId  from sys_user";
+        String where = "";
+        String levelFilter = flag == 1 ? "" : " level is null and ";
+        String roleFilter = flag == 1 ? " (role_id=4 or role_id=5) " : " role_id <> 4 and role_id <> 5 ";
+        switch (Integer.parseInt(roleId.toString())) {
+            case 2:
+            case 6:
+            case 7: where = " where id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
+            case 3: where = " where id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
+            case 1: where = " where id in (select user_id from team where level=1)";break;
+        }
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(selectFrom + where);
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("nickName", StandardBasicTypes.STRING);
+        query.addScalar("roleId", StandardBasicTypes.LONG);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
     public void appendSort(Pageable pageable) {
 
     }

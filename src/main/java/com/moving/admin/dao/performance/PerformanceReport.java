@@ -37,7 +37,7 @@ public class PerformanceReport extends AbstractNative {
         return getPerformanceReport(where + userId + whereStr);
     }
     //报告日、 周、月报表
-    public List<Map<String, Object>> getPerformanceReport(Long userId, Long roleId, Integer flag, String time) {
+    public List<Map<String, Object>> getPerformanceReport(Long userId, Long roleId, Integer flag, String time, Long memberId) {
         String where = "";
         if (StringUtils.isEmpty(time)) {
             time = "now()";
@@ -45,12 +45,16 @@ public class PerformanceReport extends AbstractNative {
             time = "'"+time+"'";
         }
         String levelFilter = flag == 1 ? "" : " level is null and ";
-        switch (Integer.parseInt(roleId.toString())) {
-            case 2:
-            case 6:
-            case 7: where = " where r.create_user_id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
-            case 3: where = " where r.create_user_id in (select user_id from team where "+levelFilter+" team_id in(select id from team where level=1 and user_id="+userId+"))";break;
-            case 1: where = " where r.create_user_id in (select user_id from team where level=1)";break;
+        if (memberId != null) {
+            where = " where r.create_user_id=" + memberId;
+        } else {
+            switch (Integer.parseInt(roleId.toString())) {
+                case 2:
+                case 6:
+                case 7: where = " where r.create_user_id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
+                case 3: where = " where r.create_user_id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
+                case 1: where = " where r.create_user_id in (select user_id from team where level=1)";break;
+            }
         }
         switch (flag) {
             case 1:where = where + " and to_days(r.create_time) = to_days("+time+")";break;
