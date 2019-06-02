@@ -176,7 +176,7 @@ public class CustomerController extends AbstractController {
     }
 
     @ApiOperation("修改名称")
-    @PostMapping("/checkName")
+    @GetMapping("/checkName")
     public Result<List<Customer>> checkCustomerName(Long id, String name) throws Exception {
         return ResultUtil.success(customerService.filterCustomer(id, name));
     }

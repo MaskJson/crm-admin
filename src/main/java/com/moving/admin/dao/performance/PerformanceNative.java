@@ -81,6 +81,31 @@ public class PerformanceNative extends AbstractNative {
     }
 
     public List<Map<String, Object>> getProjectStatusTalents(String where) {
+        List<Map<String, Object>> talentList = getList(where);
+        talentList.forEach(map -> {
+            Long id = Long.parseLong(map.get("talentId").toString());
+            map.put("reminds", projectRemindDao.findAllByProjectTalentIdOrderByCreateTimeDesc(Long.parseLong(map.get("id").toString())));
+            List<ProjectRemind> reminds = projectRemindDao.findAllById(Long.parseLong(map.get("remindId").toString()));
+            map.put("remind", reminds.size() > 0 ? reminds.get(0) : new HashMap<>());
+            map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
+            map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
+            map.put("offerCount", projectTalentDao.getProjectOfferLength(id));
+        });
+        return talentList;
+    }
+
+    public List<Map<String, Object>> getInterview(Long userId) {
+        String where = " where pt.create_user_id="+userId+" and (pr.type=2 or pr.type=4 or pr.type=8 or pr.remark_status=2) and " +
+                "to_days(pr.interview_time) = to_days(now())";
+        List<Map<String, Object>> list = getList(where);
+        list.forEach(map -> {
+            List<ProjectRemind> reminds = projectRemindDao.findAllById(Long.parseLong(map.get("remindId").toString()));
+            map.put("remind", reminds.size() > 0 ? reminds.get(0) : new HashMap<>());
+        });
+        return list;
+    }
+
+    public List<Map<String, Object>> getList(String where) {
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort);
         query.addScalar("remindStatus", StandardBasicTypes.INTEGER);
@@ -105,15 +130,6 @@ public class PerformanceNative extends AbstractNative {
         query.addScalar("departmentName", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> talentList = query.getResultList();
-        talentList.forEach(map -> {
-            Long id = Long.parseLong(map.get("talentId").toString());
-            map.put("reminds", projectRemindDao.findAllByProjectTalentIdOrderByCreateTimeDesc(Long.parseLong(map.get("id").toString())));
-            List<ProjectRemind> reminds = projectRemindDao.findAllById(Long.parseLong(map.get("remindId").toString()));
-            map.put("remind", reminds.size() > 0 ? reminds.get(0) : new HashMap<>());
-            map.put("progress", projectTalentDao.getProjectLengthByTalentId(id));
-            map.put("projects", projectTalentDao.findProjectIdsOfTalent(id));
-            map.put("offerCount", projectTalentDao.getProjectOfferLength(id));
-        });
         return talentList;
     }
 

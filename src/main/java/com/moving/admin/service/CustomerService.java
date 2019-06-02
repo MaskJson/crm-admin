@@ -338,7 +338,7 @@ public class CustomerService extends AbstractService {
     }
 
     public List<Customer> filterCustomer(Long id, String name) {
-        List<Customer> customers = customerDao.findAllByNameAndIdIsNot(name, id);
+        List<Customer> customers = customerDao.findAllByNameLikeAndIdIsNot(name, id);
         return customers;
     }
 

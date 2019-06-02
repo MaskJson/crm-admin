@@ -109,5 +109,10 @@ public class PerformanceController extends AbstractController {
         return ResultUtil.success(commonNative.getMembers(userId, roleId, flag));
     }
 
+    @ApiOperation("今日面试通知")
+    @GetMapping("/interview")
+    public Result<List<Map<String, Object>>> getInterView(Long userId) throws Exception {
+        return ResultUtil.success(performanceNative.getInterview(userId));
+    }
 
 }
