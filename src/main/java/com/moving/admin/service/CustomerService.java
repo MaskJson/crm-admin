@@ -6,9 +6,11 @@ import com.moving.admin.dao.natives.CommonNative;
 import com.moving.admin.dao.natives.CustomerNative;
 import com.moving.admin.dao.project.ProjectDao;
 import com.moving.admin.dao.sys.UserDao;
+import com.moving.admin.dao.talent.ExperienceDao;
 import com.moving.admin.entity.customer.*;
 import com.moving.admin.entity.folder.FolderItem;
 import com.moving.admin.entity.sys.User;
+import com.moving.admin.entity.talent.Experience;
 import com.moving.admin.exception.WebException;
 import com.moving.admin.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +67,9 @@ public class CustomerService extends AbstractService {
 
     @Autowired
     private CommonNative commonNative;
+
+    @Autowired
+    private ExperienceDao experienceDao;
 
     // 添加、编辑
     public Long save(Customer customer) {
@@ -342,16 +347,34 @@ public class CustomerService extends AbstractService {
         return customers;
     }
 
-    public void getCustomerByNameAndId(Long id, String name) {
+    @Transactional
+    public void getCustomerByNameAndId(Long id, String name, Long replaceId) {
 //        List<Customer> customers = customerDao.findAllByNameAndIdIsNot(name, id);
 //        if (customers.size() > 0) {
 //            throw new WebException(400, "该客户名称已存在", null);
 //        }
         Customer customer = customerDao.findById(id).get();
-        if (customer != null) {
-            customer.setName(name);
-            customer.setAuditType(2);
-            customerDao.save(customer);
+        if (replaceId != null) {
+            // 存在同名时，先将id 对应的部门转移到replaceId ，再将工作经历中的id 都改为replaceId
+            List<Department> departments = departmentDao.findAllByCustomerId(id);
+            departments.forEach(item -> {
+                item.setCustomerId(replaceId);
+            });
+            departmentDao.saveAll(departments);
+            if (customer != null) {
+                List<Experience> experiences = experienceDao.findAllByCustomerId(id);
+                experiences.forEach(item -> {
+                    item.setCustomerId(replaceId);
+                });
+                experienceDao.saveAll(experiences);
+                customerDao.delete(customer);
+            }
+        } else {
+            if (customer != null) {
+                customer.setName(name);
+                customer.setAuditType(2);
+                customerDao.save(customer);
+            }
         }
     }
 

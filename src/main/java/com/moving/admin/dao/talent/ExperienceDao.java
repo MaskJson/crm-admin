@@ -16,4 +16,6 @@ public interface ExperienceDao extends JpaRepository<Experience, Long>, JpaSpeci
 
     Experience findExperienceByCustomerIdAndDepartmentIdAndTalentId(Long customerId, Long departmentId, Long talentId);
 
+    List<Experience> findAllByCustomerId(Long customerId);
+
 }

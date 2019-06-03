@@ -183,8 +183,8 @@ public class CustomerController extends AbstractController {
 
     @ApiOperation("修改名称")
     @PostMapping("/changeName")
-    public Result<Boolean> changeCustomerName(Long id, String name) throws Exception {
-        customerService.getCustomerByNameAndId(id, name);
+    public Result<Boolean> changeCustomerName(Long id, String name, Long replaceId) throws Exception {
+        customerService.getCustomerByNameAndId(id, name, replaceId);
         return ResultUtil.success(true);
     }
 
