@@ -61,7 +61,7 @@ public class CommonController extends AbstractController {
     @IgnoreSecurity
     public HttpServletResponse download(String path, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
-            String filePath = request.getSession().getServletContext().getRealPath("/file");
+            String filePath = request.getSession().getServletContext().getRealPath(System.getProperty("file.separator") + "file");
             File file = new File(filePath, path);
             InputStream fis = new BufferedInputStream(new FileInputStream(file));
             byte[] buffer = new byte[fis.available()];

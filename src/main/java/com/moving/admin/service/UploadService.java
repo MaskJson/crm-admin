@@ -54,7 +54,7 @@ public class UploadService extends AbstractService {
 	 */
 	public Object saveFile(MultipartFile file, HttpServletRequest request) throws Exception {
 		if (file != null) {
-            String uploadFilePath = request.getSession().getServletContext().getRealPath("/file");
+            String uploadFilePath = request.getSession().getServletContext().getRealPath(System.getProperty("file.separator") + "file");
             File dir = new File(uploadFilePath);
             if (!dir.exists() && dir.isDirectory()) {// 判断文件目录是否存在
                 dir.mkdirs();
