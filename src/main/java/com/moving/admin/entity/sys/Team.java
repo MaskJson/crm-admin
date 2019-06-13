@@ -22,7 +22,7 @@ public class Team extends BaseEntity {
 
     private Long userId;
 
-    @ApiModelProperty(value = "成员等级：1：总监、2：项目经理、3：高级顾问、4：中级顾问、5：兼职 --- 兼职没有下级，下级只能为顾问和助理")
+    @ApiModelProperty(value = "成员等级：1：总监、2：项目经理、3：高级顾问、4：中级顾问、5：兼职 、6：顾问、7：助理--- 兼职没有下级，下级只能为顾问和助理")
     private Integer level;
 
     private Long parentId;
@@ -44,5 +44,13 @@ public class Team extends BaseEntity {
     @Transient
     @ApiModelProperty(value = "兼职列表")
     private List<Long> pts;
+
+    @Transient
+    @ApiModelProperty(value = "顾问列表")
+    private List<Long> gws;
+
+    @Transient
+    @ApiModelProperty(value = "助理列表")
+    private List<Long> zls;
 
 }

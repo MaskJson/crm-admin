@@ -102,6 +102,8 @@ public class TeamService extends AbstractService {
         List<Map<String, Object>> iPls = team.getIpls();
         List<Map<String, Object>> mPls = team.getMpls();
         List<Long> pts = team.getPts();
+        List<Long> gws = team.getGws();
+        List<Long> zls = team.getZls();
         // 项目经理
         List<Team> teams = new ArrayList<>();
         if (pms != null) {
@@ -125,6 +127,18 @@ public class TeamService extends AbstractService {
         if (pts != null) {
             pts.forEach(id -> {
                 teams.add(getTeamItem(id, null, teamId, 5));
+            });
+        }
+        // 顾问
+        if (gws != null) {
+            gws.forEach(id -> {
+                teams.add(getTeamItem(id, null, teamId, 6));
+            });
+        }
+        // 助理
+        if (zls != null) {
+            zls.forEach(id -> {
+                teams.add(getTeamItem(id, null, teamId, 7));
             });
         }
         List<Team> list = teamDao.saveAll(teams);
