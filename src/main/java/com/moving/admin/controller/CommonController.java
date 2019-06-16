@@ -85,10 +85,10 @@ public class CommonController extends AbstractController {
         return response;
     }
 
-    @ApiOperation("文件下载")
+    @ApiOperation("文件下载base64")
     @GetMapping("/base64")
     @IgnoreSecurity
-    public String base64(String path) throws Exception {
+    public Result<String> base64(String path) throws Exception {
         // 对字节数组Base64编码
         BASE64Encoder encoder = new BASE64Encoder();
         byte[] data = null;
@@ -110,7 +110,7 @@ public class CommonController extends AbstractController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return encoder.encode(data);
+        return ResultUtil.success(encoder.encode(data));
     }
 
     @ApiOperation("人才-客户，上传")
