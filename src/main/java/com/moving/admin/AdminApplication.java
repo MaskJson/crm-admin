@@ -12,16 +12,22 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EntityScan(basePackages = "com.moving.admin.entity")
 @EnableScheduling
 @SpringBootApplication
-public class AdminApplication extends SpringBootServletInitializer {
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(AdminApplication.class);
-    }
+//public class AdminApplication extends SpringBootServletInitializer {
+//
+//    @Override
+//    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+//        return application.sources(AdminApplication.class);
+//    }
+//
+//    public static void main(String[] args) {
+//        SpringApplication.run(AdminApplication.class, args);
+//    }
+//
+//}
+public class AdminApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AdminApplication.class, args);
     }
 
 }
-

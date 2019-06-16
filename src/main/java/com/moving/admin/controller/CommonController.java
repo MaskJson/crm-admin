@@ -6,14 +6,14 @@ import com.moving.admin.service.CommonService;
 import com.moving.admin.service.CustomerService;
 import com.moving.admin.service.TalentService;
 import com.moving.admin.util.ResultUtil;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sun.misc.BASE64Encoder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.List;
@@ -46,7 +46,8 @@ public class CommonController extends AbstractController {
     public Result<String> upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws Exception {
         String md5File = UUID.randomUUID() + file.getOriginalFilename();
         File newFile;
-        String filePath = request.getSession().getServletContext().getRealPath("/file");
+//        String filePath = request.getSession().getServletContext().getRealPath(File.separator + "file");
+        String filePath = File.separator + "crmfile";
         try {
             newFile = new File(filePath, md5File);
             file.transferTo(newFile);
@@ -61,7 +62,8 @@ public class CommonController extends AbstractController {
     @IgnoreSecurity
     public HttpServletResponse download(String path, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
-            String filePath = request.getSession().getServletContext().getRealPath(System.getProperty("file.separator") + "file");
+//            String filePath = request.getSession().getServletContext().getRealPath(File.separator + "file");
+            String filePath = File.separator + "crmfile";
             File file = new File(filePath, path);
             InputStream fis = new BufferedInputStream(new FileInputStream(file));
             byte[] buffer = new byte[fis.available()];
@@ -81,6 +83,34 @@ public class CommonController extends AbstractController {
             e.printStackTrace();
         }
         return response;
+    }
+
+    @ApiOperation("文件下载")
+    @GetMapping("/base64")
+    @IgnoreSecurity
+    public String base64(String path) throws Exception {
+        // 对字节数组Base64编码
+        BASE64Encoder encoder = new BASE64Encoder();
+        byte[] data = null;
+        try {
+//            String filePath = request.getSession().getServletContext().getRealPath(File.separator + "file");
+            String filePath = File.separator + "crmfile";
+            File file = new File(filePath, path);
+            InputStream in = null;
+            // 读取图片字节数组
+            try {
+                in = new FileInputStream(file);
+                data = new byte[in.available()];
+                in.read(data);
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return encoder.encode(data);
     }
 
     @ApiOperation("人才-客户，上传")
