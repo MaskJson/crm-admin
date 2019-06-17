@@ -119,8 +119,8 @@ public class TeamService extends AbstractService {
         }
         //中级顾问
         if (mPls != null) {
-            iPls.forEach(ipl -> {
-                setTeamList(teamId, teams, ipl, 4);
+            mPls.forEach(mpl -> {
+                setTeamList(teamId, teams, mpl, 4);
             });
         }
         // 兼职
