@@ -150,7 +150,7 @@ public class UserService extends AbstractService {
     public void changePassword(Long userId, String oldPassword, String newPassword) {
         User user = userDao.findById(userId).get();
         if (user != null) {
-            if (user.getPassword() == oldPassword) {
+            if (user.getPassword().equals(oldPassword)) {
                 user.setPassword(newPassword);
                 userDao.save(user);
             } else {

@@ -33,6 +33,8 @@ public class CustomerContact extends BaseEntity {
 
     private String phone;
 
+    private String email;
+
     private Long createUserId;
 
     private Date createTime;
