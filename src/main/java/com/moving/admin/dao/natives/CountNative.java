@@ -31,14 +31,23 @@ public class CountNative extends AbstractNative {
     private TalentRemindDao talentRemindDao;
 
     // 获取人才常规跟踪的待办列表
-    public Map<String, Object> talentRemindPendingList(Long userId, Integer type, Pageable pageable) {
+    public Map<String, Object> talentRemindPendingList(Long userId, Long roleId, Integer type, Pageable pageable) {
         Map<String, Object> map = new HashMap<>();
-        String select = "select r.id, r.type, r.status, r.remark, r.situation, r.cause, r.salary, r.meet_time as meetTime," +
+        // admin
+        String idStr = "1=1";
+        if (roleId == null) {
+            idStr = "r.create_user_id=" + userId;
+        } else if (roleId == 1) {
+            idStr = "1=1";
+        } else if (roleId == 3) {
+            idStr = "r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1))";
+        }
+        String select = "select r.id, r.type, r.status, r.remark, r.situation, r.cause, r.salary, r.meet_time as meetTime,s.nick_name as createUser," +
                 " (select count(1) from project_talent pt where pt.talent_id=t.id and pt.status<7) as projectCount," +
                 " r.meet_address as meetAddress, r.create_time as createTime, t.name, t.phone, t.status as talentStatus, t.follow_user_id as followUserId, t.id as talentId";
         String countSelect = "select count(1)";
-        String from = " from talent_remind r left join talent t on r.talent_id=t.id";
-        String where = " where r.create_user_id=" + userId +" and r.finish=0 and r.status<>10 and now()>r.next_remind_time";
+        String from = " from talent_remind r left join talent t on r.talent_id=t.id left join sys_user s on r.create_user_id=s.id";
+        String where = " where " + idStr + " and r.finish=0 and r.status<>10 and now()>r.next_remind_time";
         String sort = " order by r.id asc";
         if (type != null) {
             where = where + " and r.type=" + type;
@@ -62,6 +71,7 @@ public class CountNative extends AbstractNative {
         query.addScalar("name", StandardBasicTypes.STRING);
         query.addScalar("talentStatus", StandardBasicTypes.INTEGER);
         query.addScalar("followUserId", StandardBasicTypes.LONG);
+        query.addScalar("createUser", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> list = query.getResultList();
         list.forEach(item -> {
@@ -76,13 +86,22 @@ public class CountNative extends AbstractNative {
     }
 
     // 获取客户常规跟踪的待办列表
-    public Map<String, Object> customerRemindPendingList(Long userId, Integer type, Pageable pageable) {
+    public Map<String, Object> customerRemindPendingList(Long userId, Long roleId, Integer type, Pageable pageable) {
         Map<String, Object> map = new HashMap<>();
+        // admin
+        String idStr = "1=1";
+        if (roleId == null) {
+            idStr = "r.create_user_id=" + userId;
+        } else if (roleId == 1) {
+            idStr = "1=1";
+        } else if (roleId == 3) {
+            idStr = "r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1))";
+        }
         String select = "select r.id, r.type, r.status, r.remark, r.meet_time as meetTime, r.meet_address as meetAddress, r.meet_notice as meetNotice, " +
                 "r.create_time as createTime, c.id as customerId, c.name, c.type as customerType, c.follow_user_id as followUserId";
         String countSelect = "select count(1)";
         String from  = " from customer_remind r left join customer c on r.customer_id=c.id";
-        String where = " where r.create_user_id=" + userId + " and r.finish=0 and now()>r.next_remind_time";
+        String where = " where " + idStr + " and r.finish=0 and now()>r.next_remind_time";
         String sort = " order by r.id asc";
         if (type != null) {
             where = where + " and r.type=" + type;

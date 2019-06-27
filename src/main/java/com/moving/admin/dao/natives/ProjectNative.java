@@ -105,7 +105,7 @@ public class ProjectNative extends AbstractNative {
     }
 
     // 获取对当前用户开放的所有项目
-    public List<Map<String, Object>> getProjectsByUser(Long userId) {
+    public List<Map<String, Object>> getProjectsByUser(Long userId, Long roleId) {
         String select = "select a.id, a.name, c.name as customerName";
         String from = " from project a left join customer c on a.customer_id=c.id";
         String where = " where a.create_user_id=" + userId +
@@ -113,6 +113,10 @@ public class ProjectNative extends AbstractNative {
                 " or "+userId+" in(select pa.user_id from project_adviser pa where pa.project_id=a.id)"+
                 " or (" + userId + " in (select ttt.user_id from team ttt where ttt.team_id=a.team_id and ttt.team_id is not null) " +
                 "and (a.open_type<>1 or (a.open_type=1 and date_add(a.create_time, interval 7 day) < now())))";
+        // admin
+        if (roleId == 1) {
+            where = "";
+        }
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where);
         query.addScalar("id", StandardBasicTypes.LONG);

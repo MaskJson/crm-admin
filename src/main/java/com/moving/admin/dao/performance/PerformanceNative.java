@@ -94,8 +94,16 @@ public class PerformanceNative extends AbstractNative {
         return talentList;
     }
 
-    public List<Map<String, Object>> getInterview(Long userId) {
-        String where = " where pt.create_user_id="+userId+" and (pr.type=2 or pr.type=4 or pr.type=8 or pr.remark_status=2) and " +
+    public List<Map<String, Object>> getInterview(Long userId, Long roleId) {
+        String idStr = "1=1";
+        if (roleId == null) {
+            idStr = "r.create_user_id=" + userId;
+        } else if (roleId == 1) {
+            idStr = "1=1";
+        } else if (roleId == 3) {
+            idStr = "pr.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1))";
+        }
+        String where = " where " + idStr + " and (pr.type=2 or pr.type=4 or pr.type=8 or pr.remark_status=2) and " +
                 "to_days(pr.interview_time) = to_days(now())";
         List<Map<String, Object>> list = getList(where);
         list.forEach(map -> {

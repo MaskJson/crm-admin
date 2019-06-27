@@ -31,14 +31,14 @@ public class CountController extends AbstractController {
 
     @ApiOperation("人才待办")
     @GetMapping("/talent/pending")
-    public Result<Map<String, Object>> getTalentPendingList(Long userId, Integer type, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        return ResultUtil.success(countNative.talentRemindPendingList(userId, type, pageable));
+    public Result<Map<String, Object>> getTalentPendingList(Long userId, Long roleId, Integer type, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        return ResultUtil.success(countNative.talentRemindPendingList(userId, roleId, type, pageable));
     }
 
     @ApiOperation("客户待办")
     @GetMapping("/customer/pending")
-    public Result<Map<String, Object>> getCustomerPendingList(Long userId, Integer type, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        return ResultUtil.success(countNative.customerRemindPendingList(userId, type, pageable));
+    public Result<Map<String, Object>> getCustomerPendingList(Long userId, Long roleId, Integer type, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        return ResultUtil.success(countNative.customerRemindPendingList(userId, roleId, type, pageable));
     }
 
     @ApiOperation("人才地图")
@@ -80,7 +80,7 @@ public class CountController extends AbstractController {
     @ApiOperation("首页统计")
     @GetMapping("/home")
     public Result<Map<String, BigInteger>> getHomeCount(Long userId, Long roleId) throws Exception {
-        Map<String, BigInteger> map = homePageNative.homeCountRemind(userId);
+        Map<String, BigInteger> map = homePageNative.homeCountRemind(userId, roleId);
 //        if (roleId == 2 || roleId == 3 || roleId == 6) {
 //            map = homePageNative.homeCountProjectTalent(map, userId, roleId);
 //        }

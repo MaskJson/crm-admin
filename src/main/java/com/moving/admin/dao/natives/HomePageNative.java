@@ -18,11 +18,19 @@ import java.util.Map;
 public class HomePageNative extends AbstractNative {
 
     // 统计人才和客户的跟踪待办
-    public Map<String, BigInteger> homeCountRemind(Long userId) {
+    public Map<String, BigInteger> homeCountRemind(Long userId, Long roleId) {
         Map<String, BigInteger> map = new HashMap<>();
         String countSelectTal = "select count(1)";
         String fromTal = " from talent_remind r left join talent t on r.talent_id=t.id";
-        String whereTal = " where r.create_user_id=" + userId +" and r.finish=0 and now()>r.next_remind_time";
+        String idStr = "1=1";
+        if (roleId == null) {
+            idStr = "r.create_user_id=" + userId;
+        } else if (roleId == 1) {
+            idStr = "1=1";
+        } else if (roleId == 3) {
+            idStr = "r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1))";
+        }
+        String whereTal = " where " + idStr +" and r.finish=0 and now()>r.next_remind_time";
         String countSelectCust = "select count(1)";
         String fromCust  = " from customer_remind r left join customer c on r.customer_id=c.id";
         String whereCust = " where r.create_user_id=" + userId + " and r.finish=0";

@@ -126,7 +126,7 @@ public class CustomerService extends AbstractService {
             if (follow != null) {
                 list.add(cb.equal(root.get("follow"), follow));
             }
-            if (userId != null) {
+            if (userId != null && roleId != null && roleId > 1) {
                 List<Long> ids = new ArrayList<>();
                 ids.add(userId);
                 if (roleId == 2 || roleId == 3 || roleId == 6 || roleId == 7) {

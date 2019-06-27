@@ -62,10 +62,12 @@ public class ProjectController extends AbstractController {
     @ApiOperation("获取项目列表")
     @GetMapping("/list")
     public Result<Map<String, Object>> getList(
-            Long folderId, Long teamId, Long customerId, String industry, String city, Boolean follow, Long userId, Integer status, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+            Long folderId, Long teamId, Long customerId, String industry, String city, Boolean follow, Long userId, Long roleId, Integer status, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
             ) throws Exception {
         ProjectPageNative projectNative = new ProjectPageNative();
-        projectNative.filterUserIdIsInTeam(userId);
+        if (roleId != null && roleId > 1) {
+            projectNative.filterUserIdIsInTeam(userId);
+        }
         if (folderId != null) {
             projectNative.setFolder(SqlUtil.getIn(folderItemDao.findItemIds(folderId, 3), "a.id"));
         }
@@ -151,8 +153,8 @@ public class ProjectController extends AbstractController {
 
     @ApiOperation("获取对当前用户开放的项目")
     @GetMapping("/openByUserId")
-    public Result<List<Map<String, Object>>> getProjectByUser(Long userId) throws Exception {
-        return ResultUtil.success(projectNative.getProjectsByUser(userId));
+    public Result<List<Map<String, Object>>> getProjectByUser(Long userId, Long roleId) throws Exception {
+        return ResultUtil.success(projectNative.getProjectsByUser(userId, roleId));
     }
 
     @ApiOperation("修改项目状态")
