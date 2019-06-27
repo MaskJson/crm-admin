@@ -70,6 +70,7 @@ public class AdjustNative extends AbstractNative {
             Long projectTalentId = Long.parseLong(item.get("id").toString());
             item.put("reminds", getLastRemindByStatus(projectTalentId));
             item.put("progress", projectTalentDao.getProjectLengthByTalentId(talentId));
+            item.put("projects", projectTalentDao.findProjectIdsOfTalent(talentId));
         });
         return list;
     }
