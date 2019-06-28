@@ -5,10 +5,12 @@ import com.moving.admin.dao.folder.FolderItemDao;
 import com.moving.admin.dao.natives.CommonNative;
 import com.moving.admin.dao.natives.CustomerNative;
 import com.moving.admin.dao.project.ProjectDao;
+import com.moving.admin.dao.sys.TeamDao;
 import com.moving.admin.dao.sys.UserDao;
 import com.moving.admin.dao.talent.ExperienceDao;
 import com.moving.admin.entity.customer.*;
 import com.moving.admin.entity.folder.FolderItem;
+import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.sys.User;
 import com.moving.admin.entity.talent.Experience;
 import com.moving.admin.exception.WebException;
@@ -70,6 +72,9 @@ public class CustomerService extends AbstractService {
 
     @Autowired
     private ExperienceDao experienceDao;
+
+    @Autowired
+    private TeamDao teamDao;
 
     // 添加、编辑
     public Long save(Customer customer) {
@@ -313,9 +318,22 @@ public class CustomerService extends AbstractService {
     }
 
     // 获取达新建项目标准达公司，未签约先推人或者是客户
-    public List<Customer> findProjectCustomers() {
+    public List<Customer> findProjectCustomers(Long userId) {
         List<Integer> types = new ArrayList<>();
-        return customerDao.findAllByTypeAfter(3);
+        // 获取团队成员
+        List<Long> ids = new ArrayList<>();
+        Team team = teamDao.findTeamByUserId(userId);
+        if (team != null) {
+            Long id = team.getId();
+            if (team.getTeamId() != null) {
+                id = team.getTeamId();
+            }
+            List<Team> teams = teamDao.findAllByTeamIdOrId(id, id);
+            teams.forEach(t -> {
+                ids.add(t.getUserId());
+            });
+        }
+        return customerDao.findAllByTypeAfterAndCreateUserIdIn(3, ids);
     }
 
     // 上传合同

@@ -40,7 +40,8 @@ public class TalentController extends AbstractController {
     @ApiOperation("人才添加-编辑")
     @PostMapping("/save")
     public Result<Long> checkPhone(@RequestBody Talent talent) throws Exception {
-        return ResultUtil.success(talentService.save(talent));
+        Long id = talentService.save(talent);
+        return ResultUtil.success(id);
     }
 
     @ApiOperation("人才详情")

@@ -27,4 +27,7 @@ public interface TalentRemindDao extends JpaRepository<TalentRemind, Long>, JpaS
     // 获取上一次
     List<TalentRemind> findAllByIdBeforeOrderByCreateTimeDesc(Long id);
 
+    @Query(value = "update TalentRemind set finish=1 where talentId=:talentId")
+    void finishRemind(@Param("talentId") Long talentId);
+
 }

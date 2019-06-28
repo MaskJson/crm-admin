@@ -23,4 +23,7 @@ public interface TeamDao extends JpaRepository<Team, Long>, JpaSpecificationExec
 
     Team findTeamByUserIdAndTeamId(Long userId, Long teamId);
 
+    Team findTeamByUserId(Long userId);
+
+    List<Team> findAllByTeamIdOrId(Long teamId, Long id);
 }

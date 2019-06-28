@@ -33,12 +33,12 @@ public class AdjustNative extends AbstractNative {
                                      "p.name as projectName,p.id as projectId, c.name as customerName, u.nick_name as createUser";
     private String talentFrom = " from project_talent pt left join talent t on pt.talent_id=t.id left join project p on p.id=pt.project_id " +
             "left join customer c on c.id=p.customer_id left join sys_user u on u.id=pt.create_user_id";
-    private String talentWhere = " where pt.status=";
+    private String talentWhere = " where ";
     private String talentSort = " order by pt.update_time asc";
 
     // 根据状态获取项目人才, 当projectId 为null时，获取所有项目的
     public List<Map<String, Object>> getProjectTalent(Integer status, Long projectId, Long userId) {
-        String sql = talentSelect + talentFrom + (status != null ? (talentWhere +(status == 1 ? 0 + " or pt.status=1" : status)) : " where 1=1")
+        String sql = talentSelect + talentFrom + (status != null ? (talentWhere +(status == 1 ? " (pt.status=0 or pt.status=1)" : "pt.status="+status)) : " where 1=1")
                 + (projectId != null ? (" and pt.project_id=" + projectId) : "" ) + " and (pt.create_user_id=" + userId +
                 " or p.create_user_id="+userId+" )" +
                 talentSort;

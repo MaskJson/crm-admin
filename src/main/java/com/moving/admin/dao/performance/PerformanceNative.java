@@ -97,7 +97,7 @@ public class PerformanceNative extends AbstractNative {
     public List<Map<String, Object>> getInterview(Long userId, Long roleId) {
         String idStr = "1=1";
         if (roleId == null) {
-            idStr = "r.create_user_id=" + userId;
+            idStr = "pr.create_user_id=" + userId;
         } else if (roleId == 1) {
             idStr = "1=1";
         } else if (roleId == 3) {

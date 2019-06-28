@@ -136,12 +136,22 @@ public class TalentService extends AbstractService {
                 throw new WebException(400, "该人才已被其他用户列为专属人才，您无权限编辑", null);
             }
         }
-        talent.setUpdateTime(new Date(System.currentTimeMillis()));
+        Long createUserId = talent.getCreateUserId();
+        Long roleId = talent.getRoleId();
+        Long projectId = talent.getProjectId();
+        String recommendation = talent.getRecommendation();
+        TalentRemind remind = talent.getRemind();
+        Date createTime = new Date();
+        List<Experience> experiences = talent.getExperienceList();
+        List<Friend> friends = talent.getFriends();
+        List<Chance> chances = talent.getChances();
+        talent.setUpdateTime(createTime);
         talentDao.save(talent);
         Long id = talent.getId();
+        System.err.println(id);
         experienceDao.removeAllByTalentId(id);
-        talent.getExperienceList().forEach(item -> {
-            Long customerId = addCustomerFromTalentInfo(item.getCompany(), talent.getCreateUserId());
+        experiences.forEach(item -> {
+            Long customerId = addCustomerFromTalentInfo(item.getCompany(), createUserId, roleId);
             Long departmentId = commonService.addDepartmentFromTalentInfo(customerId, item.getDepartment());
             Experience experience = experienceDao.findExperienceByCustomerIdAndDepartmentIdAndTalentId(item.getCustomerId(), item.getDepartmentId(), id);
 //            if (experience == null) {
@@ -156,8 +166,8 @@ public class TalentService extends AbstractService {
             }
         });
         friendDao.removeAllByTalentId(id);
-        talent.getFriends().forEach(friend -> {
-            Long customerId = addCustomerFromTalentInfo(friend.getCompany(), talent.getCreateUserId());
+        friends.forEach(friend -> {
+            Long customerId = addCustomerFromTalentInfo(friend.getCompany(), createUserId, roleId);
             Long departmentId = commonService.addDepartmentFromTalentInfo(customerId, friend.getDepartment());
             friend.setTalentId(id);
             friend.setCustomerId(customerId);
@@ -165,13 +175,12 @@ public class TalentService extends AbstractService {
             friendDao.save(friend);
         });
         chanceDao.removeAllByTalentId(id);
-        talent.getChances().forEach(chance -> {
-            Long customerId = addCustomerFromTalentInfo(chance.getCompany(), talent.getCreateUserId());
+        chances.forEach(chance -> {
+            Long customerId = addCustomerFromTalentInfo(chance.getCompany(), createUserId, roleId);
             chance.setTalentId(id);
             chance.setCustomerId(customerId);
             chanceDao.save(chance);
         });
-        TalentRemind remind = talent.getRemind();
         if (remind != null) {
             remind.setTalentId(id);
             if (remind.getNextType() == null) {
@@ -179,34 +188,33 @@ public class TalentService extends AbstractService {
             }
             talentRemindDao.save(remind);
         }
-        Long projectId = talent.getProjectId();
         if (projectId != null) {
             ProjectTalent projectTalent = new ProjectTalent();
-            if (talent.getRoleId() == 3) {
+            if (roleId == 3) {
                 projectTalent.setStatus(1);
                 projectTalent.setType(1);
             } else {
                 projectTalent.setStatus(0);
                 projectTalent.setType(100);
             }
-            projectTalent.setRecommendation(remind.getRemark());
+            projectTalent.setRecommendation(recommendation);
             projectTalent.setProjectId(projectId);
             projectTalent.setTalentId(id);
-            projectTalent.setCreateUserId(talent.getCreateUserId());
-            projectTalent.setCreateTime(talent.getCreateTime());
+            projectTalent.setCreateUserId(createUserId);
+            projectTalent.setCreateTime(createTime);
             projectTalentDao.save(projectTalent);
         }
         return id;
     }
 
     // 添加客户，去重
-    public Long addCustomerFromTalentInfo(String name, Long userId) {
+    public Long addCustomerFromTalentInfo(String name, Long userId, Long roleId) {
         Customer customer = customerDao.findByName(name);
         if (customer != null) {
             return customer.getId();
         } else {
             customer = new Customer();
-            customer.setAuditType(0);
+            customer.setAuditType(roleId == 3 ? 2 : 0);
             customer.setName(name);
             customer.setCreateUserId(userId);
             customer.setIndustry(null);

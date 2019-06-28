@@ -35,9 +35,11 @@ public class TalentRemind extends BaseEntity {
     private Integer status;
 
     @ApiModelProperty(value = "跟踪记录")
+    @Column(length = 2048)
     private String remark;
 
     @ApiModelProperty(value = "候选人基本情况")
+    @Column(length = 2048)
     private String situation;
 
     @ApiModelProperty(value = "离职原因")

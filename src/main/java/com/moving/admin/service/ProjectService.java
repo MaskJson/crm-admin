@@ -150,6 +150,8 @@ public class ProjectService extends AbstractService {
             remind.setCreateUserId(projectTalent.getCreateUserId());
             addProjectRemind(remind);
         }
+        // 人才进入项目进展后 将待根据的常规跟踪都置为已跟进
+        talentRemindDao.finishRemind(talentId);
         return id;
     }
 
@@ -179,6 +181,7 @@ public class ProjectService extends AbstractService {
             projectRemind.setStatus(1);
             projectRemind.setType(1);
         }
+        projectRemind.setCreateTime(new Date());
         projectRemindDao.save(projectRemind);
         // 跟进后修改人才进展状态
         Integer status = projectRemind.getStatus();

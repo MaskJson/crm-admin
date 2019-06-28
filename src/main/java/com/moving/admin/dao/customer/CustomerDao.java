@@ -14,7 +14,7 @@ public interface CustomerDao extends JpaRepository<Customer, Long>, JpaSpecifica
     @Query(value = "select count(1) from customer where follow_user_id = ?", nativeQuery = true)
     Integer getCountByFollowUserId(Long userId);
 
-    List<Customer> findAllByTypeAfter(Integer type);
+    List<Customer> findAllByTypeAfterAndCreateUserIdIn(Integer type, List<Long> ids);
 
     // 获取所有相关客户，createUserId - followUserId
     List<Customer> findAllByCreateUserIdOrFollowUserId(Long createUserId, Long followUserId);

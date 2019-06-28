@@ -23,6 +23,7 @@ public class CustomerContactRemark extends BaseEntity {
     private Long customerContactId;
 
     @ApiModelProperty(value = "备注内容")
+    @Column(length = 2048)
     private String remark;
 
     @ApiModelProperty(value = "创建时间")

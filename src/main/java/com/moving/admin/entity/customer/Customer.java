@@ -48,9 +48,11 @@ public class Customer extends BaseEntity {
     private String email;
 
     @ApiModelProperty(value = "福利")
+    @Column(length = 2048)
     private String welfare;
 
     @ApiModelProperty(value = "简历")
+    @Column(length = 2048)
     private String description;
 
     @ApiModelProperty(value = "合同")

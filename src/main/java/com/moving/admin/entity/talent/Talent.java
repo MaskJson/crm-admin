@@ -93,12 +93,15 @@ public class Talent extends BaseEntity {
     private String aptness;
 
     @ApiModelProperty(value = "教育经历")
+    @Column(length = 2048)
     private String educationExperience;
 
     @ApiModelProperty(value = "项目经历")
+    @Column(length = 2048)
     private String projectExperience;
 
     @ApiModelProperty(value = "职能介绍")
+    @Column(length = 2048)
     private String occupationSkill;
 
     @ApiModelProperty(value = "来源类型")
@@ -177,5 +180,8 @@ public class Talent extends BaseEntity {
     @Transient
     private Long progress;
 
+    @ApiModelProperty(value = "推荐理由")
+    @Transient
+    private String recommendation;
 
 }

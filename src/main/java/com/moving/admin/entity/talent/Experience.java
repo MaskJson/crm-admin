@@ -45,9 +45,11 @@ public class Experience extends BaseEntity {
     private String department;
 
     @ApiModelProperty(value = "业绩")
+    @Column(length = 2048)
     private String performance;
 
     @ApiModelProperty(value = "评价")
+    @Column(length = 2048)
     private String remark;
 
     @ApiModelProperty(value = "人才ID")

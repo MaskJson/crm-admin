@@ -32,6 +32,7 @@ public class CustomerRemind extends BaseEntity {
     private Integer status;
 
     @ApiModelProperty(value = "沟通记录")
+    @Column(length = 2048)
     private String remark;
 
     @ApiModelProperty(value = "下次跟踪类型：1 电话， 2 拜访客户， 3 客户上门")
@@ -47,6 +48,7 @@ public class CustomerRemind extends BaseEntity {
     private String meetAddress;
 
     @ApiModelProperty(value = "见面内容")
+    @Column(length = 2048)
     private String meetNotice;
 
     @ApiModelProperty(value = "合同开始时间")

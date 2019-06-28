@@ -36,6 +36,7 @@ public class ProjectRemind extends BaseEntity {
     private Integer prevType;
 
     @ApiModelProperty(value = "跟踪备注")
+    @Column(length = 2048)
     private String remark;
 
     @ApiModelProperty(value = "创建人id")
@@ -50,9 +51,11 @@ public class ProjectRemind extends BaseEntity {
     // 特定状态下的乱七八糟字段
     // 推荐
     @ApiModelProperty(value = "推荐理由")
+    @Column(length = 2048)
     private String recommendation;
     // 推荐
     @ApiModelProperty(value = "淘汰理由")
+    @Column(length = 2048)
     private String killRemark;
     // 面试
     @ApiModelProperty(value = "面试时间")
@@ -84,8 +87,10 @@ public class ProjectRemind extends BaseEntity {
 
     // 反馈
     @ApiModelProperty(value = "人才反馈")
+    @Column(length = 2048)
     private String talentRemark;
     @ApiModelProperty(value = "客户反馈")
+    @Column(length = 2048)
     private String customerRemark;
     @ApiModelProperty(value = "反馈状态")
     private Integer remarkStatus;
