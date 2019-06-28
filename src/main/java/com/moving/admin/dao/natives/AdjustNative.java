@@ -71,6 +71,7 @@ public class AdjustNative extends AbstractNative {
             item.put("reminds", getLastRemindByStatus(projectTalentId));
             item.put("progress", projectTalentDao.getProjectLengthByTalentId(talentId));
             item.put("projects", projectTalentDao.findProjectIdsOfTalent(talentId));
+            item.put("offerCount", projectTalentDao.getProjectOfferLength(talentId));
         });
         return list;
     }
