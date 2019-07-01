@@ -6,9 +6,12 @@ import java.util.Map;
 import com.moving.admin.exception.WebException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-@org.springframework.web.bind.annotation.ControllerAdvice
-public class ControllerAdvice {
+@ControllerAdvice
+@EnableWebMvc
+public class ExceptionControllerAdvice {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public Map<String, Object> errorHandler(Exception ex) {
