@@ -206,6 +206,7 @@ public class TalentService extends AbstractService {
             projectTalent.setCreateUserId(createUserId);
             projectTalent.setCreateTime(createTime);
             projectTalent.setRemark(recommendation);
+            projectTalent.setRecommendation(recommendation);
             projectTalent.setRoleId(roleId);
             projectService.saveProjectTalent(projectTalent);
 //            projectTalentDao.save(projectTalent);

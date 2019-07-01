@@ -26,7 +26,8 @@ public class PerformanceNative extends AbstractNative {
     @Autowired
     private ProjectRemindDao projectRemindDao;
 
-    private final String select = "select pr.id as remindId, pr.status as remindStatus, pt.id, pt.project_id as projectId, pt.talent_id as talentId, pt.status, pt.type, pt.create_time as createTime, pt.update_time as updateTime," +
+    private final String select = "select pr.id as remindId, pr.status as remindStatus, " +
+            "pt.id, pt.recommendation, pt.kil_remark as killRemark, pt.project_id as projectId, pt.talent_id as talentId, pt.status, pt.type, pt.create_time as createTime, pt.update_time as updateTime," +
             " p.name as projectName, t.name as talentName, t.status as talentStatus, t.type as talentType, t.follow_user_id as followuserId, c.id as customerId, c.name as customerName," +
             " d.id as departmentId, d.name as departmentName, pr.create_user_id as createUserId, u.nick_name as createUser";
     private final String from = " from project_remind pr left join project_talent pt on pr.project_talent_id=pt.id " +
@@ -34,7 +35,7 @@ public class PerformanceNative extends AbstractNative {
             " left join customer c on p.customer_id=c.id left join department d on p.department_id=d.id" +
             " left join sys_user u on u.id=pt.create_user_id";
     private final String where = " where pr.create_user_id=";
-    private final String sort = " group by pr.project_talent_id, pr.status order by c.id,p.id, pt.status, pt.update_time desc ";
+    private final String sort = " order by pr.create_time,c.id,p.id, pt.status, pt.update_time desc ";
     private final String statusWhere = " and (pr.status <> 0 || pr.type=100) and pr.status <> 8";
 
     //进展跟踪 日、周、月绩效
@@ -137,6 +138,8 @@ public class PerformanceNative extends AbstractNative {
         query.addScalar("customerName", StandardBasicTypes.STRING);
         query.addScalar("departmentId", StandardBasicTypes.LONG);
         query.addScalar("departmentName", StandardBasicTypes.STRING);
+        query.addScalar("recommendation", StandardBasicTypes.STRING);
+        query.addScalar("killRemark", StandardBasicTypes.STRING);
         query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         List<Map<String, Object>> talentList = query.getResultList();
         return talentList;
