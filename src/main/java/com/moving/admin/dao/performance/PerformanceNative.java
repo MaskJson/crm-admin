@@ -35,7 +35,7 @@ public class PerformanceNative extends AbstractNative {
             " left join customer c on p.customer_id=c.id left join department d on p.department_id=d.id" +
             " left join sys_user u on u.id=pr.create_user_id";
     private final String where = " where pr.create_user_id=";
-    private final String sort = " order by pr.create_time,c.id,p.id, pt.status, pt.update_time desc ";
+    private final String sort = " order by pr.create_time desc ";
     private final String statusWhere = " and pr.status <> 8";
 
     //进展跟踪 日、周、月绩效
