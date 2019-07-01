@@ -33,10 +33,10 @@ public class PerformanceNative extends AbstractNative {
     private final String from = " from project_remind pr left join project_talent pt on pr.project_talent_id=pt.id " +
             " left join project p on pt.project_id=p.id left join talent t on pt.talent_id=t.id" +
             " left join customer c on p.customer_id=c.id left join department d on p.department_id=d.id" +
-            " left join sys_user u on u.id=pt.create_user_id";
+            " left join sys_user u on u.id=pr.create_user_id";
     private final String where = " where pr.create_user_id=";
     private final String sort = " order by pr.create_time,c.id,p.id, pt.status, pt.update_time desc ";
-    private final String statusWhere = " and (pr.status <> 0 || pr.type=100) and pr.status <> 8";
+    private final String statusWhere = " and pr.status <> 8";
 
     //进展跟踪 日、周、月绩效
     public List<Map<String, Object>> getPerformance(Long userId, Integer flag, String time) {
@@ -117,6 +117,7 @@ public class PerformanceNative extends AbstractNative {
 
     public List<Map<String, Object>> getList(String where) {
         Session session = entityManager.unwrap(Session.class);
+        System.err.println(select + from + where + sort);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort);
         query.addScalar("remindStatus", StandardBasicTypes.INTEGER);
         query.addScalar("id", StandardBasicTypes.LONG);
