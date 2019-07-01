@@ -117,7 +117,6 @@ public class PerformanceNative extends AbstractNative {
 
     public List<Map<String, Object>> getList(String where) {
         Session session = entityManager.unwrap(Session.class);
-        System.err.println(select + from + where + sort);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort);
         query.addScalar("remindStatus", StandardBasicTypes.INTEGER);
         query.addScalar("id", StandardBasicTypes.LONG);
