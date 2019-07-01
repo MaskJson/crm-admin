@@ -84,7 +84,6 @@ public class JwtUtil {
             }
             return null;
         } catch (Exception e) {
-            System.err.println(e.getMessage());
             return null;
         }
     }

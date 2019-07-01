@@ -234,7 +234,7 @@ public class CountNative extends AbstractNative {
         String from = " from project_remind pr left join project_talent pt on pr.project_talent_id=pt.id " +
                 " left join project p on pt.project_id=p.id left join talent t on pt.talent_id=t.id" +
                 " left join customer c on p.customer_id=c.id left join department d on p.department_id=d.id";
-        String where = " where pr.create_user_id=" + userId + " and pr.status in (1,3,4,7) and pt.talent_id in(select distinct tr.talent_id from talent_remind tr where tr.create_user_id=" + userId + ")";
+        String where = " where (pr.create_user_id=" + userId + " or pt.talent_id in(select distinct tr.talent_id from talent_remind tr where tr.create_user_id=" + userId + ")) and pr.status in (1,3,5,7) ";
         String sort = " group by pr.project_talent_id, pr.status order by p.customer_id, p.department_id, pt.status";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(select + from + where + sort);

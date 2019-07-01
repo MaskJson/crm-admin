@@ -81,7 +81,7 @@ public class TalentService extends AbstractService {
     }
 
     // 分页查询
-    public Page<Talent> getCustomerList(String city, String name, String industry, String aptness, Long folderId, String customerName, Pageable pageable) {
+    public Page<Talent> getCustomerList(String city, String name, String industry, String aptness, Long folderId, String customerName, String phone, Pageable pageable) {
         Page<Talent> result = talentDao.findAll((root, query, cb) -> {
             List<Predicate> list = new ArrayList<>();
             if (!StringUtils.isEmpty(city)) {
@@ -92,6 +92,9 @@ public class TalentService extends AbstractService {
             }
             if (!StringUtils.isEmpty(name)) {
                 list.add(cb.like(root.get("name"), "%" + name + "%"));
+            }
+            if (!StringUtils.isEmpty(phone)) {
+                list.add(cb.like(root.get("phone"), "%" + phone + "%"));
             }
             if (!StringUtils.isEmpty(industry)) {
                 list.add(cb.like(root.get("industry"), "%" + industry + "%"));
@@ -148,7 +151,6 @@ public class TalentService extends AbstractService {
         talent.setUpdateTime(createTime);
         talentDao.save(talent);
         Long id = talent.getId();
-        System.err.println(id);
         experienceDao.removeAllByTalentId(id);
         experiences.forEach(item -> {
             Long customerId = addCustomerFromTalentInfo(item.getCompany(), createUserId, roleId);
@@ -183,9 +185,7 @@ public class TalentService extends AbstractService {
         });
         if (remind != null) {
             remind.setTalentId(id);
-            if (remind.getNextType() == null) {
-                remind.setFinish(true);
-            }
+            remind.setFinish(remind.getNextType() == null);
             talentRemindDao.save(remind);
         }
         if (projectId != null) {

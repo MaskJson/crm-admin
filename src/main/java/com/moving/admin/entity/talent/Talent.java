@@ -29,7 +29,7 @@ public class Talent extends BaseEntity {
     @ApiModelProperty(value = "身份证号")
     private String card;
 
-    @ApiModelProperty(value = "婚姻状况 0：未婚 1：已婚")
+    @ApiModelProperty(value = "婚姻状况 0：未婚 1：已婚 2：单身 3：不确定")
     private Integer marry;
 
     @ApiModelProperty(value = "头像 0：男 1：女")
@@ -97,11 +97,11 @@ public class Talent extends BaseEntity {
     private String educationExperience;
 
     @ApiModelProperty(value = "项目经历")
-    @Column(length = 2048)
+    @Column(length = 10000)
     private String projectExperience;
 
     @ApiModelProperty(value = "职能介绍")
-    @Column(length = 2048)
+    @Column(length = 10000)
     private String occupationSkill;
 
     @ApiModelProperty(value = "来源类型")

@@ -16,9 +16,9 @@ import java.util.Map;
 
 public class ProjectPageNative extends AbstractNative {
 
-    private StringBuilder select = new StringBuilder("select a.id as id, a.create_user_id as createUserId, a.name as name, u.nick_name as createUser, a.follow, a.create_time as createTime");
+    private StringBuilder select = new StringBuilder("select a.id as id, a.create_user_id as createUserId, a.name as name, a.customer_id as customerId, c.name as customerName, u.nick_name as createUser, a.follow, a.create_time as createTime");
     private StringBuilder selectCount = new StringBuilder("select count(1)");
-    private StringBuilder from = new StringBuilder(" from project a left join sys_user u on a.create_user_id=u.id");
+    private StringBuilder from = new StringBuilder(" from project a left join customer c on c.id=a.customer_id left join sys_user u on a.create_user_id=u.id");
     private StringBuilder where = new StringBuilder(" where 1=1");
     private StringBuilder sort = new StringBuilder(" order by ");
 
@@ -35,6 +35,7 @@ public class ProjectPageNative extends AbstractNative {
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("createUserId", StandardBasicTypes.LONG);
+        query.addScalar("customerName", StandardBasicTypes.STRING);
         query.addScalar("name", StandardBasicTypes.STRING);
         query.addScalar("follow", StandardBasicTypes.BOOLEAN);
         query.addScalar("createUser", StandardBasicTypes.STRING);

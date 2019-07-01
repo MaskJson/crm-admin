@@ -85,7 +85,8 @@ public class ProjectService extends AbstractService {
     // 获取项目详情
     public Project getById(Long id) {
         Project project = projectDao.findById(id).get();
-        return projectDao.findById(id).get();
+        project.setAdvisers(projectAdviserDao.findAllByProjectId(id));
+        return project;
     }
 
     // 关注装修改
@@ -151,7 +152,12 @@ public class ProjectService extends AbstractService {
             addProjectRemind(remind);
         }
         // 人才进入项目进展后 将待根据的常规跟踪都置为已跟进
-        talentRemindDao.finishRemind(talentId);
+        List<TalentRemind> reminds = talentRemindDao.findAllByTalentIdAndFinish(talentId, false);
+        reminds.forEach(r -> {
+            r.setFinish(true);
+        });
+        talentRemindDao.saveAll(reminds);
+//        talentRemindDao.finishRemind(talentId);
         return id;
     }
 

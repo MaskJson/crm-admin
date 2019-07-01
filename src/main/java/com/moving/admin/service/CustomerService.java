@@ -303,8 +303,8 @@ public class CustomerService extends AbstractService {
                     throw new WebException(400, "您在" + DateUtil.dateToStr(unbindRecord.getCreateTime()) + "取消了该客户的列名，一个月内不允许对该客户做列名操作", null);
                 }
                 Integer customersOfUser = customerDao.getCountByFollowUserId(userId);
-                if (customersOfUser >= 50) {
-                    throw new WebException(400, "单人的客户列名上限为50， 您已达到上限", null);
+                if (customersOfUser >= 100) {
+                    throw new WebException(400, "单人的客户列名上限为100， 您已达到上限", null);
                 } else {
                     customer.setType(1);
                     customer.setFollowUserId(userId);
@@ -333,7 +333,7 @@ public class CustomerService extends AbstractService {
                 ids.add(t.getUserId());
             });
         }
-        return customerDao.findAllByTypeAfterAndCreateUserIdIn(3, ids);
+        return customerDao.findAllByTypeAfterAndFollowUserIdIn(3, ids);
     }
 
     // 上传合同
@@ -360,9 +360,9 @@ public class CustomerService extends AbstractService {
         }
     }
 
-    public List<Customer> filterCustomer(Long id, String name) {
-        List<Customer> customers = customerDao.findAllByNameLikeAndIdIsNot(name, id);
-        return customers;
+    public List<Map<String, Object>> filterCustomer(Long id, String name) {
+        List<Map<String, Object>> list = customerNative.filterCustomer(name, id);
+        return list;
     }
 
     @Transactional

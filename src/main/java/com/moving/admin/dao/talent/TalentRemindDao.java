@@ -30,4 +30,6 @@ public interface TalentRemindDao extends JpaRepository<TalentRemind, Long>, JpaS
     @Query(value = "update TalentRemind set finish=1 where talentId=:talentId")
     void finishRemind(@Param("talentId") Long talentId);
 
+    List<TalentRemind> findAllByTalentIdAndFinish(Long talentId, Boolean finish);
+
 }

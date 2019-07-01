@@ -104,7 +104,7 @@ public class PerformanceNative extends AbstractNative {
             idStr = "pr.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1))";
         }
         String where = " where " + idStr + " and (pr.type=2 or pr.type=4 or pr.type=8 or pr.remark_status=2) and " +
-                "to_days(pr.interview_time) = to_days(now())";
+                "to_days(pr.interview_time) = to_days(now()) and now()<pr.interview_time";
         List<Map<String, Object>> list = getList(where);
         list.forEach(map -> {
             List<ProjectRemind> reminds = projectRemindDao.findAllById(Long.parseLong(map.get("remindId").toString()));

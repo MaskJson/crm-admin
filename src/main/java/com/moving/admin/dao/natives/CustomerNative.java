@@ -179,6 +179,17 @@ public class CustomerNative extends AbstractNative {
         return list;
     }
 
+    // 公司去重查询
+    public List<Map<String, Object>> filterCustomer(String name, Long id) {
+        String sql = "select id,name from customer where name like '%"+name+"%' and id <> " + id;
+        Session session = entityManager.unwrap(Session.class);
+        NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
+        query.addScalar("id", StandardBasicTypes.LONG);
+        query.addScalar("name", StandardBasicTypes.STRING);
+        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        return query.getResultList();
+    }
+
     // 获取分页sql
     public String limitStr(Pageable pageable) {
         int pageSize = pageable.getPageSize();

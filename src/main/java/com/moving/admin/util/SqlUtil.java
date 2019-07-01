@@ -7,6 +7,7 @@ import java.util.List;
 @Service
 public class SqlUtil {
 
+    // id in ids
     public static String getIn(List<Long> ids, String key) {
         int len = ids.size();
         if (len == 0) {
@@ -20,4 +21,5 @@ public class SqlUtil {
         return str;
     }
 
+    //
 }
