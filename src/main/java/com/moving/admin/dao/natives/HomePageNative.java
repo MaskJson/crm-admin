@@ -28,7 +28,7 @@ public class HomePageNative extends AbstractNative {
         } else if (roleId == 1) {
             idStr = "1=1";
         } else if (roleId == 3) {
-            idStr = "r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1))";
+            idStr = "(r.create_user_id="+userId+" or r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1)))";
         }
         String whereTal = " where " + idStr +" and r.finish=0 and (now()>r.next_remind_time or to_days(now())=to_days(r.next_remind_time))";
         String countSelectCust = "select count(1)";

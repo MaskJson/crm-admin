@@ -40,7 +40,7 @@ public class CountNative extends AbstractNative {
         } else if (roleId == 1) {
             idStr = "1=1";
         } else if (roleId == 3) {
-            idStr = "r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1))";
+            idStr = "(r.create_user_id="+userId+" or r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1)))";
         }
         String select = "select r.id, r.type, r.status, r.remark, r.situation, r.cause, r.salary, r.meet_time as meetTime,s.nick_name as createUser," +
                 " (select count(1) from project_talent pt where pt.talent_id=t.id and pt.status<7) as projectCount," +
@@ -95,7 +95,7 @@ public class CountNative extends AbstractNative {
         } else if (roleId == 1) {
             idStr = "1=1";
         } else if (roleId == 3) {
-            idStr = "r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1))";
+            idStr = "(r.create_user_id="+userId+" or r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1)))";
         }
         String select = "select r.id, r.type, r.status, r.remark, r.meet_time as meetTime, r.meet_address as meetAddress, r.meet_notice as meetNotice, " +
                 "r.create_time as createTime, c.id as customerId, c.name, c.type as customerType, c.follow_user_id as followUserId";
