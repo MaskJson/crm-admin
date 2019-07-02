@@ -2,10 +2,7 @@ package com.moving.admin.controller;
 
 import com.moving.admin.bean.Result;
 import com.moving.admin.dao.natives.CommonNative;
-import com.moving.admin.dao.performance.PerformanceCustomerRemind;
-import com.moving.admin.dao.performance.PerformanceNative;
-import com.moving.admin.dao.performance.PerformanceReport;
-import com.moving.admin.dao.performance.PerformanceTalentRemind;
+import com.moving.admin.dao.performance.*;
 import com.moving.admin.dao.sys.ReportDao;
 import com.moving.admin.entity.sys.Report;
 import com.moving.admin.util.ResultUtil;
@@ -35,6 +32,9 @@ public class PerformanceController extends AbstractController {
 
     @Autowired
     private PerformanceReport performanceReport;
+
+    @Autowired
+    private PerformanceCount performanceCount;
 
     @Autowired
     private ReportDao reportDao;
@@ -113,6 +113,12 @@ public class PerformanceController extends AbstractController {
     @GetMapping("/interview")
     public Result<List<Map<String, Object>>> getInterView(Long userId, Long roleId) throws Exception {
         return ResultUtil.success(performanceNative.getInterview(userId, roleId));
+    }
+
+    @ApiOperation("绩效页面统计")
+    @GetMapping("/count")
+    public Result<Map<String, Object>> count(Long userId, Long roleId, Long memberId) throws Exception {
+        return ResultUtil.success(performanceCount.getPerformanceCount(userId, roleId, memberId));
     }
 
 }

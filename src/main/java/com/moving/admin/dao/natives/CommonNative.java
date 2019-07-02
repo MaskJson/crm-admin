@@ -72,9 +72,9 @@ public class CommonNative extends AbstractNative {
         switch (Integer.parseInt(roleId.toString())) {
             case 2:
             case 6:
-            case 7: where = " where id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
-            case 3: where = " where id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
-            case 1: where = " where id in (select user_id from team where level=1)";break;
+            case 7: where = " where id="+userId+" or id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
+            case 3: where = " where id="+userId+" or  id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
+            case 1: where = "";break;
         }
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(selectFrom + where);
