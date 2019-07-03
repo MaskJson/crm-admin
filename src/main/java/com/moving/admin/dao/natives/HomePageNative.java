@@ -30,10 +30,10 @@ public class HomePageNative extends AbstractNative {
         } else if (roleId == 3) {
             idStr = "r.create_user_id in (select user_id from team where team_id in (select id from team where user_id="+userId+" and level=1))";
         }
-        String whereTal = " where " + idStr +" and r.finish=0 and now()>r.next_remind_time";
+        String whereTal = " where " + idStr +" and r.finish=0 and (now()>r.next_remind_time or to_days(now())=to_days(r.next_remind_time))";
         String countSelectCust = "select count(1)";
         String fromCust  = " from customer_remind r left join customer c on r.customer_id=c.id";
-        String whereCust = " where r.create_user_id=" + userId + " and r.finish=0";
+        String whereCust = " where " + idStr + " and r.finish=0 and (now()>r.next_remind_time or to_days(now())=to_days(r.next_remind_time))";
         map.put("talentFirst", getTotal(countSelectTal + fromTal + whereTal + " and r.type=1"));
         map.put("talentSecond", getTotal(countSelectTal + fromTal + whereTal + " and r.type=2"));
         map.put("talentThird", getTotal(countSelectTal + fromTal + whereTal + " and r.type=3"));
