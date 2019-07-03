@@ -47,7 +47,7 @@ public class CountNative extends AbstractNative {
                 " r.meet_address as meetAddress, r.create_time as createTime, t.name, t.phone, t.status as talentStatus, t.follow_user_id as followUserId, t.id as talentId";
         String countSelect = "select count(1)";
         String from = " from talent_remind r left join talent t on r.talent_id=t.id left join sys_user s on r.create_user_id=s.id";
-        String where = " where " + idStr + " and r.finish=0 and r.status<>10 and now()>r.next_remind_time";
+        String where = " where " + idStr + " and r.finish=0 and r.status<>10 and (now()>r.next_remind_time or to_days(now())=to_days(r.next_remind_time))";
         String sort = " order by r.id asc";
         if (type != null) {
             where = where + " and r.type=" + type;
@@ -101,7 +101,7 @@ public class CountNative extends AbstractNative {
                 "r.create_time as createTime, c.id as customerId, c.name, c.type as customerType, c.follow_user_id as followUserId";
         String countSelect = "select count(1)";
         String from  = " from customer_remind r left join customer c on r.customer_id=c.id";
-        String where = " where " + idStr + " and r.finish=0 and now()>r.next_remind_time";
+        String where = " where " + idStr + " and r.finish=0 and  (now()>r.next_remind_time or to_days(now())=to_days(r.next_remind_time))";
         String sort = " order by r.id asc";
         if (type != null) {
             where = where + " and r.type=" + type;
