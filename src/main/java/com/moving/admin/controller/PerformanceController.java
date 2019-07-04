@@ -103,7 +103,7 @@ public class PerformanceController extends AbstractController {
         return ResultUtil.success(rp.getId());
     }
 
-    @ApiOperation("个人报告")
+    @ApiOperation("获取成员")
     @GetMapping("/members")
     public Result<List<Map<String, Object>>> getMembers(Long userId, Long roleId, Integer flag) throws Exception {
         return ResultUtil.success(commonNative.getMembers(userId, roleId, flag));

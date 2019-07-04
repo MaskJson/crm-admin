@@ -36,7 +36,7 @@ public class PerformanceCount extends AbstractNative {
     // 跟踪预约未完成总数
     public BigInteger remindCount(Long userId, Long roleId, Long memberId) {
         String sql = "select count(1) from talent_remind" +
-                " where (create_user_id=" + userId +
+                " where (create_user_id=" + (memberId != null ? memberId : userId) +
                 getMemberWhere(userId, roleId, memberId, "create_user_id") + ") and finish=0";
         Session session = entityManager.unwrap(Session.class);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
@@ -57,8 +57,8 @@ public class PerformanceCount extends AbstractNative {
         } else {
             switch (Integer.parseInt(roleId.toString())) {
                 case 2:
-                case 6: memberStr = " or " + str + " in(select user_id from team where parent_id in(select id from team where level in(2,3,4) and user_id="+userId+")))";break;
-                case 3: memberStr = " or " + str + " in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+")))";break;
+                case 6: memberStr = " or " + str + " in(select user_id from team where parent_id in(select id from team where level in(2,3,4) and user_id="+userId+"))";break;
+                case 3: memberStr = " or " + str + " in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+"))";break;
                 case 1: memberStr = " or 1=1";break;
                 default: memberStr = "";break;
             }
