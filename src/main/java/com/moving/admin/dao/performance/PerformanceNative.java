@@ -70,7 +70,7 @@ public class PerformanceNative extends AbstractNative {
                 case 6: where = " where (pr.create_user_id="+userId+" or pr.create_user_id in(select user_id from team where "+levelFilter+" parent_id in(select id from team where level in(2,3,4) and user_id="+userId+")))";break;
                 case 3: where = " where (pr.create_user_id="+userId+" or pr.create_user_id in (select user_id from team where team_id in(select id from team where level=1 and user_id="+userId+")))";break;
                 case 1: where = " where 1=1";break;
-                default: where = " where cr.create_user_id="+userId;break;
+                default: where = " where pr.create_user_id="+userId;break;
             }
         }
         switch (flag) {
