@@ -1,5 +1,6 @@
 package com.moving.admin.controller.sys;
 
+import com.moving.admin.AdminApplication;
 import com.moving.admin.annotation.IgnoreSecurity;
 import com.moving.admin.bean.Result;
 import com.moving.admin.bean.TokenInformation;
@@ -66,7 +67,12 @@ public class UserController extends AbstractController {
             if (user.getStatus() == 0) {
                 return ResultUtil.error("该用户已被禁用");
             }
-            String token = jwtUtil.encode(new TokenInformation(user.getId(), user.getRoleId()));
+            TokenInformation t = new TokenInformation(user.getId(), user.getRoleId(), System.currentTimeMillis());
+            String token = jwtUtil.encode(t);
+            // 单点登录
+            userService.singleLogin(t);
+            AdminApplication.logins.add(t);
+
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("user", user);
             map.put("token", token);

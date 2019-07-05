@@ -1,5 +1,7 @@
 package com.moving.admin.service.sys;
 
+import com.moving.admin.AdminApplication;
+import com.moving.admin.bean.TokenInformation;
 import com.moving.admin.dao.sys.TeamDao;
 import com.moving.admin.entity.sys.Team;
 import com.moving.admin.entity.sys.User;
@@ -168,6 +170,17 @@ public class UserService extends AbstractService {
             userDao.save(user);
         } else {
             throw new WebException(400, "修改异常", null);
+        }
+    }
+
+    // 单点登录
+    public void singleLogin(TokenInformation t) {
+        for (int i = 0; i < AdminApplication.logins.size(); i++) {
+            TokenInformation tokenInformation = AdminApplication.logins.get(i);
+            if (tokenInformation.getId() == t.getId()) {
+                AdminApplication.logins.remove(i);
+                break;
+            }
         }
     }
 }

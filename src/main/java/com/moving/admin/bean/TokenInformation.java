@@ -13,13 +13,16 @@ public class TokenInformation implements Serializable {
 
     private Long roleId;
 
+    private Long loginTime;
+
     public TokenInformation() {
 
     }
 
-    public TokenInformation(Long id, Long roleId) {
+    public TokenInformation(Long id, Long roleId, Long loginTime) {
         this.id = id;
         this.roleId = roleId;
+        this.loginTime = loginTime;
     }
 
 }

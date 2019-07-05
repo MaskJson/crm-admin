@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.moving.admin.AdminApplication;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.HandlerMethod;
@@ -51,6 +52,21 @@ public class RequestInterceptor implements HandlerInterceptor {
                 }
                 if ((boolean) map.get("overtime")) {
                     throw new WebException(403, "登录超时", null);
+                }
+                TokenInformation t = (TokenInformation) map.get("token");
+                int size = AdminApplication.logins.size();
+                int i = 0;
+                for (i = 0; i < size; i++) {
+                    TokenInformation tt = AdminApplication.logins.get(i);
+                    if (tt.getId() == t.getId()) {
+                        if (!tt.getLoginTime().toString().equals(t.getLoginTime().toString())) {
+                            throw new WebException(401, "您的账号已在其他地方登录", null);
+                        }
+                        break;
+                    }
+                }
+                if (i==size) {
+                    AdminApplication.logins.add(t);
                 }
                 return true;
             }
