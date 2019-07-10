@@ -68,6 +68,9 @@ public class TalentService extends AbstractService {
     private ProjectTalentDao projectTalentDao;
 
     @Autowired
+    private ProjectService projectService;
+
+    @Autowired
     private CountNative countNative;
 
     @Autowired
@@ -197,12 +200,15 @@ public class TalentService extends AbstractService {
                 projectTalent.setStatus(0);
                 projectTalent.setType(100);
             }
-            projectTalent.setRecommendation(recommendation);
+//            projectTalent.setRecommendation(recommendation);
             projectTalent.setProjectId(projectId);
             projectTalent.setTalentId(id);
             projectTalent.setCreateUserId(createUserId);
             projectTalent.setCreateTime(createTime);
-            projectTalentDao.save(projectTalent);
+            projectTalent.setRemark(recommendation);
+            projectTalent.setRoleId(roleId);
+            projectService.saveProjectTalent(projectTalent);
+//            projectTalentDao.save(projectTalent);
         }
         return id;
     }

@@ -44,8 +44,8 @@ public class PerformanceCount extends AbstractNative {
     }
 
     public String getWhere(Long userId, Long roleId, Long memberId) {
-        String where = " where (id in(select distinct talent_id from talent_remind where create_user_id=" + userId + getMemberWhere(userId, roleId, memberId, "create_user_id") + ") " +
-                "or id in(select distinct pt.talent_id from project_remind pr left join project_talent pt on pt.id=pr.project_talent_id where pr.create_user_id=" + userId +
+        String where = " where (id in(select distinct talent_id from talent_remind where create_user_id=" + (memberId!=null ? memberId:userId) + getMemberWhere(userId, roleId, memberId, "create_user_id") + ") " +
+                "or id in(select distinct pt.talent_id from project_remind pr left join project_talent pt on pt.id=pr.project_talent_id where pr.create_user_id=" + (memberId!=null ? memberId:userId) +
                 getMemberWhere(userId, roleId, memberId, "pr.create_user_id") +"))";
         return where;
     }

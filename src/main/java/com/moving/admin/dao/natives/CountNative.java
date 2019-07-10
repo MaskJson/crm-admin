@@ -108,6 +108,7 @@ public class CountNative extends AbstractNative {
         }
         Session session = entityManager.unwrap(Session.class);
         String sql = select + from + where + sort + limitStr(pageable);
+        System.err.println(sql);
         NativeQuery<Map<String, Object>> query = session.createNativeQuery(sql);
         query.addScalar("id", StandardBasicTypes.LONG);
         query.addScalar("customerId", StandardBasicTypes.LONG);

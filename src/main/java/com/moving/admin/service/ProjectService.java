@@ -141,7 +141,6 @@ public class ProjectService extends AbstractService {
         }
         if (!StringUtils.isEmpty(projectTalent.getRemark())) {
             ProjectRemind remind = new ProjectRemind();
-            remind.setCreateUserId(remind.getCreateUserId());
             remind.setRemark(projectTalent.getRemark());
             remind.setRecommendation(projectTalent.getRemark());
             remind.setType(100);

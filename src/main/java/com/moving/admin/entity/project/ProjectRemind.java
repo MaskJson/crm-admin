@@ -105,6 +105,6 @@ public class ProjectRemind extends BaseEntity {
 
     @ApiModelProperty(value = "角色id")
     @Transient
-    private Integer roleId;
+    private Long roleId;
 
 }
