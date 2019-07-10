@@ -27,7 +27,7 @@ public class PerformanceNative extends AbstractNative {
     private ProjectRemindDao projectRemindDao;
 
     private final String select = "select pr.id as remindId, pr.status as remindStatus, " +
-            "pt.id, pt.recommendation, pt.kil_remark as killRemark, pt.project_id as projectId, pt.talent_id as talentId, pt.status, pt.type, pt.create_time as createTime, pt.update_time as updateTime," +
+            "pt.id, pt.recommendation, pt.kill_remark as killRemark, pt.project_id as projectId, pt.talent_id as talentId, pt.status, pt.type, pt.create_time as createTime, pt.update_time as updateTime," +
             " p.name as projectName, t.name as talentName, t.status as talentStatus, t.type as talentType, t.follow_user_id as followuserId, c.id as customerId, c.name as customerName," +
             " d.id as departmentId, d.name as departmentName, pr.create_user_id as createUserId, u.nick_name as createUser";
     private final String from = " from project_remind pr left join project_talent pt on pr.project_talent_id=pt.id " +
