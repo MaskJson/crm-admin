@@ -196,7 +196,6 @@ public class ProjectService extends AbstractService {
         // 跟进后修改人才进展状态
         Integer status = projectRemind.getStatus();
         if (projectTalent != null) {
-
             if (type == 100) {
                 projectTalent.setRecommendation(projectRemind.getRecommendation());
             }
