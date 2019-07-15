@@ -187,11 +187,16 @@ public class ProjectService extends AbstractService {
             projectRemind.setType(1);
         }
         projectRemind.setCreateTime(new Date());
+        Integer remarkStatus = projectRemind.getRemarkStatus();
+        Integer type = projectRemind.getType();
+        if (type == 16 && remarkStatus != null && remarkStatus > 2) {
+            projectRemind.setStatus(remarkStatus);
+        }
         projectRemindDao.save(projectRemind);
         // 跟进后修改人才进展状态
         Integer status = projectRemind.getStatus();
         if (projectTalent != null) {
-            Integer type = projectRemind.getType();
+
             if (type == 100) {
                 projectTalent.setRecommendation(projectRemind.getRecommendation());
             }
@@ -208,13 +213,12 @@ public class ProjectService extends AbstractService {
                 projectTalent.setKillRemark(projectRemind.getKillRemark());
 //                projectTalent.setKillStatus(-1);
             }
-            Integer remarkStatus = projectRemind.getRemarkStatus();
-            if (type == 16 && remarkStatus != null && remarkStatus > 2) {
-                if (remarkStatus == 8) {
-//                    projectTalent.setKillStatus(-1);
-                }
-                projectTalent.setStatus(remarkStatus);
-            }
+//            if (type == 16 && remarkStatus != null && remarkStatus > 2) {
+//                if (remarkStatus == 8) {
+////                    projectTalent.setKillStatus(-1);
+//                }
+//                projectTalent.setStatus(remarkStatus);
+//            }
             projectTalent.setUpdateTime(new Date());
             projectTalentDao.save(projectTalent);
             if (status == 6) {
