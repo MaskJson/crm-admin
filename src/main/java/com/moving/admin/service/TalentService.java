@@ -216,11 +216,11 @@ public class TalentService extends AbstractService {
 
     // 添加客户，去重
     public Long addCustomerFromTalentInfo(String name, Long userId, Long roleId) {
-        Customer customer = customerDao.findByName(name);
-        if (customer != null) {
-            return customer.getId();
+        List<Customer> customers = customerDao.findAllByName(name);
+        if (customers.size() > 0) {
+            return customers.get(0).getId();
         } else {
-            customer = new Customer();
+            Customer customer = new Customer();
             customer.setAuditType(roleId == 3 ? 2 : 0);
             customer.setName(name);
             customer.setCreateUserId(userId);

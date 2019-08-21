@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CustomerDao extends JpaRepository<Customer, Long>, JpaSpecificationExecutor<Customer> {
 
-    Customer findByName(String name);
+    List<Customer> findAllByName(String name);
 
     @Query(value = "select count(1) from customer where follow_user_id = ?", nativeQuery = true)
     Integer getCountByFollowUserId(Long userId);

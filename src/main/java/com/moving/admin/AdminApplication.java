@@ -29,14 +29,9 @@ import java.util.Map;
 //    }
 //
 //}
-public class AdminApplication extends SpringBootServletInitializer {
+public class AdminApplication {
 
     public static List<TokenInformation> logins = new ArrayList<>();
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(AdminApplication.class);
-    }
 
     public static void main(String[] args) {
         SpringApplication.run(AdminApplication.class, args);

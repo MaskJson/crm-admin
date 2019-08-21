@@ -96,7 +96,10 @@ public class CustomerService extends AbstractService {
         if (id != null) {
             customer = customerDao.findById(id).get();
         } else {
-            customer = customerDao.findByName(name);
+            List<Customer> customers = customerDao.findAllByName(name);
+            if (customers.size()>0) {
+                customer = customers.get(0);
+            }
         }
         if (customer != null) {
             Long userId = customer.getCreateUserId();
